@@ -1,0 +1,42 @@
+package dev.tocraft.crafted.ctgen.map;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.RegistryFileCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+
+public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
+                       Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight) {
+
+    public MapBiome(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight) {
+        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight);
+    }
+
+    public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
+    public static final Block DEFAULT_STONE_BLOCK = Blocks.STONE;
+    public static final Block DEFAULT_DIRT_BLOCK = Blocks.DIRT;
+    public static final Block DEFAULT_SURFACE_BLOCK = Blocks.GRASS_BLOCK;
+    public static final int DEFAULT_HEIGHT = 0;
+    public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
+    public static final double DEFAULT_PIXEL_WEIGHT = 1;
+
+    public static final Codec<MapBiome> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+            Biome.CODEC.fieldOf("biome").forGetter(MapBiome::biome),
+            Codec.INT.fieldOf("color").forGetter(MapBiome::color),
+            ResourceLocation.CODEC.optionalFieldOf("deepslate_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DEEPSLATE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.deepslateBlock)),
+            ResourceLocation.CODEC.optionalFieldOf("stone_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_STONE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.stoneBlock)),
+            ResourceLocation.CODEC.optionalFieldOf("dirt_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DIRT_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.dirtBlock)),
+            ResourceLocation.CODEC.optionalFieldOf("surface_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_SURFACE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.surfaceBlock)),
+            Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(MapBiome::height),
+            Codec.DOUBLE.optionalFieldOf("perlin_multiplier", DEFAULT_PERLIN_MULTIPLIER).forGetter(MapBiome::perlinMultiplier),
+            Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(MapBiome::pixelWeight)
+    ).apply(instance, instance.stable(MapBiome::new)));
+
+    public static RegistryFileCodec<MapBiome> CODEC = RegistryFileCodec.create(CTerrainGeneration.MAP_BIOME_REGISTRY, DIRECT_CODEC);
+}

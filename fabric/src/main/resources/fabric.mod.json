@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "ctgen",
+  "version": "${version}",
+  "name": "CTGen",
+  "icon": "icon.png",
+  "description": "Create your own world by using a drawn map!\n",
+  "authors": [
+    "To_Craft"
+  ],
+  "contact": {
+    "issues": "https://github.com/ToCraft/CraftedTerrainGeneration/issues",
+    "sources": "https://github.com/ToCraft/CraftedTerrainGeneration"
+  },
+  "license": "Crafted License 1.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.tocraft.crafted.ctgen.fabric.CTGFabric::initialize"
+    ]
+  },
+  "mixins": [
+    "ctgen.mixins.json"
+  ],
+  "depends": {
+    "minecraft": ">=${minecraft}",
+    "fabricloader": ">=0.8.7+build.201",
+    "fabric": "*",
+    "fabric-api": "*"
+  }
+}

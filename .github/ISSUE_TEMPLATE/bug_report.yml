@@ -1,0 +1,61 @@
+name: Bug Report
+labels:
+  - bug
+description: Report issues
+body:
+  - type: dropdown
+    id: modloader
+    attributes:
+      label: Mod loader
+      options:
+        - Forge
+        - NeoForge
+        - Fabric
+    validations:
+      required: true
+  - type: input
+    id: mc-version
+    attributes:
+      label: Minecraft version
+      placeholder: e.g. 1.20.1
+    validations:
+      required: true
+  - type: input
+    id: ctg-version
+    attributes:
+      label: CTGen version
+      placeholder: e.g. 1.0
+    validations:
+      required: true
+  - type: input
+    id: modloader-version
+    attributes:
+      label: Modloader version
+      placeholder: e.g. 48.2.0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: The latest.log file
+      description: Drag-and-Drop your latest.log file or append a link to a Gist-file.
+      placeholder: Your latest.log file
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Issue description
+      placeholder: A description of the issue.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        e.g.
+        1. Start game
+        2. go into world
+        3. etc...
+  - type: textarea
+    attributes:
+      label: Other
+      description: Anything else which is related to the issue, e.g. the mod it's crashing with.
