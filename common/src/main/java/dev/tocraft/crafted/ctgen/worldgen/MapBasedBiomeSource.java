@@ -15,7 +15,7 @@ public class MapBasedBiomeSource extends BiomeSource {
             MapSettings.CODEC.fieldOf("settings").forGetter(o -> o.settings)
     ).apply(instance, instance.stable(MapBasedBiomeSource::new)));
 
-    private final MapSettings settings;
+    final MapSettings settings;
 
     public MapBasedBiomeSource(MapSettings settings) {
         this.settings = settings;
@@ -28,15 +28,11 @@ public class MapBasedBiomeSource extends BiomeSource {
 
     @Override
     protected @NotNull Stream<Holder<Biome>> collectPossibleBiomes() {
-        return this.settings.biomeData().stream().map(holder -> holder.value().biome());
+        return this.settings.biomeData.stream().map(holder -> holder.value().biome());
     }
 
     @Override
     public @NotNull Holder<Biome> getNoiseBiome(int pX, int pY, int pZ, Climate.@NotNull Sampler pSampler) {
         return settings.getMapBiome(pX, pZ).value().biome();
-    }
-
-    public MapSettings getSettings() {
-        return settings;
     }
 }

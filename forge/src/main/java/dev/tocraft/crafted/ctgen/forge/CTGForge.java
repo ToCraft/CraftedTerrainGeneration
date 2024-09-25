@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.forge;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeChunkGenerator;
+import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +22,6 @@ public class CTGForge {
 
     private void event(RegisterEvent event) {
         Registry.register(BuiltInRegistries.BIOME_SOURCE, CTerrainGeneration.id("map_based_biome_source"), MapBasedBiomeSource.CODEC);
-        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedBiomeChunkGenerator.CODEC);
+        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedChunkGenerator.CODEC);
     }
 }

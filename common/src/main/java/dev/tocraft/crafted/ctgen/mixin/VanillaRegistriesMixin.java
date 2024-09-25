@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.mixin;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.map.MapBiomes;
+import dev.tocraft.crafted.ctgen.biome.MapBiomes;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.registries.VanillaRegistries;
 import org.spongepowered.asm.mixin.Final;

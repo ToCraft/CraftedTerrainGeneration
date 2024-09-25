@@ -1,6 +1,6 @@
 package dev.tocraft.crafted.ctgen;
 
-import dev.tocraft.crafted.ctgen.map.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

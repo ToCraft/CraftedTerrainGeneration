@@ -2,7 +2,7 @@ package dev.tocraft.crafted.ctgen.fabric;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
-import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeChunkGenerator;
+import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -21,7 +21,7 @@ import java.util.concurrent.Executor;
 public class CTGFabric {
     public static void initialize() {
         Registry.register(BuiltInRegistries.BIOME_SOURCE, CTerrainGeneration.id("map_based_biome_source"), MapBasedBiomeSource.CODEC);
-        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedBiomeChunkGenerator.CODEC);
+        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedChunkGenerator.CODEC);
 
         {
             MapImageRegistry reloadListener = new MapImageRegistry();

@@ -2,8 +2,9 @@ package dev.tocraft.crafted.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.tocraft.crafted.ctgen.biome.CaveSetting;
+import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
-import dev.tocraft.crafted.ctgen.map.MapBiome;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,45 +21,53 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), 125, 65, CaveSetting.DEFAULT);
+
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.biomeMapId),
-            Codec.list(MapBiome.CODEC).fieldOf("map_biomes").forGetter(o -> o.biomeData),
+            Codec.list(MapBiome.CODEC).optionalFieldOf("map_biomes", DEFAULT.biomeData).forGetter(o -> o.biomeData),
             MapBiome.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
-            Codec.INT.fieldOf("deepslate_level").forGetter(o -> o.deepslateLevel),
-            Codec.INT.fieldOf("dirt_level").forGetter(o -> o.dirtLevel),
-            Codec.INT.fieldOf("min_y").forGetter(o -> o.minY),
-            Codec.INT.fieldOf("height").forGetter(o -> o.height),
-            Codec.INT.fieldOf("sea_level").forGetter(o -> o.seaLevel),
-            Codec.INT.optionalFieldOf("transition", 24).forGetter(o -> o.transition),
-            Codec.INT.optionalFieldOf("noise_stretch", 250).forGetter(o -> o.noiseStretch),
-            Codec.INT.optionalFieldOf("noise_detail", 4).forGetter(o -> o.noiseDetail),
+            Codec.INT.optionalFieldOf("deepslate_level", DEFAULT.deepslateLevel).forGetter(o -> o.deepslateLevel),
+            Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
+            Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
+            Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
+            Codec.INT.optionalFieldOf("sea_level", DEFAULT.seaLevel).forGetter(o -> o.seaLevel),
+            Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
+            Codec.INT.optionalFieldOf("noise_stretch", DEFAULT.noiseStretch).forGetter(o -> o.noiseStretch),
+            Codec.INT.optionalFieldOf("noise_detail", DEFAULT.noiseDetail).forGetter(o -> o.noiseDetail),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
-            Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY)
+            Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
+            Codec.INT.optionalFieldOf("cave_stretch_xz", DEFAULT.caveStretchXZ).forGetter(o -> o.caveStretchXZ),
+            Codec.INT.optionalFieldOf("cave_stretch_y", DEFAULT.caveStretchY).forGetter(o -> o.caveStretchY),
+            CaveSetting.CODEC.optionalFieldOf("default_caves", CaveSetting.DEFAULT).forGetter(o -> o.caves)
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation biomeMapId;
-    private final List<Holder<MapBiome>> biomeData;
+    final List<Holder<MapBiome>> biomeData;
     private final Holder<MapBiome> defaultBiome;
-    private final int deepslateLevel;
-    private final int dirtLevel;
-    private final int minY;
-    private final int height;
-    private final int seaLevel;
-    private final int transition;
-    private final int noiseStretch;
-    private final int noiseDetail;
+    final int deepslateLevel;
+    final int surfaceLevel;
+    final int minY;
+    final int genHeight;
+    final int seaLevel;
+    final int transition;
+    final int noiseStretch;
+    final int noiseDetail;
     private final Supplier<BufferedImage> biomeMap;
-    private final Optional<Integer> spawnX;
-    private final Optional<Integer> spawnY;
+    final Optional<Integer> spawnX;
+    final Optional<Integer> spawnY;
+    final int caveStretchXZ;
+    final int caveStretchY;
+    final CaveSetting caves;
 
-    public MapSettings(ResourceLocation biomeMapId, List<Holder<MapBiome>> biomeData, Holder<MapBiome> defaultBiome, int deepslateLevel, int dirtLevel, int minY, int height, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY) {
+    public MapSettings(ResourceLocation biomeMapId, List<Holder<MapBiome>> biomeData, Holder<MapBiome> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, int caveStretchXZ, int caveStretchY, CaveSetting caves) {
         this.biomeMapId = biomeMapId;
         this.biomeData = biomeData;
         this.defaultBiome = defaultBiome;
         this.deepslateLevel = deepslateLevel;
-        this.dirtLevel = dirtLevel;
+        this.surfaceLevel = surfaceLevel;
         this.minY = minY;
-        this.height = height;
+        this.genHeight = genHeight;
         this.seaLevel = seaLevel;
         this.transition = transition;
         this.noiseStretch = noiseStretch;
@@ -65,6 +75,9 @@ public final class MapSettings {
         this.biomeMap = () -> MapImageRegistry.getById(biomeMapId);
         this.spawnX = spawnX;
         this.spawnY = spawnY;
+        this.caveStretchXZ = caveStretchXZ;
+        this.caveStretchY = caveStretchY;
+        this.caves = caves;
     }
 
     /**
@@ -110,7 +123,7 @@ public final class MapSettings {
         return perlin;
     }
 
-    private double getValueWithTransition(int x, int y, Function<MapBiome, Double> function) {
+    double getValueWithTransition(int x, int y, Function<MapBiome, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;
@@ -138,8 +151,8 @@ public final class MapSettings {
         yPercent = Math.abs(yPercent);
 
         // Introduce cubic-like transitions based on weight differences
-            xPercent = smoothStep(xPercent);
-            yPercent = smoothStep(yPercent);
+        xPercent = smoothStep(xPercent);
+        yPercent = smoothStep(yPercent);
 
         // Calculate bi-linear interpolation
         return (h00 * (1 - xPercent) * (1 - yPercent)) +
@@ -156,7 +169,6 @@ public final class MapSettings {
         return x >= 0 && y >= 0 && x < biomeMap.get().getWidth() && y < biomeMap.get().getHeight();
     }
 
-
     // used to move the map in order to spawn in the center
     public int xOffset(int x) {
         return x + spawnX.orElseGet(() -> biomeMap.get().getWidth() / 2);
@@ -164,30 +176,6 @@ public final class MapSettings {
 
     public int yOffset(int y) {
         return y + spawnY.orElseGet(() -> biomeMap.get().getHeight() / 2);
-    }
-
-    public List<Holder<MapBiome>> biomeData() {
-        return biomeData;
-    }
-
-    public int deepslateLevel() {
-        return deepslateLevel;
-    }
-
-    public int dirtLevel() {
-        return dirtLevel;
-    }
-
-    public int minY() {
-        return minY;
-    }
-
-    public int height() {
-        return height;
-    }
-
-    public int seaLevel() {
-        return seaLevel;
     }
 
     @Override
@@ -199,34 +187,13 @@ public final class MapSettings {
                 Objects.equals(this.biomeData, that.biomeData) &&
                 Objects.equals(this.defaultBiome, that.defaultBiome) &&
                 this.deepslateLevel == that.deepslateLevel &&
-                this.dirtLevel == that.dirtLevel &&
+                this.surfaceLevel == that.surfaceLevel &&
                 this.minY == that.minY &&
-                this.height == that.height &&
+                this.genHeight == that.genHeight &&
                 this.seaLevel == that.seaLevel &&
                 this.transition == that.transition &&
                 this.noiseStretch == that.noiseStretch &&
                 this.noiseDetail == that.noiseDetail;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(biomeMapId, biomeData, defaultBiome, deepslateLevel, dirtLevel, minY, height, seaLevel, transition, noiseStretch, noiseDetail);
-    }
-
-    @Override
-    public String toString() {
-        return "MapSettings[" +
-                "biomeMapId=" + biomeMapId + ", " +
-                "biomeData=" + biomeData + ", " +
-                "defaultBiome=" + defaultBiome + ", " +
-                "deepslateLevel=" + deepslateLevel + ", " +
-                "dirtLevel=" + dirtLevel + ", " +
-                "minY=" + minY + ", " +
-                "height=" + height + ", " +
-                "seaLevel=" + seaLevel + ", " +
-                "transition=" + transition + ", " +
-                "noiseStretch=" + noiseStretch + ", " +
-                "noiseDetail=" + noiseDetail + ']';
     }
 
     @Nullable

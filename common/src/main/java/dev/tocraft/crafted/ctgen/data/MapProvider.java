@@ -2,7 +2,7 @@ package dev.tocraft.crafted.ctgen.data;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
-import dev.tocraft.crafted.ctgen.map.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;

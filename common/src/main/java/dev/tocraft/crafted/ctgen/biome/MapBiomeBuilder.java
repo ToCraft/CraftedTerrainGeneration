@@ -1,12 +1,13 @@
-package dev.tocraft.crafted.ctgen.map;
+package dev.tocraft.crafted.ctgen.biome;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
 import java.awt.*;
+import java.util.Optional;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class MapBiomeBuilder {
     private Holder<Biome> biome;
     private int color;
@@ -17,6 +18,7 @@ public class MapBiomeBuilder {
     private Block stoneBlock = MapBiome.DEFAULT_STONE_BLOCK;
     private Block dirtBlock = MapBiome.DEFAULT_DIRT_BLOCK;
     private Block surfaceBlock = MapBiome.DEFAULT_SURFACE_BLOCK;
+    private Optional<Double> caveThreshold = Optional.empty();
 
     public MapBiomeBuilder setBiome(Holder<Biome> biome) {
         this.biome = biome;
@@ -68,7 +70,12 @@ public class MapBiomeBuilder {
         return this;
     }
 
+    public MapBiomeBuilder setCaveThreshold(double caveThreshold) {
+        this.caveThreshold = Optional.of(caveThreshold);
+        return this;
+    }
+
     public MapBiome build() {
-        return new MapBiome(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, height, perlinMultiplier, pixelWeight);
+        return new MapBiome(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, height, perlinMultiplier, pixelWeight, caveThreshold);
     }
 }

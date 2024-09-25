@@ -1,6 +1,6 @@
 package dev.tocraft.crafted.ctgen.util;
 
-import dev.tocraft.crafted.ctgen.map.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.MapBiome;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.map;
+package dev.tocraft.crafted.ctgen.biome;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,11 +11,15 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
-                       Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight) {
+import java.util.Optional;
 
-    public MapBiome(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight) {
-        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight);
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
+                       Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
+                       Optional<Double> caveThreshold) {
+
+    private MapBiome(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold) {
+        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, caveThreshold);
     }
 
     public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
@@ -35,7 +39,8 @@ public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Blo
             ResourceLocation.CODEC.optionalFieldOf("surface_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_SURFACE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.surfaceBlock)),
             Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(MapBiome::height),
             Codec.DOUBLE.optionalFieldOf("perlin_multiplier", DEFAULT_PERLIN_MULTIPLIER).forGetter(MapBiome::perlinMultiplier),
-            Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(MapBiome::pixelWeight)
+            Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(MapBiome::pixelWeight),
+            Codec.DOUBLE.optionalFieldOf("cave_threshold").forGetter(MapBiome::caveThreshold)
     ).apply(instance, instance.stable(MapBiome::new)));
 
     public static RegistryFileCodec<MapBiome> CODEC = RegistryFileCodec.create(CTerrainGeneration.MAP_BIOME_REGISTRY, DIRECT_CODEC);

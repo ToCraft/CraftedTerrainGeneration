@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.map;
+package dev.tocraft.crafted.ctgen.biome;
 
 import net.minecraft.data.worldgen.BootstapContext;
 
