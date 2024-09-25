@@ -1,6 +1,6 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
-import dev.tocraft.crafted.ctgen.biome.CaveSetting;
+import dev.tocraft.crafted.ctgen.biome.CarverSetting;
 import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +23,7 @@ public class MapSettingsBuilder {
     private int noiseDetail = MapSettings.DEFAULT.noiseDetail;
     private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
     private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
-    private int caveStretchXZ = MapSettings.DEFAULT.caveStretchXZ;
-    private int caveStretchY = MapSettings.DEFAULT.caveStretchY;
-    private CaveSetting caves = MapSettings.DEFAULT.caves;
+    private List<CarverSetting> carverSettings = MapSettings.DEFAULT.carverSettings;
 
     public MapSettingsBuilder setBiomeMapId(ResourceLocation biomeMapId) {
         this.biomeMapId = biomeMapId;
@@ -92,22 +90,12 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setCaveStretchXZ(int caveStretchXZ) {
-        this.caveStretchXZ = caveStretchXZ;
-        return this;
-    }
-
-    public MapSettingsBuilder setCaveStretchY(int caveStretchY) {
-        this.caveStretchY = caveStretchY;
-        return this;
-    }
-
-    public MapSettingsBuilder setCaves(CaveSetting caves) {
-        this.caves = caves;
+    public MapSettingsBuilder setCarverSettings(List<CarverSetting> carverSetting) {
+        this.carverSettings = carverSetting;
         return this;
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, biomeData, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, caveStretchXZ, caveStretchY, caves);
+        return new MapSettings(biomeMapId, biomeData, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
     }
 }

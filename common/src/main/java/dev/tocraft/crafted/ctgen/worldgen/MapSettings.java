@@ -2,7 +2,7 @@ package dev.tocraft.crafted.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.tocraft.crafted.ctgen.biome.CaveSetting;
+import dev.tocraft.crafted.ctgen.biome.CarverSetting;
 import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import net.minecraft.core.Holder;
@@ -12,16 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), 125, 65, CaveSetting.DEFAULT);
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.biomeMapId),
@@ -37,9 +34,7 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("noise_detail", DEFAULT.noiseDetail).forGetter(o -> o.noiseDetail),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
-            Codec.INT.optionalFieldOf("cave_stretch_xz", DEFAULT.caveStretchXZ).forGetter(o -> o.caveStretchXZ),
-            Codec.INT.optionalFieldOf("cave_stretch_y", DEFAULT.caveStretchY).forGetter(o -> o.caveStretchY),
-            CaveSetting.CODEC.optionalFieldOf("default_caves", CaveSetting.DEFAULT).forGetter(o -> o.caves)
+            Codec.list(CarverSetting.CODEC).optionalFieldOf("cave_carver", DEFAULT.carverSettings).forGetter(o -> o.carverSettings)
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation biomeMapId;
@@ -56,11 +51,9 @@ public final class MapSettings {
     private final Supplier<BufferedImage> biomeMap;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
-    final int caveStretchXZ;
-    final int caveStretchY;
-    final CaveSetting caves;
+    final List<CarverSetting> carverSettings;
 
-    public MapSettings(ResourceLocation biomeMapId, List<Holder<MapBiome>> biomeData, Holder<MapBiome> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, int caveStretchXZ, int caveStretchY, CaveSetting caves) {
+    public MapSettings(ResourceLocation biomeMapId, List<Holder<MapBiome>> biomeData, Holder<MapBiome> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.biomeMapId = biomeMapId;
         this.biomeData = biomeData;
         this.defaultBiome = defaultBiome;
@@ -75,9 +68,7 @@ public final class MapSettings {
         this.biomeMap = () -> MapImageRegistry.getById(biomeMapId);
         this.spawnX = spawnX;
         this.spawnY = spawnY;
-        this.caveStretchXZ = caveStretchXZ;
-        this.caveStretchY = caveStretchY;
-        this.caves = caves;
+        this.carverSettings = carverSettings;
     }
 
     /**

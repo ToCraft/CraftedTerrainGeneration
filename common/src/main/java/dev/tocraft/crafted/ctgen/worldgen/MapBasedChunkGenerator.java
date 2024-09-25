@@ -3,6 +3,7 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.biome.CarverSetting;
 import dev.tocraft.crafted.ctgen.biome.MapBiome;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -52,7 +53,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void applyCarvers(@NotNull WorldGenRegion pLevel, long pSeed, @NotNull RandomState pRandom, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess pChunk, GenerationStep.@NotNull Carving pStep) {
+    public void applyCarvers(@NotNull WorldGenRegion level, long pSeed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
     }
 
     @Override
@@ -63,80 +64,90 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                BlockPos pos = chunk.getPos().getBlockAt(x, chunk.getHeight(), z);
+                int xOff = chunk.getPos().getBlockX(x);
+                int zOff = chunk.getPos().getBlockZ(z);
 
-                MapBiome biomeData = getSettings().getMapBiome(pos.getX() >> 2, pos.getZ() >> 2).value();
-                double surfaceHeight = getSettings().getHeight(noise, pos.getX(), pos.getZ()) + getSettings().surfaceLevel;
+                MapBiome biomeData = getSettings().getMapBiome(xOff >> 2, zOff >> 2).value();
+                double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
 
                 for (int y = chunk.getMinBuildHeight(); y <= surfaceHeight || y <= getSeaLevel(); y++) {
-                    BlockPos blockPos = chunk.getPos().getBlockAt(x, y, z);
+                    BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
                     if (y < minHeight) {
                         // place bedrock
-                        chunk.setBlockState(blockPos, Blocks.BEDROCK.defaultBlockState(), false);
+                        chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
                         continue;
-                    } else if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
-                        // place deepslate
-                        chunk.setBlockState(blockPos, biomeData.deepslateBlock().defaultBlockState(), false);
-                    } else if (y < surfaceHeight - DIRT_SIZE) {
-                        // place stone between deepslate and surface - DIRT_SIZE
-                        chunk.setBlockState(blockPos, biomeData.stoneBlock().defaultBlockState(), false);
-                    } else if (y < surfaceHeight - 1) {
-                        // place dirt below surface
-                        chunk.setBlockState(blockPos, biomeData.dirtBlock().defaultBlockState(), false);
-                    } else if (y <= getSeaLevel()) {
+                    } else if (y > surfaceHeight && surfaceHeight < getSeaLevel()) {
                         // place oceans if the surface isn't higher than the sea level
-                        chunk.setBlockState(chunk.getPos().getBlockAt(x, y, z), Blocks.WATER.defaultBlockState(), false);
-                        // place no caves in ocean
-                        continue;
-                    }
-                    // only surface is missing
-                    else {
-                        Block surfaceBlock = biomeData.surfaceBlock();
-                        // no grass underwater
-                        if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
-                            surfaceBlock = Blocks.DIRT;
+                        chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
+                    // check for caves
+                    } else if (canSetBlock(pos, minHeight, surfaceHeight)) {
+                        if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
+                            // place deepslate
+                            chunk.setBlockState(pos, biomeData.deepslateBlock().defaultBlockState(), false);
+                        } else if (y < surfaceHeight - DIRT_SIZE) {
+                            // place stone between deepslate and surface - DIRT_SIZE
+                            chunk.setBlockState(pos, biomeData.stoneBlock().defaultBlockState(), false);
+                        } else if (y < surfaceHeight - 1) {
+                            // place dirt below surface
+                            chunk.setBlockState(pos, biomeData.dirtBlock().defaultBlockState(), false);
                         }
-                        chunk.setBlockState(blockPos, surfaceBlock.defaultBlockState(), false);
-                    }
-
-                    // Caves
-                    // Modify cave threshold based on y, (nearly) no caves for 100% height nor 0%
-                    double threshold;
-                    int y2 = y - minHeight;
-                    int deepLevel = getSettings().deepslateLevel - minHeight;
-                    if (y2 <= deepLevel) {
-                        threshold = lerp(getSettings().caves.bedrockThreshold(), getSettings().caves.midThreshold(), (double) y2 / deepLevel);
-                    } else {
-                        double halfSurfaceLevel = surfaceHeight / 2;
-                        if (y > halfSurfaceLevel) {
-                            double entryThreshold = getSettings().getValueWithTransition(pos.getX(), pos.getZ(), mapBiome -> mapBiome.caveThreshold().orElse(getSettings().caves.entryThreshold()));
-                            threshold = lerp(getSettings().caves.midThreshold(), entryThreshold, (y - halfSurfaceLevel) / halfSurfaceLevel);
-                        }
+                        // only surface is missing
                         else {
-                            threshold = getSettings().caves.midThreshold();
+                            Block surfaceBlock = biomeData.surfaceBlock();
+                            // no grass underwater
+                            if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
+                                surfaceBlock = Blocks.DIRT;
+                            }
+                            chunk.setBlockState(pos, surfaceBlock.defaultBlockState(), false);
                         }
-                    }
-
-                    double noiseValue = get3DPerlin(noise, blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                    if (noiseValue > threshold) {
-                        chunk.setBlockState(blockPos, Blocks.CAVE_AIR.defaultBlockState(), false);
                     }
                 }
             }
         }
     }
 
-    public double get3DPerlin(SimplexNoise noise, int x, int y, int z) {
-        double perlin = 0;
-        for (int i = 0; i < 1; i++) {
-            perlin += Math.pow(0.5, i) * noise.getValue(x * Math.pow(2, i) / getSettings().caveStretchXZ, y * Math.pow(2, i) / getSettings().caveStretchY, z * Math.pow(2, i) / getSettings().caveStretchXZ);
+    private boolean canSetBlock(BlockPos pos, int minHeight, double surfaceHeight) {
+        // Modify cave threshold based on y, (nearly) no caves for 100% height nor 0%
+        // Get scaled noise values
+        int y2 = pos.getY() - minHeight;
+        int deepLevel = getSettings().deepslateLevel - minHeight;
+        for (CarverSetting carver : getSettings().carverSettings) {
+            double threshold;
+            if (y2 <= deepLevel) {
+                threshold = lerp(carver.bedrockThreshold(), carver.midThreshold(), (double) y2 / deepLevel);
+            } else {
+                double halfSurfaceLevel = surfaceHeight / 2;
+                if (pos.getY() > halfSurfaceLevel) {
+                    double entryThreshold = getSettings().getValueWithTransition(pos.getX(), pos.getZ(), mapBiome -> mapBiome.caveThreshold().orElse(carver.entryThreshold()));
+                    threshold = lerp(carver.midThreshold(), entryThreshold, (pos.getY() - halfSurfaceLevel) / halfSurfaceLevel);
+                } else {
+                    threshold = carver.midThreshold();
+                }
+            }
+
+            // get noise value
+            double perlin = getPerlin3D(carver.detail(), (double) pos.getX() / carver.caveStretchXZ(), (double) pos.getY() / carver.caveStretchY(), (double) pos.getZ() / carver.caveStretchXZ());
+
+            // check if there should be a cave
+            if (perlin > threshold) {
+                return false;
+            }
         }
-        perlin = perlin / (1 - Math.pow(0.5, getSettings().noiseDetail));
-        return perlin;
+
+        return true;
     }
 
     private static double lerp(double start, double end, double percentage) {
         return (start * (1 - percentage)) + (end * percentage);
+    }
+
+    public double getPerlin3D(int detail, double x, double y, double z) {
+        double perlin = 0;
+        for (int i = 0; i < detail; i++) {
+            perlin += Math.pow(0.5, i) * noise.getValue(x * Math.pow(2, i) / detail, y * Math.pow(2, i) / detail, z * Math.pow(2, i) / detail);
+        }
+        perlin = perlin / (1 - Math.pow(0.5, detail));
+        return perlin;
     }
 
     @Override
