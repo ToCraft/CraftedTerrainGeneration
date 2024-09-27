@@ -6,6 +6,7 @@
 # Crafted Terrain Generation Mod
 
 *Crafted Terrain Generation Mod* (CTGen) allows you to generate entire Minecraft worlds with just one map image!
+It's fully data-driven, so you can configure it entirely via datapacks- no need for java code, even though it's still possible if you prefer it.
 
 ### License
 
