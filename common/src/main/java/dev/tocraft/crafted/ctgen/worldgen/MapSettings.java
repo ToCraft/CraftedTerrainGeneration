@@ -114,7 +114,7 @@ public final class MapSettings {
         return perlin;
     }
 
-    double getValueWithTransition(int x, int y, Function<MapBiome, Double> function) {
+    private double getValueWithTransition(int x, int y, Function<MapBiome, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;

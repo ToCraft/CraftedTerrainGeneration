@@ -22,6 +22,7 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -53,20 +54,12 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void applyCarvers(@NotNull WorldGenRegion level, long seed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
-        setNoise(random);
-
-        if (step == GenerationStep.Carving.AIR) {
-            for (CarverSetting setting : getSettings().carverSettings) {
-                CaveCarver caveCarver = new CaveCarver(setting, seed, noise, pos -> getSettings().getMapBiome(pos.getX() >> 2, pos.getZ() >> 2).value().caveAir(), pos -> (int) (getSettings().getHeight(noise, pos.getX() >> 2, pos.getZ() >> 2) + getSettings().surfaceLevel));
-                caveCarver.carveCaves(chunk, level.getChunkSource());
-            }
-        }
+    public void applyCarvers(@NotNull WorldGenRegion level, long pSeed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
     }
 
     @Override
-    public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState random, @NotNull ChunkAccess chunk) {
-        setNoise(random);
+    public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState pRandom, @NotNull ChunkAccess chunk) {
+        setNoise(pRandom);
 
         int minHeight = chunk.getMinBuildHeight() + BEDROCK_SIZE;
 
@@ -77,6 +70,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
                 MapBiome biomeData = getSettings().getMapBiome(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
+                BlockState caveAir = biomeData.caveAir().defaultBlockState();
 
                 for (int y = chunk.getMinBuildHeight(); y <= surfaceHeight || y <= getSeaLevel(); y++) {
                     BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
@@ -88,7 +82,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         // place oceans if the surface isn't higher than the sea level
                         chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
                     // check for caves
-                    } else {
+                    } else if (canSetBlock(pos, minHeight, surfaceHeight)) {
                         if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
                             // place deepslate
                             chunk.setBlockState(pos, biomeData.deepslateBlock().defaultBlockState(), false);
@@ -108,10 +102,35 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                             }
                             chunk.setBlockState(pos, surfaceBlock.defaultBlockState(), false);
                         }
+                    } else {
+                        chunk.setBlockState(pos, caveAir, false);
                     }
                 }
             }
         }
+    }
+
+    private boolean canSetBlock(BlockPos pos, int surfaceHeight, double minHeight) {
+        double height = (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
+        double addThreshold = height * height * height * height * 6;
+
+        for (CarverSetting carver : getSettings().carverSettings) {
+            double perlin = 0;
+            float i = 0;
+            for (float octave : carver.octaves()) {
+                perlin += noise.getValue((double) pos.getX() / carver.caveStretchXZ() * octave, (double) pos.getY() / carver.caveStretchY() * octave, (double) pos.getZ() / carver.caveStretchXZ() * octave);
+                i += octave;
+            }
+
+            perlin = perlin / i;
+
+            double threshold = carver.threshold() + addThreshold;
+            if (perlin > threshold) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
