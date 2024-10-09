@@ -18,6 +18,7 @@ public class MapBiomeBuilder {
     private Block stoneBlock = MapBiome.DEFAULT_STONE_BLOCK;
     private Block dirtBlock = MapBiome.DEFAULT_DIRT_BLOCK;
     private Block surfaceBlock = MapBiome.DEFAULT_SURFACE_BLOCK;
+    private Block caveAir = MapBiome.DEFAULT_CAVE_AIR_BLOCK;
     private Optional<Double> caveThreshold = Optional.empty();
 
     public MapBiomeBuilder setBiome(Holder<Biome> biome) {
@@ -70,12 +71,17 @@ public class MapBiomeBuilder {
         return this;
     }
 
+    public MapBiomeBuilder setCaveAir(Block caveAir) {
+        this.caveAir = caveAir;
+        return this;
+    }
+
     public MapBiomeBuilder setCaveThreshold(double caveThreshold) {
         this.caveThreshold = Optional.of(caveThreshold);
         return this;
     }
 
     public MapBiome build() {
-        return new MapBiome(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, height, perlinMultiplier, pixelWeight, caveThreshold);
+        return new MapBiome(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, caveAir, height, perlinMultiplier, pixelWeight, caveThreshold);
     }
 }

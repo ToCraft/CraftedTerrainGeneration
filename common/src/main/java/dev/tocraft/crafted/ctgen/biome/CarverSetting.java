@@ -3,15 +3,13 @@ package dev.tocraft.crafted.ctgen.biome;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public record CarverSetting(int detail, int caveStretchXZ, int caveStretchY, double midThreshold, double bedrockThreshold, double entryThreshold) {
-    public static final CarverSetting DEFAULT = new CarverSetting(3, 15, 7, 0.75, 1, 0.95);
+public record CarverSetting(float occurrences, int radius, int minLength, int maxLength) {
+    public static final CarverSetting DEFAULT = new CarverSetting(0.25F, 3, 50, 100);
 
     public static final Codec<CarverSetting> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-            Codec.INT.optionalFieldOf("detail", DEFAULT.detail).forGetter(CarverSetting::detail),
-            Codec.INT.optionalFieldOf("cave_stretch_xz", DEFAULT.caveStretchXZ).forGetter(CarverSetting::caveStretchXZ),
-            Codec.INT.optionalFieldOf("cave_stretch_y", DEFAULT.caveStretchY).forGetter(CarverSetting::caveStretchY),
-            Codec.DOUBLE.optionalFieldOf("mid_threshold", DEFAULT.midThreshold).forGetter(CarverSetting::midThreshold),
-            Codec.DOUBLE.optionalFieldOf("bedrock_threshold", DEFAULT.bedrockThreshold).forGetter(CarverSetting::bedrockThreshold),
-            Codec.DOUBLE.optionalFieldOf("entry_threshold", DEFAULT.entryThreshold).forGetter(CarverSetting::entryThreshold)
+            Codec.FLOAT.optionalFieldOf("occurrences", DEFAULT.occurrences).forGetter(CarverSetting::occurrences),
+            Codec.INT.optionalFieldOf("radius", DEFAULT.radius).forGetter(CarverSetting::radius),
+            Codec.INT.optionalFieldOf("min_length", DEFAULT.minLength).forGetter(CarverSetting::minLength),
+            Codec.INT.optionalFieldOf("max_length", DEFAULT.minLength).forGetter(CarverSetting::maxLength)
     ).apply(instance, instance.stable(CarverSetting::new)));
 }

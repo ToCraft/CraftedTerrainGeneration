@@ -15,17 +15,18 @@ import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
-                       Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
+                       Block surfaceBlock, Block caveAir, int height, double perlinMultiplier, double pixelWeight,
                        Optional<Double> caveThreshold) {
 
-    private MapBiome(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold) {
-        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, caveThreshold);
+    private MapBiome(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, ResourceLocation caveAir, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold) {
+        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), BuiltInRegistries.BLOCK.get(caveAir), height, perlinMultiplier, pixelWeight, caveThreshold);
     }
 
     public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
     public static final Block DEFAULT_STONE_BLOCK = Blocks.STONE;
     public static final Block DEFAULT_DIRT_BLOCK = Blocks.DIRT;
     public static final Block DEFAULT_SURFACE_BLOCK = Blocks.GRASS_BLOCK;
+    public static final Block DEFAULT_CAVE_AIR_BLOCK = Blocks.CAVE_AIR;
     public static final int DEFAULT_HEIGHT = 0;
     public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
     public static final double DEFAULT_PIXEL_WEIGHT = 1;
@@ -37,6 +38,7 @@ public record MapBiome(Holder<Biome> biome, int color, Block deepslateBlock, Blo
             ResourceLocation.CODEC.optionalFieldOf("stone_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_STONE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.stoneBlock)),
             ResourceLocation.CODEC.optionalFieldOf("dirt_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DIRT_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.dirtBlock)),
             ResourceLocation.CODEC.optionalFieldOf("surface_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_SURFACE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.surfaceBlock)),
+            ResourceLocation.CODEC.optionalFieldOf("cave_air", BuiltInRegistries.BLOCK.getKey(DEFAULT_CAVE_AIR_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.caveAir)),
             Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(MapBiome::height),
             Codec.DOUBLE.optionalFieldOf("perlin_multiplier", DEFAULT_PERLIN_MULTIPLIER).forGetter(MapBiome::perlinMultiplier),
             Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(MapBiome::pixelWeight),

@@ -53,12 +53,20 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void applyCarvers(@NotNull WorldGenRegion level, long pSeed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
+    public void applyCarvers(@NotNull WorldGenRegion level, long seed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
+        setNoise(random);
+
+        if (step == GenerationStep.Carving.AIR) {
+            for (CarverSetting setting : getSettings().carverSettings) {
+                CaveCarver caveCarver = new CaveCarver(setting, seed, noise, pos -> getSettings().getMapBiome(pos.getX() >> 2, pos.getZ() >> 2).value().caveAir(), pos -> (int) (getSettings().getHeight(noise, pos.getX() >> 2, pos.getZ() >> 2) + getSettings().surfaceLevel));
+                caveCarver.carveCaves(chunk, level.getChunkSource());
+            }
+        }
     }
 
     @Override
-    public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState pRandom, @NotNull ChunkAccess chunk) {
-        setNoise(pRandom);
+    public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState random, @NotNull ChunkAccess chunk) {
+        setNoise(random);
 
         int minHeight = chunk.getMinBuildHeight() + BEDROCK_SIZE;
 
@@ -80,7 +88,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         // place oceans if the surface isn't higher than the sea level
                         chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
                     // check for caves
-                    } else if (canSetBlock(pos, minHeight, surfaceHeight)) {
+                    } else {
                         if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
                             // place deepslate
                             chunk.setBlockState(pos, biomeData.deepslateBlock().defaultBlockState(), false);
@@ -104,50 +112,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 }
             }
         }
-    }
-
-    private boolean canSetBlock(BlockPos pos, int minHeight, double surfaceHeight) {
-        // Modify cave threshold based on y, (nearly) no caves for 100% height nor 0%
-        // Get scaled noise values
-        int y2 = pos.getY() - minHeight;
-        int deepLevel = getSettings().deepslateLevel - minHeight;
-        for (CarverSetting carver : getSettings().carverSettings) {
-            double threshold;
-            if (y2 <= deepLevel) {
-                threshold = lerp(carver.bedrockThreshold(), carver.midThreshold(), (double) y2 / deepLevel);
-            } else {
-                double halfSurfaceLevel = surfaceHeight / 2;
-                if (pos.getY() > halfSurfaceLevel) {
-                    double entryThreshold = getSettings().getValueWithTransition(pos.getX(), pos.getZ(), mapBiome -> mapBiome.caveThreshold().orElse(carver.entryThreshold()));
-                    threshold = lerp(carver.midThreshold(), entryThreshold, (pos.getY() - halfSurfaceLevel) / halfSurfaceLevel);
-                } else {
-                    threshold = carver.midThreshold();
-                }
-            }
-
-            // get noise value
-            double perlin = getPerlin3D(carver.detail(), (double) pos.getX() / carver.caveStretchXZ(), (double) pos.getY() / carver.caveStretchY(), (double) pos.getZ() / carver.caveStretchXZ());
-
-            // check if there should be a cave
-            if (perlin > threshold) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static double lerp(double start, double end, double percentage) {
-        return (start * (1 - percentage)) + (end * percentage);
-    }
-
-    public double getPerlin3D(int detail, double x, double y, double z) {
-        double perlin = 0;
-        for (int i = 0; i < detail; i++) {
-            perlin += Math.pow(0.5, i) * noise.getValue(x * Math.pow(2, i) / detail, y * Math.pow(2, i) / detail, z * Math.pow(2, i) / detail);
-        }
-        perlin = perlin / (1 - Math.pow(0.5, detail));
-        return perlin;
     }
 
     @Override
