@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.WorldGenRegion;
@@ -22,7 +22,6 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -68,7 +67,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 int xOff = chunk.getPos().getBlockX(x);
                 int zOff = chunk.getPos().getBlockZ(z);
 
-                MapBiome biomeData = getSettings().getMapBiome(xOff >> 2, zOff >> 2).value();
+                Zone biomeData = getSettings().getMapBiome(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
                 BlockState caveAir = biomeData.caveAir().defaultBlockState();
 

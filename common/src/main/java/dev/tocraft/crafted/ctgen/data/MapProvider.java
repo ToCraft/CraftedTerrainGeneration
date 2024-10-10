@@ -2,7 +2,7 @@ package dev.tocraft.crafted.ctgen.data;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -23,9 +23,9 @@ public class MapProvider implements DataProvider {
     private final PackOutput packOutput;
     private final BufferedImage original;
     private final ResourceLocation id;
-    private final CompletableFuture<List<MapBiome>> mapBiomesFuture;
+    private final CompletableFuture<List<Zone>> mapBiomesFuture;
 
-    public MapProvider(BufferedImage original, ResourceLocation id, CompletableFuture<List<MapBiome>> mapBiomes, PackOutput packOutput) {
+    public MapProvider(BufferedImage original, ResourceLocation id, CompletableFuture<List<Zone>> mapBiomes, PackOutput packOutput) {
         this.packOutput = packOutput;
         this.original = original;
         this.id = id;

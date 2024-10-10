@@ -28,7 +28,7 @@ public class MapBasedBiomeSource extends BiomeSource {
 
     @Override
     protected @NotNull Stream<Holder<Biome>> collectPossibleBiomes() {
-        return this.settings.biomeData.stream().map(holder -> holder.value().biome());
+        return this.settings.zones.stream().map(holder -> holder.value().biome());
     }
 
     @Override

@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
 import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 
@@ -11,8 +11,9 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class MapSettingsBuilder {
     private ResourceLocation biomeMapId;
-    private List<Holder<MapBiome>> biomeData = MapSettings.DEFAULT.biomeData;
-    private Holder<MapBiome> defaultBiome;
+    private boolean pixelsAreChunks = MapSettings.DEFAULT.pixelsAreChunks;
+    private List<Holder<Zone>> biomeData = MapSettings.DEFAULT.zones;
+    private Holder<Zone> defaultBiome;
     private int deepslateLevel = MapSettings.DEFAULT.deepslateLevel;
     private int surfaceLevel = MapSettings.DEFAULT.surfaceLevel;
     private int minY = MapSettings.DEFAULT.minY;
@@ -30,12 +31,17 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setBiomeData(List<Holder<MapBiome>> biomeData) {
+    public MapSettingsBuilder setPixelsAreChunks(boolean pixelsAreChunks) {
+        this.pixelsAreChunks = pixelsAreChunks;
+        return this;
+    }
+
+    public MapSettingsBuilder setBiomeData(List<Holder<Zone>> biomeData) {
         this.biomeData = biomeData;
         return this;
     }
 
-    public MapSettingsBuilder setDefaultBiome(Holder<MapBiome> defaultBiome) {
+    public MapSettingsBuilder setDefaultBiome(Holder<Zone> defaultBiome) {
         this.defaultBiome = defaultBiome;
         return this;
     }
@@ -96,6 +102,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, biomeData, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, biomeData, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
     }
 }

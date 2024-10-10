@@ -3,7 +3,7 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -18,12 +18,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.biomeMapId),
-            Codec.list(MapBiome.CODEC).optionalFieldOf("map_biomes", DEFAULT.biomeData).forGetter(o -> o.biomeData),
-            MapBiome.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
+            Codec.BOOL.optionalFieldOf("pixels_are_chunks", DEFAULT.pixelsAreChunks).forGetter(o -> o.pixelsAreChunks),
+            Codec.list(Zone.CODEC).optionalFieldOf("map_biomes", DEFAULT.zones).forGetter(o -> o.zones),
+            Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.INT.optionalFieldOf("deepslate_level", DEFAULT.deepslateLevel).forGetter(o -> o.deepslateLevel),
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
             Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
@@ -38,8 +39,9 @@ public final class MapSettings {
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation biomeMapId;
-    final List<Holder<MapBiome>> biomeData;
-    private final Holder<MapBiome> defaultBiome;
+    final boolean pixelsAreChunks;
+    final List<Holder<Zone>> zones;
+    private final Holder<Zone> defaultBiome;
     final int deepslateLevel;
     final int surfaceLevel;
     final int minY;
@@ -48,14 +50,15 @@ public final class MapSettings {
     final int transition;
     final int noiseStretch;
     final int noiseDetail;
-    private final Supplier<BufferedImage> biomeMap;
+    private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
     final List<CarverSetting> carverSettings;
 
-    public MapSettings(ResourceLocation biomeMapId, List<Holder<MapBiome>> biomeData, Holder<MapBiome> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation biomeMapId, boolean pixelsAreChunks, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.biomeMapId = biomeMapId;
-        this.biomeData = biomeData;
+        this.pixelsAreChunks = pixelsAreChunks;
+        this.zones = zones;
         this.defaultBiome = defaultBiome;
         this.deepslateLevel = deepslateLevel;
         this.surfaceLevel = surfaceLevel;
@@ -65,7 +68,7 @@ public final class MapSettings {
         this.transition = transition;
         this.noiseStretch = noiseStretch;
         this.noiseDetail = noiseDetail;
-        this.biomeMap = () -> MapImageRegistry.getById(biomeMapId);
+        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(biomeMapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX;
         this.spawnY = spawnY;
         this.carverSettings = carverSettings;
@@ -79,13 +82,13 @@ public final class MapSettings {
      * @return Returns the biome color or the default biome if none was found
      */
     @NotNull
-    public Holder<MapBiome> getMapBiome(int pX, int pY) {
+    public Holder<Zone> getMapBiome(int pX, int pY) {
         int x = xOffset(pX);
         int y = yOffset(pY);
 
         // check if coordinate is inbound
         if (isPixelInBiomeMap(x, y)) {
-            Holder<MapBiome> biome = getByColor(biomeMap.get().getRGB(x, y));
+            Holder<Zone> biome = getByColor(mapImage.get().getRGB(x, y));
             return biome != null ? biome : defaultBiome;
         } else {
             //fallback
@@ -100,7 +103,7 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double perlin = getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, MapBiome::perlinMultiplier);
+        double perlin = getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, Zone::perlinMultiplier);
         double genHeight = getValueWithTransition(pX, pY, mapBiome -> (double) mapBiome.height());
         return genHeight + perlin;
     }
@@ -114,7 +117,7 @@ public final class MapSettings {
         return perlin;
     }
 
-    private double getValueWithTransition(int x, int y, Function<MapBiome, Double> function) {
+    private double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;
@@ -123,10 +126,10 @@ public final class MapSettings {
         if (x < 0) baseX -= transition;
         if (y < 0) baseY -= transition;
 
-        MapBiome biome00 = getMapBiome(baseX >> 2, baseY >> 2).value(); // Top-left
-        MapBiome biome10 = getMapBiome((baseX + transition) >> 2, baseY >> 2).value(); // Top-right
-        MapBiome biome01 = getMapBiome(baseX >> 2, (baseY + transition) >> 2).value(); // Bottom-left
-        MapBiome biome11 = getMapBiome((baseX + transition) >> 2, (baseY + transition) >> 2).value(); // Bottom-right
+        Zone biome00 = getMapBiome(baseX >> 2, baseY >> 2).value(); // Top-left
+        Zone biome10 = getMapBiome((baseX + transition) >> 2, baseY >> 2).value(); // Top-right
+        Zone biome01 = getMapBiome(baseX >> 2, (baseY + transition) >> 2).value(); // Bottom-left
+        Zone biome11 = getMapBiome((baseX + transition) >> 2, (baseY + transition) >> 2).value(); // Bottom-right
 
         double h00 = function.apply(biome00);
         double h10 = function.apply(biome10);
@@ -157,16 +160,16 @@ public final class MapSettings {
     }
 
     private boolean isPixelInBiomeMap(int x, int y) {
-        return x >= 0 && y >= 0 && x < biomeMap.get().getWidth() && y < biomeMap.get().getHeight();
+        return x >= 0 && y >= 0 && x < mapImage.get().getWidth() && y < mapImage.get().getHeight();
     }
 
     // used to move the map in order to spawn in the center
     public int xOffset(int x) {
-        return x + spawnX.orElseGet(() -> biomeMap.get().getWidth() / 2);
+        return x + spawnX.orElseGet(() -> mapImage.get().getWidth() / 2);
     }
 
     public int yOffset(int y) {
-        return y + spawnY.orElseGet(() -> biomeMap.get().getHeight() / 2);
+        return y + spawnY.orElseGet(() -> mapImage.get().getHeight() / 2);
     }
 
     @Override
@@ -175,7 +178,7 @@ public final class MapSettings {
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (MapSettings) obj;
         return Objects.equals(this.biomeMapId, that.biomeMapId) &&
-                Objects.equals(this.biomeData, that.biomeData) &&
+                Objects.equals(this.zones, that.zones) &&
                 Objects.equals(this.defaultBiome, that.defaultBiome) &&
                 this.deepslateLevel == that.deepslateLevel &&
                 this.surfaceLevel == that.surfaceLevel &&
@@ -188,7 +191,7 @@ public final class MapSettings {
     }
 
     @Nullable
-    private Holder<MapBiome> getByColor(int color) {
-        return biomeData.stream().filter(biome -> biome.value().color() == color).findAny().orElse(null);
+    private Holder<Zone> getByColor(int color) {
+        return zones.stream().filter(biome -> biome.value().color() == color).findAny().orElse(null);
     }
 }

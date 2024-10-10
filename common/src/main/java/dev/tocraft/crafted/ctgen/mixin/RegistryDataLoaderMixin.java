@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.mixin;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryDataLoader;
 import org.spongepowered.asm.mixin.Final;
@@ -34,7 +34,7 @@ public class RegistryDataLoaderMixin {
             }
         }
         if (biomeIndex != -1) {
-            RegistryDataLoader.RegistryData<?> mapBiomeRegistryData = new RegistryDataLoader.RegistryData<>(CTerrainGeneration.MAP_BIOME_REGISTRY, MapBiome.DIRECT_CODEC);
+            RegistryDataLoader.RegistryData<?> mapBiomeRegistryData = new RegistryDataLoader.RegistryData<>(CTerrainGeneration.MAP_BIOME_REGISTRY, Zone.DIRECT_CODEC);
             worldGenRegistries.add(biomeIndex + 1, mapBiomeRegistryData);
             WORLDGEN_REGISTRIES = worldGenRegistries;
         }

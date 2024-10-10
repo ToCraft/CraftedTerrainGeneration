@@ -1,6 +1,6 @@
 package dev.tocraft.crafted.ctgen.util;
 
-import dev.tocraft.crafted.ctgen.biome.MapBiome;
+import dev.tocraft.crafted.ctgen.biome.Zone;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -28,7 +28,7 @@ public class MapUtils {
     private static final int[][] diagonal = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
     private static final int[][] orthogonal = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
-    public static BufferedImage generateBiomeMap(final BufferedImage original, Iterable<MapBiome> biomes) {
+    public static BufferedImage generateBiomeMap(final BufferedImage original, Iterable<Zone> biomes) {
         final BufferedImage greatMap = new BufferedImage(original.getWidth() * 2, original.getHeight() * 2, original.getType());
         // seed is 0 so the map is always the same
         final Random random = new Random(0);
@@ -82,7 +82,7 @@ public class MapUtils {
         return x >= 0 && y >= 0 && x < width && y < height;
     }
 
-    private static int getMostWeightColor(Iterable<MapBiome> biomes, List<Integer> list, Random random) {
+    private static int getMostWeightColor(Iterable<Zone> biomes, List<Integer> list, Random random) {
         double totalWeight = 0;
         for (int color : list) {
             totalWeight += getByColor(biomes, color).pixelWeight();
@@ -99,8 +99,8 @@ public class MapUtils {
         throw new RuntimeException("no valid color could be found!");
     }
 
-    private static MapBiome getByColor(Iterable<MapBiome> biomes, int color) {
-        for (MapBiome biome : biomes) {
+    private static Zone getByColor(Iterable<Zone> biomes, int color) {
+        for (Zone biome : biomes) {
             if (biome.color() == color) {
                 return biome;
             }

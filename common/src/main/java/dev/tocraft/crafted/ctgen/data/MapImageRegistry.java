@@ -1,6 +1,8 @@
 package dev.tocraft.crafted.ctgen.data;
 
 import com.mojang.logging.LogUtils;
+import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.util.MapUtils;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -17,9 +19,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 public class MapImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
     private static final Map<ResourceLocation, BufferedImage> MAPS = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, BufferedImage> UPSCALED_MAPS = new ConcurrentHashMap<>();
     private static final String DIRECTORY = "worldgen/map_based/maps";
 
     @Override
@@ -46,7 +50,20 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
     }
 
     @Nullable
-    public static BufferedImage getById(ResourceLocation id) {
-        return MAPS.get(id);
+    public static BufferedImage getByIdOrUpscale(ResourceLocation id, boolean pixelsAreChunks, Supplier<Iterable<Zone>> zones) {
+        if (pixelsAreChunks) {
+            if (UPSCALED_MAPS.containsKey(id)) {
+                return UPSCALED_MAPS.get(id);
+            } else {
+                BufferedImage original = MAPS.get(id);
+                if (original != null) {
+                    return UPSCALED_MAPS.put(id, MapUtils.generateBiomeMap(original, zones.get()));
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return MAPS.get(id);
+        }
     }
 }
