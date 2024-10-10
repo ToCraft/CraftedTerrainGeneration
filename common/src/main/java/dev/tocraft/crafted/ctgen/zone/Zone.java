@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.biome;
+package dev.tocraft.crafted.ctgen.zone;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -45,5 +45,5 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
             Codec.DOUBLE.optionalFieldOf("cave_threshold").forGetter(Zone::caveThreshold)
     ).apply(instance, instance.stable(Zone::new)));
 
-    public static RegistryFileCodec<Zone> CODEC = RegistryFileCodec.create(CTerrainGeneration.MAP_BIOME_REGISTRY, DIRECT_CODEC);
+    public static RegistryFileCodec<Zone> CODEC = RegistryFileCodec.create(CTerrainGeneration.MAP_ZONES_REGISTRY, DIRECT_CODEC);
 }

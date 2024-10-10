@@ -1,8 +1,8 @@
-package dev.tocraft.crafted.ctgen.biome;
+package dev.tocraft.crafted.ctgen.zone;
 
 import net.minecraft.data.worldgen.BootstapContext;
 
-public class MapBiomes {
+public class Zones {
     public static void bootstrap(BootstapContext<Zone> context) {
     }
 }

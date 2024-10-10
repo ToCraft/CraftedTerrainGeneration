@@ -2,8 +2,8 @@ package dev.tocraft.crafted.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.zone.CarverSetting;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -82,7 +82,7 @@ public final class MapSettings {
      * @return Returns the biome color or the default biome if none was found
      */
     @NotNull
-    public Holder<Zone> getMapBiome(int pX, int pY) {
+    public Holder<Zone> getZone(int pX, int pY) {
         int x = xOffset(pX);
         int y = yOffset(pY);
 
@@ -104,7 +104,7 @@ public final class MapSettings {
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
         double perlin = getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, Zone::perlinMultiplier);
-        double genHeight = getValueWithTransition(pX, pY, mapBiome -> (double) mapBiome.height());
+        double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
         return genHeight + perlin;
     }
 
@@ -126,10 +126,10 @@ public final class MapSettings {
         if (x < 0) baseX -= transition;
         if (y < 0) baseY -= transition;
 
-        Zone biome00 = getMapBiome(baseX >> 2, baseY >> 2).value(); // Top-left
-        Zone biome10 = getMapBiome((baseX + transition) >> 2, baseY >> 2).value(); // Top-right
-        Zone biome01 = getMapBiome(baseX >> 2, (baseY + transition) >> 2).value(); // Bottom-left
-        Zone biome11 = getMapBiome((baseX + transition) >> 2, (baseY + transition) >> 2).value(); // Bottom-right
+        Zone biome00 = getZone(baseX >> 2, baseY >> 2).value(); // Top-left
+        Zone biome10 = getZone((baseX + transition) >> 2, baseY >> 2).value(); // Top-right
+        Zone biome01 = getZone(baseX >> 2, (baseY + transition) >> 2).value(); // Bottom-left
+        Zone biome11 = getZone((baseX + transition) >> 2, (baseY + transition) >> 2).value(); // Bottom-right
 
         double h00 = function.apply(biome00);
         double h10 = function.apply(biome10);

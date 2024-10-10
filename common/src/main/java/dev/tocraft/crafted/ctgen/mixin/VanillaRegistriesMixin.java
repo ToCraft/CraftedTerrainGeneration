@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.mixin;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.biome.MapBiomes;
+import dev.tocraft.crafted.ctgen.zone.Zones;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.registries.VanillaRegistries;
 import org.spongepowered.asm.mixin.Final;
@@ -19,6 +19,6 @@ public class VanillaRegistriesMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void onInit(CallbackInfo ci) {
-        BUILDER.add(CTerrainGeneration.MAP_BIOME_REGISTRY, MapBiomes::bootstrap);
+        BUILDER.add(CTerrainGeneration.MAP_ZONES_REGISTRY, Zones::bootstrap);
     }
 }

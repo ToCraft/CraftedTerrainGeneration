@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.biome;
+package dev.tocraft.crafted.ctgen.zone;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;

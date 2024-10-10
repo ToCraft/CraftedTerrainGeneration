@@ -1,35 +1,53 @@
 package dev.tocraft.crafted.ctgen.util;
 
-import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class MapUtils {
-    public static BufferedImage approachColors(final BufferedImage inImage, final Iterable<Color> colors) {
-        BufferedImage output = new BufferedImage(inImage.getWidth(), inImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        for (int x = 0; x < output.getWidth(); x++) {
-            for (int y = 0; y < output.getHeight(); y++) {
+    public static int approachColors(final BufferedImage inImage, final BufferedImage outImage, final Iterable<Color> colors) {
+        int changed = 0;
+
+        for (int x = 0; x < outImage.getWidth(); x++) {
+            for (int y = 0; y < outImage.getHeight(); y++) {
                 Color in = new Color(inImage.getRGB(x, y));
                 Color out = ColorUtils.getNearestColor(in, colors);
                 if (out != null) {
-                    output.setRGB(x, y, out.getRGB());
+                    outImage.setRGB(x, y, out.getRGB());
+                    // count the changes
+                    if (out.getRGB() != in.getRGB()) {
+                        changed++;
+                    }
                 }
             }
         }
 
-        return output;
+        return changed;
     }
 
     private static final int[][] diagonal = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
     private static final int[][] orthogonal = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
-    public static BufferedImage generateBiomeMap(final BufferedImage original, Iterable<Zone> biomes) {
-        final BufferedImage greatMap = new BufferedImage(original.getWidth() * 2, original.getHeight() * 2, original.getType());
+    public static BufferedImage generateDetailedMap(final BufferedImage original, Iterable<Zone> zones) {
+        return generateDetailedMap(original, color -> {
+            for (Zone zone : zones) {
+                if (zone.color() == color) {
+                    return zone.pixelWeight();
+                }
+            }
+
+            throw new IllegalArgumentException("No zone for color " + color + " was found.");
+        });
+    }
+
+    public static BufferedImage generateDetailedMap(final BufferedImage original, Function<Integer, Double> getWeightByColor) {
+        final BufferedImage greatMap = new BufferedImage(original.getWidth() * 2, original.getHeight() * 2, BufferedImage.TYPE_INT_RGB);
         // seed is 0 so the map is always the same
         final Random random = new Random(0);
 
@@ -52,7 +70,7 @@ public class MapUtils {
                         nearColors.add(greatMap.getRGB(x1, y1));
                     }
                 }
-                int out = getMostWeightColor(biomes, nearColors, random);
+                int out = getMostWeightColor(getWeightByColor, nearColors, random);
                 greatMap.setRGB(x, y, out);
             }
         }
@@ -71,7 +89,7 @@ public class MapUtils {
                     }
                 }
 
-                int out = getMostWeightColor(biomes, nearColors, random);
+                int out = getMostWeightColor(getWeightByColor, nearColors, random);
                 greatMap.setRGB(x, y, out);
             }
         }
@@ -82,29 +100,20 @@ public class MapUtils {
         return x >= 0 && y >= 0 && x < width && y < height;
     }
 
-    private static int getMostWeightColor(Iterable<Zone> biomes, List<Integer> list, Random random) {
+    private static int getMostWeightColor(Function<Integer, Double> getWeightByColor, List<Integer> list, Random random) {
         double totalWeight = 0;
         for (int color : list) {
-            totalWeight += getByColor(biomes, color).pixelWeight();
+            totalWeight += getWeightByColor.apply(color);
         }
         double randomWeight = random.nextDouble(totalWeight);
         double currentWeight = 0;
         for (int color : list) {
-            currentWeight += getByColor(biomes, color).pixelWeight();
+            currentWeight += getWeightByColor.apply(color);
             if (currentWeight >= randomWeight) {
                 return color;
             }
         }
 
         throw new RuntimeException("no valid color could be found!");
-    }
-
-    private static Zone getByColor(Iterable<Zone> biomes, int color) {
-        for (Zone biome : biomes) {
-            if (biome.color() == color) {
-                return biome;
-            }
-        }
-        throw new IllegalArgumentException("No biome for color " + color + " was found.");
     }
 }

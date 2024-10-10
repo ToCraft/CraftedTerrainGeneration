@@ -3,8 +3,8 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.zone.CarverSetting;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.WorldGenRegion;
@@ -67,7 +67,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 int xOff = chunk.getPos().getBlockX(x);
                 int zOff = chunk.getPos().getBlockZ(z);
 
-                Zone biomeData = getSettings().getMapBiome(xOff >> 2, zOff >> 2).value();
+                Zone biomeData = getSettings().getZone(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
                 BlockState caveAir = biomeData.caveAir().defaultBlockState();
 
@@ -174,7 +174,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(@NotNull List<String> pInfo, @NotNull RandomState pRandom, @NotNull BlockPos pPos) {
-        getSettings().getMapBiome(pPos.getX() >> 2, pPos.getZ() >> 2).unwrapKey().ifPresent(key -> pInfo.add("Map Biome: " + key.location()));
+        getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).unwrapKey().ifPresent(key -> pInfo.add("Map Biome: " + key.location()));
         pInfo.add("Pixel Pos: X: " + getSettings().xOffset(pPos.getX() >> 2) + " Y: " + getSettings().yOffset(pPos.getZ() >> 2));
     }
 

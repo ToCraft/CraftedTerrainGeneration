@@ -13,6 +13,3 @@ tasks.withType<ProcessResources> {
     outputs.upToDateWhen { false }
 }
 
-dependencies {
-    implementation("commons-cli:commons-cli:1.9.0")
-}

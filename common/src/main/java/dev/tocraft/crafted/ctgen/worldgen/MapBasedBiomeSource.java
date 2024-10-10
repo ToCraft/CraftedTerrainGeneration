@@ -33,6 +33,6 @@ public class MapBasedBiomeSource extends BiomeSource {
 
     @Override
     public @NotNull Holder<Biome> getNoiseBiome(int pX, int pY, int pZ, Climate.@NotNull Sampler pSampler) {
-        return settings.getMapBiome(pX, pZ).value().biome();
+        return settings.getZone(pX, pZ).value().biome();
     }
 }

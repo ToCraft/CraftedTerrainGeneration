@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.data;
 
 import com.mojang.logging.LogUtils;
-import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
@@ -57,7 +57,7 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
             } else {
                 BufferedImage original = MAPS.get(id);
                 if (original != null) {
-                    return UPSCALED_MAPS.put(id, MapUtils.generateBiomeMap(original, zones.get()));
+                    return UPSCALED_MAPS.put(id, MapUtils.generateDetailedMap(original, zones.get()));
                 } else {
                     return null;
                 }

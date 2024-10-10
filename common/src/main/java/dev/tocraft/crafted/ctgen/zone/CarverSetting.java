@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.biome;
+package dev.tocraft.crafted.ctgen.zone;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

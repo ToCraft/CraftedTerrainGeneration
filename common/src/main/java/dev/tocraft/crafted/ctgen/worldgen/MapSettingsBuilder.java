@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
-import dev.tocraft.crafted.ctgen.biome.CarverSetting;
-import dev.tocraft.crafted.ctgen.biome.Zone;
+import dev.tocraft.crafted.ctgen.zone.CarverSetting;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 

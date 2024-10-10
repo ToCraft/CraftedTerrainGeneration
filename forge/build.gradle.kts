@@ -17,7 +17,3 @@ loom {
         mixinConfigs.add("ctgen.mixins.json")
     }
 }
-
-dependencies {
-    implementation("commons-cli:commons-cli:1.9.0")
-}

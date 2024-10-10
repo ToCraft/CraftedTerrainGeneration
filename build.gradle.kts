@@ -10,7 +10,7 @@ allprojects {
             attributes["Implementation-Title"] = rootProject.properties["archives_base_name"]
             attributes["Implementation-Version"] = rootProject.version
             attributes["Implementation-Vendor"] = "To_Craft"
-            attributes["Main-Class"] = "dev.tocraft.crafted.ctgen.runtime.Main"
+            attributes["Main-Class"] = rootProject.properties["main_class"]
         }
     }
 }
