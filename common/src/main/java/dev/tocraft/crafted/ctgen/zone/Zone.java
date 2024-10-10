@@ -11,6 +11,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
+import java.awt.*;
 import java.util.Optional;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -18,8 +19,8 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
                    Block surfaceBlock, Block caveAir, int height, double perlinMultiplier, double pixelWeight,
                    Optional<Double> caveThreshold) {
 
-    private Zone(Holder<Biome> biome, int color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, ResourceLocation caveAir, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold) {
-        this(biome, color, BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), BuiltInRegistries.BLOCK.get(caveAir), height, perlinMultiplier, pixelWeight, caveThreshold);
+    private Zone(Holder<Biome> biome, Color color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, ResourceLocation caveAir, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold) {
+        this(biome, color.getRGB(), BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), BuiltInRegistries.BLOCK.get(caveAir), height, perlinMultiplier, pixelWeight, caveThreshold);
     }
 
     public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
@@ -31,9 +32,15 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
     public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
     public static final double DEFAULT_PIXEL_WEIGHT = 1;
 
+    private static final Codec<Color> COLOR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("r").forGetter(Color::getRGB),
+            Codec.INT.fieldOf("g").forGetter(Color::getGreen),
+            Codec.INT.fieldOf("b").forGetter(Color::getBlue)
+    ).apply(instance, instance.stable(Color::new)));
+
     public static final Codec<Zone> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             Biome.CODEC.fieldOf("biome").forGetter(Zone::biome),
-            Codec.INT.fieldOf("color").forGetter(Zone::color),
+            COLOR_CODEC.fieldOf("color").forGetter(zone -> new Color(zone.color)),
             ResourceLocation.CODEC.optionalFieldOf("deepslate_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DEEPSLATE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.deepslateBlock)),
             ResourceLocation.CODEC.optionalFieldOf("stone_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_STONE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.stoneBlock)),
             ResourceLocation.CODEC.optionalFieldOf("dirt_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DIRT_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.dirtBlock)),

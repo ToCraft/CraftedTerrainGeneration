@@ -12,7 +12,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Main {
@@ -138,8 +140,15 @@ public class Main {
                     }
 
                     String json = Files.readString(zoneFile);
-                    String color = getJsonValue(json, "color");
-                    String pixelWeight = getJsonValue(json, "pixel_weight");
+                    Color color;
+                    {
+                        @SuppressWarnings("unchecked") Map<String, String> colorMap = (Map<String, String>) parseJson(json).get("color");
+                        int r = Integer.parseInt(colorMap.get("r"));
+                        int g = Integer.parseInt(colorMap.get("g"));
+                        int b = Integer.parseInt(colorMap.get("b"));
+                        color = new Color(r, g, b);
+                    }
+                    String pixelWeight = (String) parseJson(json).get("pixel_weight");
                     if (pixelWeight == null) {
                         pixelWeight = String.valueOf(weight);
                     }
@@ -178,32 +187,37 @@ public class Main {
     }
 
     private record JsonZone(int color, double pixelWeight) {
-        public JsonZone(String color, String pixelWeight) throws NumberFormatException {
-            this(Integer.parseInt(color), Double.parseDouble(pixelWeight));
+        public JsonZone(Color color, String pixelWeight) throws NumberFormatException {
+            this(color.getRGB(), Double.parseDouble(pixelWeight));
         }
     }
 
     @Nullable
     private static String getJsonValue(String json, String key) {
-        String searchKey = "\"" + key + "\":";
-        int jsonIndex = json.indexOf(searchKey);
-        if (jsonIndex == -1) {
-            return null;
+        return (String) parseJson(json).get(key);
+    }
+
+    public static Map<String, Object> parseJson(String json) {
+        json = json.trim();
+        if (json.startsWith("{") && json.endsWith("}")) {
+            json = json.substring(1, json.length() - 1);
         }
 
-        int startIndex = jsonIndex + searchKey.length();
-        int endIndex = json.indexOf(",", startIndex);
+        String[] outerEntries = json.split(",");
 
-        if (endIndex == -1) {
-            endIndex = json.indexOf("}", startIndex);
+        Map<String, Object> jsonMap = new HashMap<>();
+        for (String entry : outerEntries) {
+            String[] keyValue = entry.split(":");
+            String key = keyValue[0].trim().replace("\"", ""); // Remove quotes
+            String value = keyValue[1].trim();
+
+            if (value.startsWith("{") && value.endsWith("}")) {
+                jsonMap.put(key, parseJson(value));
+            } else {
+                jsonMap.put(key, value.replace("\"", ""));
+            }
         }
 
-        String value = json.substring(startIndex, endIndex).trim();
-
-        if (value.startsWith("\"") && value.endsWith("\"")) {
-            value = value.substring(1, value.length() - 1);
-        }
-
-        return value;
+        return jsonMap;
     }
 }
