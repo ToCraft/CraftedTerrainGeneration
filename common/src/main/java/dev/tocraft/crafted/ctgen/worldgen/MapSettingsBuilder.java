@@ -12,7 +12,8 @@ import java.util.Optional;
 public class MapSettingsBuilder {
     private ResourceLocation biomeMapId;
     private boolean pixelsAreChunks = MapSettings.DEFAULT.pixelsAreChunks;
-    private List<Holder<Zone>> biomeData = MapSettings.DEFAULT.zones;
+    private int thresholdModifier = MapSettings.DEFAULT.thresholdModifier;
+    private List<Holder<Zone>> zones = MapSettings.DEFAULT.zones;
     private Holder<Zone> defaultBiome;
     private int deepslateLevel = MapSettings.DEFAULT.deepslateLevel;
     private int surfaceLevel = MapSettings.DEFAULT.surfaceLevel;
@@ -36,8 +37,13 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setBiomeData(List<Holder<Zone>> biomeData) {
-        this.biomeData = biomeData;
+    public MapSettingsBuilder setThresholdModifier(int thresholdModifier) {
+        this.thresholdModifier = thresholdModifier;
+        return this;
+    }
+
+    public MapSettingsBuilder setZones(List<Holder<Zone>> zones) {
+        this.zones = zones;
         return this;
     }
 
@@ -102,6 +108,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, biomeData, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
     }
 }

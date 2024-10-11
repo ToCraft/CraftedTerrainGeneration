@@ -7,5 +7,6 @@
     "r": 168
   },
   "height": 60,
-  "perlin_multiplier": 28.0
+  "perlin_multiplier": 28.0,
+  "surface_block": "minecraft:snow"
 }

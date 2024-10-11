@@ -7,5 +7,7 @@
     "r": 0
   },
   "height": -60,
-  "perlin_multiplier": 33.0
+  "perlin_multiplier": 33.0,
+  "threshold_modifier": 26
+
 }

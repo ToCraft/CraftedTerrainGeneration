@@ -18,8 +18,8 @@ public class ZoneBuilder {
     private Block stoneBlock = Zone.DEFAULT_STONE_BLOCK;
     private Block dirtBlock = Zone.DEFAULT_DIRT_BLOCK;
     private Block surfaceBlock = Zone.DEFAULT_SURFACE_BLOCK;
-    private Block caveAir = Zone.DEFAULT_CAVE_AIR_BLOCK;
     private Optional<Double> caveThreshold = Optional.empty();
+    private Optional<Integer> thresholdModifier = Optional.empty();
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
         this.biome = biome;
@@ -71,17 +71,17 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setCaveAir(Block caveAir) {
-        this.caveAir = caveAir;
-        return this;
-    }
-
     public ZoneBuilder setCaveThreshold(double caveThreshold) {
         this.caveThreshold = Optional.of(caveThreshold);
         return this;
     }
 
+    public ZoneBuilder setThresholdModifier(int thresholdModifier) {
+        this.thresholdModifier = Optional.of(thresholdModifier);
+        return this;
+    }
+
     public Zone build() {
-        return new Zone(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, caveAir, height, perlinMultiplier, pixelWeight, caveThreshold);
+        return new Zone(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, height, perlinMultiplier, pixelWeight, caveThreshold, thresholdModifier);
     }
 }

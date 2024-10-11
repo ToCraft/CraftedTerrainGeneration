@@ -18,11 +18,12 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, true, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -32, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.biomeMapId),
             Codec.BOOL.optionalFieldOf("pixels_are_chunks", DEFAULT.pixelsAreChunks).forGetter(o -> o.pixelsAreChunks),
+            Codec.INT.optionalFieldOf("default_threshold_modifier", DEFAULT.thresholdModifier).forGetter(o -> o.thresholdModifier),
             Codec.list(Zone.CODEC).optionalFieldOf("map_biomes", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.INT.optionalFieldOf("deepslate_level", DEFAULT.deepslateLevel).forGetter(o -> o.deepslateLevel),
@@ -40,6 +41,7 @@ public final class MapSettings {
 
     private final ResourceLocation biomeMapId;
     final boolean pixelsAreChunks;
+    final int thresholdModifier;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     final int deepslateLevel;
@@ -55,9 +57,10 @@ public final class MapSettings {
     final Optional<Integer> spawnY;
     final List<CarverSetting> carverSettings;
 
-    public MapSettings(ResourceLocation biomeMapId, boolean pixelsAreChunks, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation biomeMapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.biomeMapId = biomeMapId;
         this.pixelsAreChunks = pixelsAreChunks;
+        this.thresholdModifier = thresholdModifier;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
         this.deepslateLevel = deepslateLevel;
@@ -117,7 +120,7 @@ public final class MapSettings {
         return perlin;
     }
 
-    private double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
+    double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;

@@ -8,5 +8,6 @@
   },
   "height": -35,
   "perlin_multiplier": 16.0,
-  "surface_block": "minecraft:sand"
+  "surface_block": "minecraft:sand",
+  "threshold_modifier": 26
 }

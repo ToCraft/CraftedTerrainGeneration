@@ -67,9 +67,9 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 int xOff = chunk.getPos().getBlockX(x);
                 int zOff = chunk.getPos().getBlockZ(z);
 
-                Zone biomeData = getSettings().getZone(xOff >> 2, zOff >> 2).value();
+                Zone zone = getSettings().getZone(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
-                BlockState caveAir = biomeData.caveAir().defaultBlockState();
+                int thresholdModifier = (int) getSettings().getValueWithTransition(xOff, zOff, zo -> (double) zo.thresholdModifier().orElse(getSettings().thresholdModifier));
 
                 for (int y = chunk.getMinBuildHeight(); y <= surfaceHeight || y <= getSeaLevel(); y++) {
                     BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
@@ -81,37 +81,35 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         // place oceans if the surface isn't higher than the sea level
                         chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
                     // check for caves
-                    } else if (canSetBlock(pos, minHeight, surfaceHeight)) {
+                    } else if (canSetBlock(pos, minHeight, surfaceHeight, thresholdModifier)) {
                         if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
                             // place deepslate
-                            chunk.setBlockState(pos, biomeData.deepslateBlock().defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.deepslateBlock().defaultBlockState(), false);
                         } else if (y < surfaceHeight - DIRT_SIZE) {
                             // place stone between deepslate and surface - DIRT_SIZE
-                            chunk.setBlockState(pos, biomeData.stoneBlock().defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.stoneBlock().defaultBlockState(), false);
                         } else if (y < surfaceHeight - 1) {
                             // place dirt below surface
-                            chunk.setBlockState(pos, biomeData.dirtBlock().defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.dirtBlock().defaultBlockState(), false);
                         }
                         // only surface is missing
                         else {
-                            Block surfaceBlock = biomeData.surfaceBlock();
+                            Block surfaceBlock = zone.surfaceBlock();
                             // no grass underwater
                             if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
                                 surfaceBlock = Blocks.DIRT;
                             }
                             chunk.setBlockState(pos, surfaceBlock.defaultBlockState(), false);
                         }
-                    } else {
-                        chunk.setBlockState(pos, caveAir, false);
                     }
                 }
             }
         }
     }
 
-    private boolean canSetBlock(BlockPos pos, int surfaceHeight, double minHeight) {
+    private boolean canSetBlock(BlockPos pos, int surfaceHeight, double minHeight, int thresholdModifier) {
         double height = (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
-        double addThreshold = height * height * height * height * 6;
+        double addThreshold = height * height * height * height * thresholdModifier;
 
         for (CarverSetting carver : getSettings().carverSettings) {
             double perlin = 0;
@@ -174,7 +172,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(@NotNull List<String> pInfo, @NotNull RandomState pRandom, @NotNull BlockPos pPos) {
-        getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).unwrapKey().ifPresent(key -> pInfo.add("Map Biome: " + key.location()));
+        getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).unwrapKey().ifPresent(key -> pInfo.add("Zone: " + key.location()));
         pInfo.add("Pixel Pos: X: " + getSettings().xOffset(pPos.getX() >> 2) + " Y: " + getSettings().yOffset(pPos.getZ() >> 2));
     }
 
