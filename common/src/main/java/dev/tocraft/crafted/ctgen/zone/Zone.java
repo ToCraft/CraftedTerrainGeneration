@@ -17,11 +17,10 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
                    Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
-                   Optional<Double> caveThreshold,
                    Optional<Integer> thresholdModifier) {
 
-    private Zone(Holder<Biome> biome, Color color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Double> caveThreshold, Optional<Integer> thresholdModifier) {
-        this(biome, color.getRGB(), BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, caveThreshold, thresholdModifier);
+    private Zone(Holder<Biome> biome, Color color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Integer> thresholdModifier) {
+        this(biome, color.getRGB(), BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, thresholdModifier);
     }
 
     public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
@@ -48,7 +47,6 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
             Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(Zone::height),
             Codec.DOUBLE.optionalFieldOf("perlin_multiplier", DEFAULT_PERLIN_MULTIPLIER).forGetter(Zone::perlinMultiplier),
             Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(Zone::pixelWeight),
-            Codec.DOUBLE.optionalFieldOf("cave_threshold").forGetter(Zone::caveThreshold),
             Codec.INT.optionalFieldOf("threshold_modifier").forGetter(Zone::thresholdModifier)
     ).apply(instance, instance.stable(Zone::new)));
 
