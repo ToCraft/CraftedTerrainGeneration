@@ -1,7 +1,13 @@
 package dev.tocraft.crafted.ctgen.runtime;
 
+import dev.tocraft.crafted.cli.CmdLineBuilder;
+import dev.tocraft.crafted.cli.CommandLine;
+import dev.tocraft.crafted.cli.Option;
+import dev.tocraft.crafted.cli.OptionBuilder;
+import dev.tocraft.crafted.cli.json.JsonParser;
+import dev.tocraft.crafted.cli.json.elements.JsonDouble;
+import dev.tocraft.crafted.cli.json.elements.JsonElement;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
-import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,90 +18,38 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Main {
-    private static final String HELP_PAGE = """
-            usage: java -jar CTGen.jar -z <arg> -i <arg> -o <arg> [-w <arg>] [-c <arg>]
-            Tool for upscaling map images so they can be properly read by the Crafted
-            Terrain Generation Mod (CTGen).
-             -z,--zones <arg>       directory containing the zones as json files
-             -i,--original <arg>    Input map image, no alpha supported!
-             -o,--output <arg>      Output map image, must end with ".png"
-             -w,--weight <arg>      Default pixel weight, will default to 1
-             -c,--corrected <arg>   Optional file to save the input image with corrected colors, must end with ".png"
-            Copyright (c) 2024 To_Craft. Licensed under the Crafted License 1.0
-            """;
+    private static final String JAR_FILE_NAME = Path.of(Main.class
+            .getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .getPath()).getFileName().toString();
+
+    private static final String CMD_BASE = "java -jar " + JAR_FILE_NAME;
+    private static final String DESCRIPTION = "Tool for upscaling map images so they can be properly read by\nthe Crafted Terrain Generation Mod (CTGen).";
+    private static final String COPYRIGHT = "Copyright (c) 2024 To_Craft. Licensed under the Crafted License 1.0";
+    private static final Option INPUT = new OptionBuilder().setAbbreviation("-i").addAlias("--input").setDescription("Input map image, no alpha supported!").create();
+    private static final Option ZONES = new OptionBuilder().setAbbreviation("-z").addAlias("--zones").setDescription("directory containing the zones as json files").create();
+    private static final Option OUTPUT = new OptionBuilder().setAbbreviation("-o").addAlias("--output").setDescription("Output map image, must end with \".png\"").create();
+    private static final Option CORRECTED = new OptionBuilder().setAbbreviation("-c").addAlias("--corrected").setDescription("Optional file to save the input image with corrected colors, must end with \".png\"").setRequired(false).create();
+    private static final Option WEIGHT = new OptionBuilder().setAbbreviation("-w").addAlias("--weight").setDescription("Default pixel weight, will default to 1").setRequired(false).create();
+    private static final CommandLine CMDLINE = new CmdLineBuilder().setCmdBase(CMD_BASE).setHeader(DESCRIPTION).setFooter(COPYRIGHT).addOptions(INPUT, ZONES, OUTPUT, CORRECTED, WEIGHT).create();
 
     public static void main(String[] args) {
-        List<String> processedArgs = new ArrayList<>();
-        StringBuilder input = new StringBuilder();
-        StringBuilder zones = new StringBuilder();
-        StringBuilder output = new StringBuilder();
-        StringBuilder weight = new StringBuilder();
-        StringBuilder corrected = new StringBuilder();
-        for (int i = 0; i < args.length - 1; i++) {
-            String arg = args[i];
-            switch (arg) {
-                case "-i", "--original": {
-                    String value = args[i + 1];
-                    input.append(value);
-                    processedArgs.add(arg);
-                    processedArgs.add(value);
-                    break;
-                }
-                case "-z", "--zones": {
-                    String value = args[i + 1];
-                    zones.append(value);
-                    processedArgs.add(arg);
-                    processedArgs.add(value);
-                    break;
-                }
-                case "-o", "--output": {
-                    String value = args[i + 1];
-                    if (!value.endsWith(".png")) {
-                        System.err.println("The output file must end with \".png\"");
-                        System.exit(0);
-                    }
-                    output.append(value);
-                    processedArgs.add(arg);
-                    processedArgs.add(value);
-                    break;
-                }
-                case "-w", "--weight": {
-                    String value = args[i + 1];
-                    weight.append(value);
-                    processedArgs.add(arg);
-                    processedArgs.add(value);
-                    break;
-                }
-                case "-c", "--corrected": {
-                    String value = args[i + 1];
-                    if (!value.endsWith(".png")) {
-                        System.err.println("The output file must end with \".png\"");
-                        System.exit(0);
-                    }
-                    corrected.append(value);
-                    processedArgs.add(arg);
-                    processedArgs.add(value);
-                    break;
-                }
-            }
-        }
-
-        // arg is missing or there are too many args
-        if (input.isEmpty()  || zones.isEmpty() || output.isEmpty() || new ArrayList<>(List.of(args)).retainAll(processedArgs)) {
-            System.out.println(HELP_PAGE);
-            System.exit(0);
-        }
+        Map<Option, String> input = CMDLINE.parseArgs(args);
 
         try {
+            if (input == null) {
+                throw new IOException();
+            }
+
             long startTime = System.currentTimeMillis();
 
-            Preparer preparer = new Preparer(input.toString(), zones.toString(), output.toString(), weight.toString(), corrected.toString());
+            Preparer preparer = new Preparer(input.get(INPUT), input.get(ZONES), input.get(OUTPUT), input.get(WEIGHT), input.get(CORRECTED));
             Runner runner = preparer.run();
             System.out.println("Successfully read all input files. Continuing with processing.");
             runner.run();
@@ -104,9 +58,12 @@ public class Main {
             float duration = (float) ((System.currentTimeMillis() - startTime) / 1000.0);
             System.out.println("Program finished within " + duration + " seconds.");
         } catch (IOException e) {
-            System.out.println(HELP_PAGE);
+            System.out.println(CMDLINE.getHelpPage());
             System.err.println("Caught an error while parsing the args.");
-            System.err.println(e.getMessage());
+            String msg = e.getMessage();
+            if (msg != null && !msg.isBlank()) {
+                System.err.println(msg);
+            }
             System.exit(0);
         }
     }
@@ -116,15 +73,14 @@ public class Main {
         private final Path zones;
         private final File output;
         private final double weight;
-        @Nullable
         private final File corrected;
 
         public Preparer(String input, String zones, String output, String weight, String corrected) {
             this.input = new File(input);
             this.zones = Path.of(zones);
             this.output = new File(output);
-            this.weight = weight.isBlank() ? 1.0d : Double.parseDouble(weight);
-            this.corrected = corrected.isBlank() ? null : new File(corrected);
+            this.weight = weight == null ? 1.0d : Double.parseDouble(weight);
+            this.corrected = corrected == null ? null : new File(corrected);
         }
 
         // read input files and parse as something readable
@@ -142,18 +98,18 @@ public class Main {
                     String json = Files.readString(zoneFile);
                     Color color;
                     {
-                        @SuppressWarnings("unchecked") Map<String, String> colorMap = (Map<String, String>) parseJson(json).get("color");
-                        int r = Integer.parseInt(colorMap.get("r"));
-                        int g = Integer.parseInt(colorMap.get("g"));
-                        int b = Integer.parseInt(colorMap.get("b"));
+                        Map<String, JsonElement> colorMap = JsonParser.parseJson(json).asObject().get("color").asObject();
+                        int r = colorMap.get("r").asInt().get();
+                        int g = colorMap.get("g").asInt().get();
+                        int b = colorMap.get("b").asInt().get();
                         color = new Color(r, g, b);
                     }
-                    String pixelWeight = (String) parseJson(json).get("pixel_weight");
+                    JsonElement pixelWeight = JsonParser.parseJson(json).asObject().get("pixel_weight");
                     if (pixelWeight == null) {
-                        pixelWeight = String.valueOf(weight);
+                        pixelWeight = new JsonDouble(weight);
                     }
 
-                    JsonZone zone = new JsonZone(color, pixelWeight);
+                    JsonZone zone = new JsonZone(color.getRGB(), pixelWeight.asDouble().get());
                     zones.add(zone);
                 }
             }
@@ -162,7 +118,7 @@ public class Main {
         }
     }
 
-    private record Runner(BufferedImage original, List<JsonZone> zones, File output, @Nullable File corrected) {
+    private record Runner(BufferedImage original, List<JsonZone> zones, File output, File corrected) {
         // actual map generation logic
         public void run() throws IOException {
             List<Color> colors = zones.stream().map(zone -> new Color(zone.color)).toList();
@@ -187,37 +143,5 @@ public class Main {
     }
 
     private record JsonZone(int color, double pixelWeight) {
-        public JsonZone(Color color, String pixelWeight) throws NumberFormatException {
-            this(color.getRGB(), Double.parseDouble(pixelWeight));
-        }
-    }
-
-    @Nullable
-    private static String getJsonValue(String json, String key) {
-        return (String) parseJson(json).get(key);
-    }
-
-    public static Map<String, Object> parseJson(String json) {
-        json = json.trim();
-        if (json.startsWith("{") && json.endsWith("}")) {
-            json = json.substring(1, json.length() - 1);
-        }
-
-        String[] outerEntries = json.split(",");
-
-        Map<String, Object> jsonMap = new HashMap<>();
-        for (String entry : outerEntries) {
-            String[] keyValue = entry.split(":");
-            String key = keyValue[0].trim().replace("\"", ""); // Remove quotes
-            String value = keyValue[1].trim();
-
-            if (value.startsWith("{") && value.endsWith("}")) {
-                jsonMap.put(key, parseJson(value));
-            } else {
-                jsonMap.put(key, value.replace("\"", ""));
-            }
-        }
-
-        return jsonMap;
     }
 }

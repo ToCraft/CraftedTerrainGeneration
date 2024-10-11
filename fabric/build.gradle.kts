@@ -2,6 +2,11 @@ plugins {
     id("dev.tocraft.modmaster.fabric")
 }
 
+
+dependencies {
+    shadowCommon(implementation("dev.tocraft.crafted:cli:${rootProject.properties["cli_version"]}")!!)
+}
+
 tasks.withType<ProcessResources> {
     @Suppress("UNCHECKED_CAST") val modMeta = parent!!.ext["mod_meta"]!! as Map<String, Any>
     //inputs.properties.putAll(modMeta)
@@ -12,4 +17,3 @@ tasks.withType<ProcessResources> {
 
     outputs.upToDateWhen { false }
 }
-
