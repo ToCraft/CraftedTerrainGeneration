@@ -30,26 +30,27 @@ public class Main {
             .getPath()).getFileName().toString();
 
     private static final String CMD_BASE = "java -jar " + JAR_FILE_NAME;
-    private static final String DESCRIPTION = "Tool for upscaling map images so they can be properly read by\nthe Crafted Terrain Generation Mod (CTGen).";
+    private static final String DESCRIPTION = "Tool for upscaling map images so they can be properly read by\nthe Crafted Terrain Generation Mod (CTGen).\nEvery image file path must end with \".png\"";
     private static final String COPYRIGHT = "Copyright (c) 2024 To_Craft. Licensed under the Crafted License 1.0";
     private static final Option INPUT = new OptionBuilder().setAbbreviation("-i").addAlias("--input").setDescription("Input map image, no alpha supported!").create();
     private static final Option ZONES = new OptionBuilder().setAbbreviation("-z").addAlias("--zones").setDescription("directory containing the zones as json files").create();
-    private static final Option OUTPUT = new OptionBuilder().setAbbreviation("-o").addAlias("--output").setDescription("Output map image, must end with \".png\"").create();
-    private static final Option CORRECTED = new OptionBuilder().setAbbreviation("-c").addAlias("--corrected").setDescription("Optional file to save the input image with corrected colors, must end with \".png\"").setRequired(false).create();
+    private static final Option OUTPUT = new OptionBuilder().setAbbreviation("-o").addAlias("--output").setDescription("Output map image").create();
+    private static final Option CORRECTED = new OptionBuilder().setAbbreviation("-c").addAlias("--corrected").setDescription("Optional file to save an image with only the corrected colors").setRequired(false).create();
+    private static final Option ONLY_CHANGED = new OptionBuilder().setAbbreviation("-oc").addAlias("--only-changed").setDescription("Works only in addition to --corrected, the corrected image will only show the changed pixel.").setTakesInput(false).setRequired(false).create();
     private static final Option WEIGHT = new OptionBuilder().setAbbreviation("-w").addAlias("--weight").setDescription("Default pixel weight, will default to 1").setRequired(false).create();
-    private static final CommandLine CMDLINE = new CmdLineBuilder().setCmdBase(CMD_BASE).setHeader(DESCRIPTION).setFooter(COPYRIGHT).addOptions(INPUT, ZONES, OUTPUT, CORRECTED, WEIGHT).create();
+    private static final CommandLine CMDLINE = new CmdLineBuilder().setCmdBase(CMD_BASE).setHeader(DESCRIPTION).setFooter(COPYRIGHT).addOptions(INPUT, ZONES, OUTPUT, CORRECTED, ONLY_CHANGED, WEIGHT).create();
 
     public static void main(String[] args) {
         Map<Option, String> input = CMDLINE.parseArgs(args);
 
         try {
-            if (input == null) {
+            if (input == null || (input.containsKey(ONLY_CHANGED) && !input.containsKey(CORRECTED))) {
                 throw new IOException();
             }
 
             long startTime = System.currentTimeMillis();
 
-            Preparer preparer = new Preparer(input.get(INPUT), input.get(ZONES), input.get(OUTPUT), input.get(WEIGHT), input.get(CORRECTED));
+            Preparer preparer = new Preparer(input.get(INPUT), input.get(ZONES), input.get(OUTPUT), input.get(WEIGHT), input.get(CORRECTED), input.containsKey(ONLY_CHANGED));
             Runner runner = preparer.run();
             System.out.println("Successfully read all input files. Continuing with processing.");
             runner.run();
@@ -74,13 +75,15 @@ public class Main {
         private final File output;
         private final double weight;
         private final File corrected;
+        private final boolean onlyChanged;
 
-        public Preparer(String input, String zones, String output, String weight, String corrected) {
+        public Preparer(String input, String zones, String output, String weight, String corrected, boolean onlyChanged) {
             this.input = new File(input);
             this.zones = Path.of(zones);
             this.output = new File(output);
             this.weight = weight == null ? 1.0d : Double.parseDouble(weight);
             this.corrected = corrected == null ? null : new File(corrected);
+            this.onlyChanged = onlyChanged;
         }
 
         // read input files and parse as something readable
@@ -114,18 +117,37 @@ public class Main {
                 }
             }
 
-            return new Runner(inImage, zones, output, corrected);
+            return new Runner(inImage, zones, output, corrected, onlyChanged);
         }
     }
 
-    private record Runner(BufferedImage original, List<JsonZone> zones, File output, File corrected) {
+    private record Runner(BufferedImage original, List<JsonZone> zones, File output, File corrected,
+                          boolean onlyChanged) {
         // actual map generation logic
         public void run() throws IOException {
             List<Color> colors = zones.stream().map(zone -> new Color(zone.color)).toList();
             BufferedImage corrected = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+            corrected.setData(original.copyData(null));
             int count = MapUtils.approachColors(original, corrected, colors);
             // optionally save the corrected image
-            if (this.corrected != null) ImageIO.write(corrected, "PNG", this.corrected);
+            if (this.corrected != null) {
+                BufferedImage outCorr;
+                if (onlyChanged) {
+                    outCorr = new BufferedImage(corrected.getWidth(), corrected.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    for (int x = 0; x < corrected.getWidth(); x++) {
+                        for (int y = 0; y < corrected.getHeight(); y++) {
+                            int c = corrected.getRGB(x, y);
+                            int o = original.getRGB(x, y);
+                            if (c != o) {
+                                outCorr.setRGB(x, y, c);
+                            }
+                        }
+                    }
+                } else {
+                    outCorr = corrected;
+                }
+                ImageIO.write(outCorr, "PNG", this.corrected);
+            }
             System.out.println("Corrected the color for " + count + " pixels.");
 
             BufferedImage outMap = MapUtils.generateDetailedMap(corrected, color -> {

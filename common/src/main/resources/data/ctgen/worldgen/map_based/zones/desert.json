@@ -1,0 +1,12 @@
+{
+  "biome": "minecraft:desert",
+  "color": {
+    "b": 54,
+    "g": 171,
+    "r": 165
+  },
+  "dirt_block": "minecraft:sandstone",
+  "height": 5,
+  "perlin_multiplier": 4.0,
+  "surface_block": "minecraft:sand"
+}

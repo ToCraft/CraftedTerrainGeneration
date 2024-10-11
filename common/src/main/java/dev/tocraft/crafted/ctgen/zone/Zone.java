@@ -33,7 +33,7 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
     public static final double DEFAULT_PIXEL_WEIGHT = 1;
 
     private static final Codec<Color> COLOR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("r").forGetter(Color::getRGB),
+            Codec.INT.fieldOf("r").forGetter(Color::getRed),
             Codec.INT.fieldOf("g").forGetter(Color::getGreen),
             Codec.INT.fieldOf("b").forGetter(Color::getBlue)
     ).apply(instance, instance.stable(Color::new)));

@@ -1,0 +1,10 @@
+{
+  "biome": "minecraft:windswept_gravelly_hills",
+  "color": {
+    "b": 151,
+    "g": 151,
+    "r": 151
+  },
+  "height": 25,
+  "perlin_multiplier": 18.0
+}

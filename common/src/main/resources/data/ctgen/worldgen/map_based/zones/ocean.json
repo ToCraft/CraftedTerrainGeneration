@@ -1,0 +1,12 @@
+{
+  "biome": "minecraft:ocean",
+  "cave_air": "minecraft:water",
+  "color": {
+    "b": 103,
+    "g": 42,
+    "r": 0
+  },
+  "height": -35,
+  "perlin_multiplier": 16.0,
+  "surface_block": "minecraft:sand"
+}

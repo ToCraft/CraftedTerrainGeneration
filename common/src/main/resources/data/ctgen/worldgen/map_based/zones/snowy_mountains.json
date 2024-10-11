@@ -1,0 +1,11 @@
+{
+  "biome": "minecraft:jagged_peaks",
+  "cave_threshold": 0.7,
+  "color": {
+    "b": 168,
+    "g": 168,
+    "r": 168
+  },
+  "height": 60,
+  "perlin_multiplier": 28.0
+}

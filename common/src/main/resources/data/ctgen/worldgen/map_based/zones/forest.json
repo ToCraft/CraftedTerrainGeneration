@@ -1,0 +1,10 @@
+{
+  "biome": "minecraft:forest",
+  "color": {
+    "b": 43,
+    "g": 70,
+    "r": 43
+  },
+  "height": 8,
+  "perlin_multiplier": 6.0
+}

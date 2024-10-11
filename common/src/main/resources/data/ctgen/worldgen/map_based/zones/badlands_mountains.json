@@ -1,0 +1,12 @@
+{
+  "biome": "minecraft:badlands",
+  "color": {
+    "b": 53,
+    "g": 71,
+    "r": 70
+  },
+  "dirt_block": "minecraft:red_concrete",
+  "height": 28,
+  "perlin_multiplier": 24.0,
+  "surface_block": "minecraft:brown_concrete"
+}

@@ -1,0 +1,11 @@
+{
+  "biome": "minecraft:deep_ocean",
+  "cave_air": "minecraft:water",
+  "color": {
+    "b": 85,
+    "g": 35,
+    "r": 0
+  },
+  "height": -60,
+  "perlin_multiplier": 33.0
+}
