@@ -31,8 +31,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
-    private static final int BEDROCK_SIZE = 4;
-    private static final int DIRT_SIZE = 4;
+    private static final int BEDROCK_SIZE = 5;
+private static final int DIRT_SIZE = 6;
 
     protected final MapBasedBiomeSource biomeSource;
     private SimplexNoise noise = null;
@@ -60,7 +60,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState pRandom, @NotNull ChunkAccess chunk) {
         setNoise(pRandom);
 
-        int minHeight = chunk.getMinBuildHeight() + BEDROCK_SIZE;
+        int minHeight = getSettings().minY + BEDROCK_SIZE;
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -71,22 +71,32 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
                 int thresholdModifier = (int) getSettings().getValueWithTransition(xOff, zOff, zo -> (double) zo.thresholdModifier().orElse(getSettings().thresholdModifier));
 
-                for (int y = chunk.getMinBuildHeight(); y <= surfaceHeight || y <= getSeaLevel(); y++) {
+                Block surfaceBlock = zone.surfaceBlock();
+                // no grass underwater
+                if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
+                    surfaceBlock = Blocks.DIRT;
+                }
+
+                int shift = (int) (noise.getValue(xOff, zOff) * 3);
+                int bedrockLevel = minHeight + shift;
+                int deepslateLevel = getSettings().deepslateLevel + shift;
+                int dirtLevel = (int) (surfaceHeight - DIRT_SIZE + shift);
+
+                for (int y = getSettings().minY; y <= surfaceHeight || y <= getSeaLevel(); y++) {
                     BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
-                    if (y < minHeight) {
+                    if (y < bedrockLevel) {
                         // place bedrock
                         chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
-                        continue;
                     } else if (y > surfaceHeight && surfaceHeight < getSeaLevel()) {
                         // place oceans if the surface isn't higher than the sea level
                         chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
                     // check for caves
-                    } else if (canSetBlock(pos, minHeight, surfaceHeight, thresholdModifier)) {
-                        if (y < getSettings().deepslateLevel && getSettings().deepslateLevel < surfaceHeight) {
+                    } else if (canSetBlock(pos, surfaceHeight, getSettings().deepslateLevel, minHeight + 3, thresholdModifier)) {
+                        if (y < deepslateLevel && deepslateLevel < surfaceHeight) {
                             // place deepslate
                             chunk.setBlockState(pos, zone.deepslateBlock().defaultBlockState(), false);
-                        } else if (y < surfaceHeight - DIRT_SIZE) {
-                            // place stone between deepslate and surface - DIRT_SIZE
+                        } else if (y < dirtLevel) {
+                            // place stone between deepslate and dirt
                             chunk.setBlockState(pos, zone.stoneBlock().defaultBlockState(), false);
                         } else if (y < surfaceHeight - 1) {
                             // place dirt below surface
@@ -94,11 +104,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         }
                         // only surface is missing
                         else {
-                            Block surfaceBlock = zone.surfaceBlock();
-                            // no grass underwater
-                            if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
-                                surfaceBlock = Blocks.DIRT;
-                            }
                             chunk.setBlockState(pos, surfaceBlock.defaultBlockState(), false);
                         }
                     }
@@ -107,9 +112,10 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         }
     }
 
-    private boolean canSetBlock(BlockPos pos, int surfaceHeight, double minHeight, int thresholdModifier) {
-        double height = (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
-        double addThreshold = height * height * height * height * thresholdModifier;
+    private boolean canSetBlock(BlockPos pos, double surfaceHeight, int deepslateLevel, int bedrockLevel, int thresholdModifier) {
+        double height = (double) (pos.getY() - bedrockLevel) / (surfaceHeight - bedrockLevel) - 0.5;
+        int mod = height > (deepslateLevel / (surfaceHeight - bedrockLevel) - 0.5) ? thresholdModifier : 16;
+        double addThreshold = height * height * height * height * mod;
 
         for (CarverSetting carver : getSettings().carverSettings) {
             double perlin = 0;

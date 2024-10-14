@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.awt.*;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
                    Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
                    Optional<Integer> thresholdModifier) {
 
+    @ApiStatus.Internal
     private Zone(Holder<Biome> biome, Color color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Integer> thresholdModifier) {
         this(biome, color.getRGB(), BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, thresholdModifier);
     }
