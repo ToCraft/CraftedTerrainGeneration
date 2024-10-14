@@ -27,7 +27,10 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 public class CTGLocateCommand {
     public static void register(LiteralCommandNode<CommandSourceStack> rootNode, CommandBuildContext context) {
@@ -58,19 +61,23 @@ public class CTGLocateCommand {
             Zone zone = level.registryAccess().registryOrThrow(CTerrainGeneration.MAP_ZONES_REGISTRY).getOptional(zoneId).orElseThrow();
 
             MapSettings settings = generator.getSettings();
+            BufferedImage image = generator.getSettings().getMapImage();
+            int targetColor = zone.color();
+
             Vec3 pos = source.getPosition();
             int x = settings.xOffset(((int) pos.x) >> 2);
             int z = settings.yOffset(((int) pos.y) >> 2);
+            // still search in image, even if player is outside of it
+            if (x < 0 || x > image.getWidth()) x = 0;
+            if (z < 0 || z > image.getHeight()) z = 0;
             Point start = new Point(x, z);
-            BufferedImage image = generator.getSettings().getMapImage();
-            int targetColor = zone.color();
 
             Point located = locateColor(image, start, targetColor);
 
             if (located != null) {
                 showResult(source, located, zoneId.toString(), stopwatch.elapsed());
             } else {
-                source.sendFailure(Component.translatable("ctgen.commands.locate.failure"));
+                source.sendFailure(Component.translatable("ctgen.commands.locate.failure", zoneId));
             }
         } else {
             throw CTGCommand.INVALID_CHUNK_GENERATOR.create();
@@ -81,7 +88,7 @@ public class CTGLocateCommand {
 
     private static final Point[] DIRECTIONS = {
             new Point(4, 0),   // Right
-            new Point(0,  4),   // Down
+            new Point(0, 4),   // Down
             new Point(-4, 0),  // Left
             new Point(0, -4)   // Up
     };
@@ -93,11 +100,6 @@ public class CTGLocateCommand {
         Queue<Point> queue = new LinkedList<>();
         Set<Point> visited = new HashSet<>();
 
-        int startColor = image.getRGB(startPoint.x, startPoint.y);
-        if (startColor == targetColor) {
-            return startPoint;
-        }
-
         queue.add(startPoint);
 
         while (!queue.isEmpty()) {
@@ -106,22 +108,23 @@ public class CTGLocateCommand {
             if (!visited.contains(current)) {
                 visited.add(current);
 
-                int currentColor = image.getRGB(current.x, current.y);
+                if (current.x >= 0 && current.x < width && current.y >= 0 && current.y < height) {
+                    int currentColor = image.getRGB(current.x, current.y);
 
-                if (currentColor == targetColor) {
-                    return current;
-                }
+                    if (currentColor == targetColor) {
+                        return current;
+                    }
 
-                for (Point dir : DIRECTIONS) {
-                    int newX = current.x + dir.x;
-                    int newY = current.y + dir.y;
+                    for (Point dir : DIRECTIONS) {
+                        int newX = current.x + dir.x;
+                        int newY = current.y + dir.y;
 
-                    if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
                         queue.add(new Point(newX, newY));
                     }
                 }
             }
         }
+
         return null;
     }
 
@@ -134,7 +137,7 @@ public class CTGLocateCommand {
         Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("ctgen.coordinates", pixelPos.x, pixelPos.y))
                 .withStyle(
                         style -> style.withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ctgen tp @s " + pixelPos.x + " " + pixelPos.y))
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ctgen teleport @s " + pixelPos.x + " " + pixelPos.y))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
                 );
         source.sendSuccess(() -> Component.translatable("ctgen.commands.locate.success", elementName, component), false);

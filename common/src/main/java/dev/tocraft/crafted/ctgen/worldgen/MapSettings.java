@@ -2,9 +2,9 @@ package dev.tocraft.crafted.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
-import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -13,7 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 

@@ -33,7 +33,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
     private static final int BEDROCK_SIZE = 2;
-private static final int DIRT_SIZE = 6;
+    private static final int DIRT_SIZE = 6;
 
     protected final MapBasedBiomeSource biomeSource;
     private SimplexNoise noise = null;
@@ -91,7 +91,7 @@ private static final int DIRT_SIZE = 6;
                     } else if (y > surfaceHeight && surfaceHeight < getSeaLevel()) {
                         // place oceans if the surface isn't higher than the sea level
                         chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
-                    // check for caves
+                        // check for caves
                     } else if (canSetBlock(pos, surfaceHeight, getSettings().deepslateLevel, minHeight + 3, thresholdModifier)) {
                         if (y < deepslateLevel && deepslateLevel < surfaceHeight) {
                             // place deepslate

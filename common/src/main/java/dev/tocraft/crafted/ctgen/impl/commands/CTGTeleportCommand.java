@@ -32,34 +32,32 @@ public class CTGTeleportCommand {
                 Commands.literal("teleport")
                         .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                         .then(
-                                Commands.argument("pos", Vec2Argument.vec2())
+                                Commands.argument("pixel", Vec2Argument.vec2())
                                         .executes(
                                                 commandContext -> teleportToPos(
                                                         commandContext.getSource(),
                                                         Collections.singleton(commandContext.getSource().getEntityOrException()),
                                                         commandContext.getSource().getLevel(),
-                                                        Vec2Argument.getVec2(commandContext, "pos")
+                                                        Vec2Argument.getVec2(commandContext, "pixel")
                                                 )
                                         )
                         )
                         .then(
                                 Commands.argument("targets", EntityArgument.entities())
                                         .then(
-                                                Commands.argument("pos", Vec2Argument.vec2())
+                                                Commands.argument("pixel", Vec2Argument.vec2())
                                                         .executes(
                                                                 commandContext -> teleportToPos(
                                                                         commandContext.getSource(),
                                                                         EntityArgument.getEntities(commandContext, "targets"),
                                                                         commandContext.getSource().getLevel(),
-                                                                        Vec2Argument.getVec2(commandContext, "pos")
+                                                                        Vec2Argument.getVec2(commandContext, "pixel")
                                                                 )
                                                         )
                                         )
                         ).build();
 
-        LiteralCommandNode<CommandSourceStack> tpNode = Commands.literal("tp").redirect(teleportNode).build();
         rootNode.addChild(teleportNode);
-        rootNode.addChild(tpNode);
     }
 
     private static int teleportToPos(CommandSourceStack source, Collection<? extends Entity> targets, ServerLevel level, Vec2 dest) throws CommandSyntaxException {

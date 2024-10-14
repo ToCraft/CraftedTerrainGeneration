@@ -1,8 +1,8 @@
 package dev.tocraft.crafted.ctgen.data;
 
 import com.mojang.logging.LogUtils;
-import dev.tocraft.crafted.ctgen.zone.Zone;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
+import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
