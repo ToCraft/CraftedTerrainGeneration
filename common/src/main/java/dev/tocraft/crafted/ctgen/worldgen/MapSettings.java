@@ -74,8 +74,20 @@ public final class MapSettings {
         this.noiseStretch = noiseStretch;
         this.noiseDetail = noiseDetail;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(biomeMapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
-        this.spawnX = spawnX;
-        this.spawnY = spawnY;
+        this.spawnX = spawnX.map(sX -> {
+            if (pixelsAreChunks) {
+                return sX >> 2;
+            } else {
+                return sX;
+            }
+        });
+        this.spawnY = spawnY.map(sX -> {
+            if (pixelsAreChunks) {
+                return sX >> 2;
+            } else {
+                return sX;
+            }
+        });
         this.carverSettings = carverSettings;
     }
 

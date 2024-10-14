@@ -1,3 +1,4 @@
 {
-  "generator.elarth.elarth": "Elarth"
+  "generator.elarth.elarth": "Elarth",
+  "ctgen.commands.invalidChunkGenerator": "The current level doesn't use CTGen for chunk generation!"
 }

@@ -2,8 +2,10 @@ package dev.tocraft.crafted.ctgen.fabric;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
+import dev.tocraft.crafted.ctgen.impl.CTGCommand;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Registry;
@@ -43,5 +45,7 @@ public class CTGFabric {
                 }
             });
         }
+
+        CommandRegistrationCallback.EVENT.register(CTGCommand::register);
     }
 }

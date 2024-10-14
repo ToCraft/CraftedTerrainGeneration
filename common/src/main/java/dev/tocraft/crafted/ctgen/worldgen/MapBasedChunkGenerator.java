@@ -20,6 +20,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -188,7 +189,8 @@ private static final int DIRT_SIZE = 6;
         return biomeSource;
     }
 
-    private MapSettings getSettings() {
+    @ApiStatus.Internal
+    public MapSettings getSettings() {
         return biomeSource.settings;
     }
 

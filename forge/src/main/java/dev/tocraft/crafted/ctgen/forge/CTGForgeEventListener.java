@@ -1,8 +1,10 @@
 package dev.tocraft.crafted.ctgen.forge;
 
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
+import dev.tocraft.crafted.ctgen.impl.CTGCommand;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
@@ -21,5 +23,10 @@ public class CTGForgeEventListener {
         for (PreparableReloadListener reloadListener : RELOAD_LISTENERS) {
             event.addListener(reloadListener);
         }
+    }
+
+    @SubscribeEvent
+    public void registerCommands(RegisterCommandsEvent event) {
+        CTGCommand.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
     }
 }
