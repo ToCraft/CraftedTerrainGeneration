@@ -60,7 +60,6 @@ public class CTGTeleportCommand {
         LiteralCommandNode<CommandSourceStack> tpNode = Commands.literal("tp").redirect(teleportNode).build();
         rootNode.addChild(teleportNode);
         rootNode.addChild(tpNode);
-
     }
 
     private static int teleportToPos(CommandSourceStack source, Collection<? extends Entity> targets, ServerLevel level, Vec2 dest) throws CommandSyntaxException {

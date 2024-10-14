@@ -32,7 +32,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
-    private static final int BEDROCK_SIZE = 5;
+    private static final int BEDROCK_SIZE = 2;
 private static final int DIRT_SIZE = 6;
 
     protected final MapBasedBiomeSource biomeSource;

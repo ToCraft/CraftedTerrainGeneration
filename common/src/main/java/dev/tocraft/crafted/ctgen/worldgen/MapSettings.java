@@ -211,4 +211,9 @@ public final class MapSettings {
     private Holder<Zone> getByColor(int color) {
         return zones.stream().filter(biome -> biome.value().color() == color).findAny().orElse(null);
     }
+
+    @ApiStatus.Internal
+    public BufferedImage getMapImage() {
+        return mapImage.get();
+    }
 }

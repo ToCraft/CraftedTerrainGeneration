@@ -1,4 +1,7 @@
 {
   "generator.elarth.elarth": "Elarth",
-  "ctgen.commands.invalidChunkGenerator": "The current level doesn't use CTGen for chunk generation!"
+  "ctgen.commands.invalidChunkGenerator": "The current level doesn't use CTGen for chunk generation!",
+  "ctgen.commands.locate.success": "Located %s at pixel pos %s.",
+  "ctgen.commands.locate.failure": "Couldn't locate %s in the current world!",
+  "ctgen.coordinates": "%s, %s"
 }

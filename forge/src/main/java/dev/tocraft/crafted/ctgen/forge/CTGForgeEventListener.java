@@ -27,6 +27,6 @@ public class CTGForgeEventListener {
 
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
-        CTGCommand.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        CTGCommand.register(event.getDispatcher(), event.getBuildContext());
     }
 }
