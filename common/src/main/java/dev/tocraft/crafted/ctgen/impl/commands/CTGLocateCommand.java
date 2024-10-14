@@ -87,10 +87,10 @@ public class CTGLocateCommand {
     }
 
     private static final Point[] DIRECTIONS = {
-            new Point(4, 0),   // Right
-            new Point(0, 4),   // Down
-            new Point(-4, 0),  // Left
-            new Point(0, -4)   // Up
+            new Point(2, 0),   // Right
+            new Point(0, 2),   // Down
+            new Point(-2, 0),  // Left
+            new Point(0, -2)   // Up
     };
 
     public static Point locateColor(BufferedImage image, Point startPoint, int targetColor) {
