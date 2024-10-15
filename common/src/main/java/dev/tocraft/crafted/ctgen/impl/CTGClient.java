@@ -1,11 +1,11 @@
 package dev.tocraft.crafted.ctgen.impl;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.tocraft.crafted.ctgen.impl.screen.MapScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.glfw.GLFW;
@@ -23,7 +23,7 @@ public class CTGClient {
 
         if (OPEN_MAP_KEY.consumeClick()) {
             ResourceLocation mapId = CURRENT_MAP.get();
-            minecraft.player.displayClientMessage(Component.literal(mapId != null ? "Using map: " + mapId : "Not using CTGen for Chunk Generation!"), false);
+            minecraft.setScreen(new MapScreen(minecraft, mapId));
         }
     }
 }
