@@ -25,7 +25,7 @@ public final class MapSettings {
     static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-            ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.biomeMapId),
+            ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
             Codec.BOOL.optionalFieldOf("pixels_are_chunks", DEFAULT.pixelsAreChunks).forGetter(o -> o.pixelsAreChunks),
             Codec.INT.optionalFieldOf("default_threshold_modifier", DEFAULT.thresholdModifier).forGetter(o -> o.thresholdModifier),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
@@ -43,7 +43,7 @@ public final class MapSettings {
             Codec.list(CarverSetting.CODEC).optionalFieldOf("cave_carver", DEFAULT.carverSettings).forGetter(o -> o.carverSettings)
     ).apply(instance, instance.stable(MapSettings::new)));
 
-    private final ResourceLocation biomeMapId;
+    private final ResourceLocation mapId;
     final boolean pixelsAreChunks;
     final int thresholdModifier;
     final List<Holder<Zone>> zones;
@@ -62,8 +62,8 @@ public final class MapSettings {
     final List<CarverSetting> carverSettings;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation biomeMapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
-        this.biomeMapId = biomeMapId;
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+        this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.thresholdModifier = thresholdModifier;
         this.zones = zones;
@@ -76,7 +76,7 @@ public final class MapSettings {
         this.transition = transition;
         this.noiseStretch = noiseStretch;
         this.noiseDetail = noiseDetail;
-        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(biomeMapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
+        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX.map(sX -> {
             if (pixelsAreChunks) {
                 return sX >> 2;
@@ -197,7 +197,7 @@ public final class MapSettings {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (MapSettings) obj;
-        return Objects.equals(this.biomeMapId, that.biomeMapId) &&
+        return Objects.equals(this.mapId, that.mapId) &&
                 Objects.equals(this.zones, that.zones) &&
                 Objects.equals(this.defaultBiome, that.defaultBiome) &&
                 this.deepslateLevel == that.deepslateLevel &&
@@ -218,5 +218,9 @@ public final class MapSettings {
     @ApiStatus.Internal
     public BufferedImage getMapImage() {
         return mapImage.get();
+    }
+
+    public ResourceLocation getMapId() {
+        return mapId;
     }
 }
