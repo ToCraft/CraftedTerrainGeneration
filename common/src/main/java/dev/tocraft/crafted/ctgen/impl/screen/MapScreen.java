@@ -1,6 +1,7 @@
 package dev.tocraft.crafted.ctgen.impl.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -40,19 +41,21 @@ public class MapScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+
         assert minecraft != null && minecraft.player != null;
 
         renderBackground(context);
 
         // render map image
         // check if texture with was found
-        if (mapId != null && minecraft.getResourceManager().getResource(mapId).isPresent() && ratio > -1) {
+        if (mapIsPresent(minecraft)) {
 
             // use this.height twice so the aspect ratio will be properly handled
-            int textureWidth = (int) (ratio * this.height * MAP_SCALE);
-            int textureHeight = (int) (this.height / ratio * MAP_SCALE);
-            int mapX = (this.width - textureWidth) / 2;
-            int mapY = (this.height - textureHeight) / 2;
+            final int textureWidth = (int) (ratio * this.height * MAP_SCALE);
+            final int textureHeight = (int) (this.height / ratio * MAP_SCALE);
+            final int mapX = (this.width - textureWidth) / 2;
+            final int mapY = (this.height - textureHeight) / 2;
 
             // only render the area with the map
             double scaleFactor = minecraft.getWindow().getGuiScale();
@@ -64,12 +67,25 @@ public class MapScreen extends Screen {
             BlockPos blockPos = minecraft.player.blockPosition();
             int pixelX = (blockPos.getX() >> 2) + xOffset;
             int pixelY = (blockPos.getZ() >> 2) + yOffset;
-            int playerX = (int) (mapX + ((double) pixelX / mapWidth * textureWidth));
-            int playerY = (int) (mapY + ((double) pixelY / mapHeight * textureHeight));
+            final int playerX = (int) (mapX + (double) pixelX / mapWidth * textureWidth);
+            final int playerY = (int) (mapY + (double) pixelY / mapHeight * textureHeight);
             renderPlayerHead(minecraft.player, context, playerX, playerY);
 
             // no more cutting, map is rendered
             RenderSystem.disableScissor();
+
+            // render cursor position
+            if (mouseX >= mapX && mouseX <= mapX + textureWidth && mouseY >= mapY && mouseY <= mapY + textureHeight) {
+                int mousePixelX = (int) ((double) (mouseX - mapX) / textureWidth * mapWidth);
+                int mousePixelY = (int) ((double) (mouseY - mapY) / textureHeight * mapHeight);
+                Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
+                int textWidth = minecraft.font.width(text);
+                PoseStack pose = context.pose();
+                pose.pushPose();
+                pose.scale(0.75f, 0.75f, 1);
+                context.drawString(minecraft.font, text, (int) ((width - textWidth * 0.75f) / 1.5f), (int) ((textureHeight - (float) (height - textureHeight) / 2) / 0.75f), 0xffffff);
+                pose.popPose();
+            }
         } else {
             // print info why there is no map
             Component text = mapId != null ? Component.translatable("ctgen.screen.no_texture", mapId) : Component.translatable("ctgen.screen.wrong_generation");
@@ -89,5 +105,35 @@ public class MapScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         onClose();
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean bl = super.mouseClicked(mouseX, mouseY, button);
+        if (bl) return true;
+        else {
+            if (button == 0 && minecraft != null && minecraft.player != null && mapIsPresent(minecraft)) {
+                final int textureWidth = (int) (ratio * this.height * MAP_SCALE);
+                final int textureHeight = (int) (this.height / ratio * MAP_SCALE);
+                final int mapX = (this.width - textureWidth) / 2;
+                final int mapY = (this.height - textureHeight) / 2;
+
+                if (mouseX >= mapX && mouseX <= mapX + textureWidth && mouseY >= mapY && mouseY <= mapY + textureHeight) {
+                    // clicked on map
+                    int mousePixelX = (int) ((mouseX - mapX) / textureWidth * mapWidth);
+                    int mousePixelY = (int) ((mouseY - mapY) / textureHeight * mapHeight);
+                    if (minecraft.player.hasPermissions(2)) {
+                        minecraft.player.connection.sendCommand("ctgen teleport " + mousePixelX + " " + mousePixelY);
+                        onClose();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    private boolean mapIsPresent(Minecraft minecraft) {
+        return mapId != null && minecraft.getResourceManager().getResource(mapId).isPresent() && ratio > -1;
     }
 }

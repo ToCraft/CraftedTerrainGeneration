@@ -3,7 +3,7 @@ plugins {
 }
 
 modmaster {
-    useArchPlugin = false
+    useArchPlugin = true
 }
 
 allprojects {
