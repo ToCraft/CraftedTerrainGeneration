@@ -10,6 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.RegisterEvent;
@@ -34,6 +35,10 @@ public class CTGForge {
                     packet.handle();
                 })
                 .add();
+
+        if (FMLEnvironment.dist.isClient()) {
+            new CTGForgeClient();
+        }
     }
 
     private void event(RegisterEvent event) {

@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.mixin;
+package dev.tocraft.crafted.ctgen.mixin.impl;
 
 import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;

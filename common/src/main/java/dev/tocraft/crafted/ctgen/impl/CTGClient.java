@@ -1,9 +1,14 @@
 package dev.tocraft.crafted.ctgen.impl;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -11,4 +16,14 @@ import java.util.concurrent.atomic.AtomicReference;
 @ApiStatus.Internal
 public class CTGClient {
     public static final AtomicReference<ResourceLocation> CURRENT_MAP = new AtomicReference<>(null);
+    public static final KeyMapping OPEN_MAP_KEY = new KeyMapping("key.ctgen_map", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.ctgen");
+
+    public static void tick(Minecraft minecraft) {
+        assert minecraft.player != null;
+
+        if (OPEN_MAP_KEY.consumeClick()) {
+            ResourceLocation mapId = CURRENT_MAP.get();
+            minecraft.player.displayClientMessage(Component.literal(mapId != null ? "Using map: " + mapId : "Not using CTGen for Chunk Generation!"), false);
+        }
+    }
 }

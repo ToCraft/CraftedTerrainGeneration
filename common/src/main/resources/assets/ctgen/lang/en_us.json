@@ -1,4 +1,6 @@
 {
+  "key.categories.ctgen": "CTGen",
+  "key.ctgen_map": "Open map menu",
   "generator.elarth.elarth": "Elarth",
   "ctgen.commands.invalidChunkGenerator": "The current level doesn't use CTGen for chunk generation!",
   "ctgen.commands.locate.success": "Located %s at pixel pos %s.",

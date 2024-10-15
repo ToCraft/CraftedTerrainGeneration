@@ -3,7 +3,6 @@
   "id": "ctgen",
   "version": "${version}",
   "name": "CTGen",
-  "icon": "icon.png",
   "description": "Create your own world by using a drawn map!\n",
   "authors": [
     "To_Craft"
@@ -17,6 +16,9 @@
   "entrypoints": {
     "main": [
       "dev.tocraft.crafted.ctgen.fabric.CTGFabric::initialize"
+    ],
+    "client": [
+      "dev.tocraft.crafted.ctgen.fabric.CTGFabricClient::initialize"
     ]
   },
   "mixins": [

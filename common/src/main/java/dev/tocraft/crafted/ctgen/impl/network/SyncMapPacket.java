@@ -38,7 +38,6 @@ public class SyncMapPacket {
 
     public void handle() {
         CTGClient.CURRENT_MAP.set(mapId);
-        LogUtils.getLogger().info("Using map: {}", mapId);
     }
 
     public void send(ServerPlayer to) {
