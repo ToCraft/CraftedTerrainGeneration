@@ -65,32 +65,29 @@ public class CTGTeleportCommand {
             MapSettings settings = generator.getSettings();
             int x = ((int) dest.x) - settings.xOffset(0) << 2;
             int z = ((int) dest.y) - settings.yOffset(0) << 2;
-            int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+            int y = level.getChunk(x >> 4, z >> 4).getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) + 1;
             BlockPos pos = new BlockPos(x, y, z);
 
             for (Entity entity : targets) {
                 performTeleport(entity, level, pos);
             }
 
+            Component coords = Component.translatable("ctgen.coordinates", ((int) dest.x), ((int) dest.y));
             if (targets.size() == 1) {
                 source.sendSuccess(
                         () -> Component.translatable(
-                                "commands.teleport.success.location.single",
+                                "ctgen.commands.teleport.success.location.single",
                                 targets.iterator().next().getDisplayName(),
-                                pos.getX(),
-                                pos.getY(),
-                                pos.getZ()
+                                coords
                         ),
                         true
                 );
             } else {
                 source.sendSuccess(
                         () -> Component.translatable(
-                                "commands.teleport.success.location.multiple",
+                                "ctgen.commands.teleport.success.location.multiple",
                                 targets.size(),
-                                pos.getX(),
-                                pos.getY(),
-                                pos.getZ()
+                                coords
                         ),
                         true
                 );
