@@ -66,7 +66,7 @@ public class CTGLocateCommand {
 
             Vec3 pos = source.getPosition();
             int x = settings.xOffset(((int) pos.x) >> 2);
-            int z = settings.yOffset(((int) pos.y) >> 2);
+            int z = settings.yOffset(((int) pos.z) >> 2);
             // still search in image, even if player is outside of it
             if (x < 0 || x > image.getWidth()) x = 0;
             if (z < 0 || z > image.getHeight()) z = 0;
@@ -87,10 +87,10 @@ public class CTGLocateCommand {
     }
 
     private static final Point[] DIRECTIONS = {
-            new Point(2, 0),   // Right
-            new Point(0, 2),   // Down
-            new Point(-2, 0),  // Left
-            new Point(0, -2)   // Up
+            new Point(4, 0),   // Right
+            new Point(0, 4),   // Down
+            new Point(-4, 0),  // Left
+            new Point(0, -4)   // Up
     };
 
     public static Point locateColor(BufferedImage image, Point startPoint, int targetColor) {

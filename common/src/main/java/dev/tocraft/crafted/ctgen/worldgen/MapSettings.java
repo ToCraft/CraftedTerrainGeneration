@@ -223,4 +223,14 @@ public final class MapSettings {
     public ResourceLocation getMapId() {
         return mapId;
     }
+
+    @ApiStatus.Internal
+    public int getMapWidth() {
+        return mapImage.get().getWidth();
+    }
+
+    @ApiStatus.Internal
+    public int getMapHeight() {
+        return mapImage.get().getHeight();
+    }
 }

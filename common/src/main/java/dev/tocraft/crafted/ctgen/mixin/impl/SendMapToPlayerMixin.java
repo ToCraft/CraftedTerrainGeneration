@@ -2,6 +2,7 @@ package dev.tocraft.crafted.ctgen.mixin.impl;
 
 import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.crafted.ctgen.worldgen.MapSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,20 +16,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayDeque;
 
 @Mixin(ServerPlayer.class)
-public class SendMapToPlayerMixin {
+public abstract class SendMapToPlayerMixin {
     @Unique
     private final ArrayDeque<SyncMapPacket> ctgen$packetStack = new ArrayDeque<>();
 
     @Inject(method = "setServerLevel", at = @At("HEAD"))
     private void onDimChange(@NotNull ServerLevel level, CallbackInfo ci) {
         ResourceLocation mapId;
+        int xOffset;
+        int yOffset;
+        int mapWidth;
+        int mapHeight;
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
-            mapId = generator.getSettings().getMapId();
+            MapSettings settings = generator.getSettings();
+            mapId = settings.getMapId();
+            xOffset = settings.xOffset(0);
+            yOffset = settings.yOffset(0);
+            mapWidth = settings.getMapWidth();
+            mapHeight = settings.getMapHeight();
         } else {
             mapId = null;
+            xOffset = -1;
+            yOffset = -1;
+            mapWidth = -1;
+            mapHeight = -1;
         }
 
-        SyncMapPacket packet = new SyncMapPacket(mapId);
+        SyncMapPacket packet = new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
         ctgen$packetStack.addLast(packet);
     }
 
