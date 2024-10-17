@@ -145,20 +145,28 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean bl = false;
         if (keyCode == GLFW.GLFW_KEY_W || keyCode == GLFW.GLFW_KEY_UP) {
             textureOffsetY += 10; // Move up
-            return true;
-        } else if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
-            textureOffsetY -= 10; // Move down
-            return true;
-        } else if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
-            textureOffsetX += 10; // Move left
-            return true;
-        } else if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
-            textureOffsetX -= 10; // Move right
-            return true;
+            bl = true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
+            textureOffsetY -= 10; // Move down
+            bl = true;
+        }
+        if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
+            textureOffsetX += 10; // Move left
+            bl = true;
+        }
+        if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
+            textureOffsetX -= 10; // Move right
+            bl = true;
+        }
+        if (bl) {
+            return true;
+        } else {
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
     }
 
     @Override
@@ -199,6 +207,7 @@ public class MapScreen extends Screen {
             double newZ = zoom / oZoom;
             textureOffsetY *= newZ;
             textureOffsetX *= newZ;
+            return true;
         }
 
         return super.mouseScrolled(mouseX, mouseY, amount);
@@ -209,6 +218,7 @@ public class MapScreen extends Screen {
         if (button == 0) {
             textureOffsetX += dragX;
             textureOffsetY += dragY;
+            return true;
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
