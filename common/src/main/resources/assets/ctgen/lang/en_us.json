@@ -1,5 +1,4 @@
 {
-  "key.categories.ctgen": "CTGen",
   "key.ctgen_map": "Open map menu",
   "ctgen.screen.no_texture": "No texture for map image %s was found!",
   "ctgen.screen.wrong_generation": "CTGen isn't used for Chunk Generation in your current level!",
