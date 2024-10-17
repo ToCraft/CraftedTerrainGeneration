@@ -2,7 +2,6 @@ package dev.tocraft.crafted.ctgen.impl.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -22,6 +21,7 @@ public class MapScreen extends Screen {
     private static final int PLAYER_HEAD_SCALE = 8;
     private static final float ZOOM_FACTOR = 1.1F;
 
+    // texture to be used as map
     private final ResourceLocation mapId;
 
     // received from the server
@@ -31,16 +31,19 @@ public class MapScreen extends Screen {
     private final int mapWidth;
     private final int mapHeight;
 
-    private int textureWidth = 0;
-    private int textureHeight = 0;
-    private int textureX = 0;
-    private int textureY = 0;
+    // frame
+    private float frameX = 0;
+    private float frameWidth = 0;
+    private float frameY = 0;
+    private float frameHeight = 0;
 
-    private int scaledWidth = 0;
-    private int scaledHeight = 0;
+    // rendered map
     private int startX = 0;
     private int startY = 0;
+    private int scaledWidth = 0;
+    private int scaledHeight = 0;
 
+    // zoom and offsets
     private double textureOffsetX = 0;
     private double textureOffsetY = 0;
     private double zoom = 1;
@@ -73,29 +76,34 @@ public class MapScreen extends Screen {
         if (mapIsPresent(minecraft)) {
 
             // use this.height twice so the aspect ratio will be properly handled
-            textureWidth = (int) (ratio * this.height * MAP_SCALE);
-            textureHeight = (int) (this.height / ratio * MAP_SCALE);
-            textureX = (this.width - textureWidth) / 2;
-            textureY = (this.height - textureHeight) / 2;
+            int textureWidth = (int) (ratio * this.height * MAP_SCALE);
+            int textureHeight = (int) (this.height / ratio * MAP_SCALE);
+            int textureX = (this.width - textureWidth) / 2;
+            int textureY = (this.height - textureHeight) / 2;
 
             // apply zoom and offsets
             scaledWidth = (int) (textureWidth * zoom);
             scaledHeight = (int) (textureHeight * zoom);
-            int i = (textureWidth - scaledWidth) / 2;
-            textureOffsetX = Mth.clamp(textureOffsetX, i, -i); // clamp x offset
-            int i2 = (textureHeight - scaledHeight) / 2;
-            textureOffsetY = Mth.clamp(textureOffsetY, i2, -i2); // clamp y offset
+
+            // collect vars for frame
+            frameWidth = Mth.clamp(scaledWidth, textureWidth, this.width * MAP_SCALE * MAP_SCALE);
+            frameHeight = textureHeight;
+
+            // handle offsets
+            double d = (frameWidth - scaledWidth) / 2;
+            textureOffsetX = Mth.clamp(textureOffsetX, d, -d); // clamp x offset
+            double d2 = (frameHeight - scaledHeight) / 2;
+            textureOffsetY = Mth.clamp(textureOffsetY, d2, -d2); // clamp y offset
             startX = (int) ((double) (this.width - scaledWidth) / 2 + textureOffsetX);
             startY = (int) ((double) (this.height - scaledHeight) / 2  + textureOffsetY);
 
             // only render the area with the map
             final double scaleFactor = minecraft.getWindow().getGuiScale();
-            final int frameX = (int) (Mth.clamp(startX, this.width - this.width * MAP_SCALE, textureX) * scaleFactor);
-            final int frameWidth = (int) (Mth.clamp(scaledWidth, textureWidth, this.width * MAP_SCALE * MAP_SCALE) * scaleFactor);
-            final int frameY = (int) (textureY * scaleFactor);
-            final int frameHeight = (int) (textureHeight * scaleFactor);
-            RenderSystem.enableScissor(frameX, frameY, frameWidth, frameHeight);
+            frameX = Mth.clamp(startX, this.width - this.width * MAP_SCALE, textureX);
+            frameY = textureY;
+            RenderSystem.enableScissor((int) (frameX * scaleFactor), (int) (frameY * scaleFactor), (int) (frameWidth * scaleFactor), (int) (frameHeight * scaleFactor));
 
+            // render actual map
             context.blit(mapId, startX, startY,  0, 0, scaledWidth, scaledHeight, scaledWidth, scaledHeight);
 
             // calculate pixel pos for the player
@@ -117,7 +125,7 @@ public class MapScreen extends Screen {
             RenderSystem.disableScissor();
 
             // render cursor position
-            if (mouseX >= textureX && mouseX <= textureX + textureWidth && mouseY >= textureY && mouseY <= textureY + textureHeight) {
+            if (mouseIsOnMap(mouseX, mouseY)) {
                 int mousePixelX = (int) ((double) (mouseX - startX) / scaledWidth * mapWidth);
                 int mousePixelY = (int) ((double) (mouseY - startY) / scaledHeight * mapHeight);
                 Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
@@ -145,27 +153,27 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean bl = false;
-        if (keyCode == GLFW.GLFW_KEY_W || keyCode == GLFW.GLFW_KEY_UP) {
-            textureOffsetY += 10; // Move up
-            bl = true;
-        }
-        if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
-            textureOffsetY -= 10; // Move down
-            bl = true;
-        }
-        if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
-            textureOffsetX += 10; // Move left
-            bl = true;
-        }
-        if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
-            textureOffsetX -= 10; // Move right
-            bl = true;
-        }
+        boolean bl = super.keyPressed(keyCode, scanCode, modifiers);
         if (bl) {
             return true;
+        }
+        else if (keyCode == GLFW.GLFW_KEY_W || keyCode == GLFW.GLFW_KEY_UP) {
+            textureOffsetY += 10; // Move up
+            return true;
+        }
+        else if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
+            textureOffsetY -= 10; // Move down
+            return true;
+        }
+        else if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
+            textureOffsetX += 10; // Move left
+            return true;
+        }
+        else if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
+            textureOffsetX -= 10; // Move right
+            return true;
         } else {
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return false;
         }
     }
 
@@ -175,7 +183,7 @@ public class MapScreen extends Screen {
         if (bl) return true;
         else {
             if (button == 1 && minecraft != null && minecraft.player != null && mapIsPresent(minecraft)) {
-                if (mouseX >= textureX && mouseX <= textureX + textureWidth && mouseY >= textureY && mouseY <= textureY + textureHeight) {
+                if (mouseIsOnMap(mouseX, mouseY)) {
                     // clicked on map
                     int mousePixelX = (int) ((mouseX - startX) / scaledWidth * mapWidth);
                     int mousePixelY = (int) ((mouseY - startY) / scaledHeight * mapHeight);
@@ -192,39 +200,52 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        double oZoom = zoom;
-
-        // Zoom in/out with scrolling
-        if (amount > 0) {
-            zoom *= ZOOM_FACTOR;
-        } else if (amount < 0) {
-            zoom /= ZOOM_FACTOR;
-        }
-
-        zoom = Math.max(1, zoom);
-
-        if (zoom != oZoom) {
-            double newZ = zoom / oZoom;
-            textureOffsetY *= newZ;
-            textureOffsetX *= newZ;
+        boolean bl = super.mouseScrolled(mouseX, mouseY, amount);
+        if (bl) {
             return true;
-        }
+        } else {
+            double oZoom = zoom;
 
-        return super.mouseScrolled(mouseX, mouseY, amount);
+            // Zoom in/out with scrolling
+            if (amount > 0) {
+                zoom *= ZOOM_FACTOR;
+            } else if (amount < 0) {
+                zoom /= ZOOM_FACTOR;
+            }
+
+            zoom = Math.max(1, zoom);
+
+            if (zoom != oZoom) {
+                double newZ = zoom / oZoom;
+                // apply zoom to offset
+                textureOffsetY *= newZ;
+                textureOffsetX *= newZ;
+                return true;
+            }
+
+            return false;
+        }
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (button == 0) {
+        boolean bl = super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        if (bl) {
+            return true;
+        } else if (button == 0) {
             textureOffsetX += dragX;
             textureOffsetY += dragY;
             return true;
+        } else {
+            return false;
         }
-
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     private boolean mapIsPresent(Minecraft minecraft) {
         return mapId != null && minecraft.getResourceManager().getResource(mapId).isPresent() && ratio > -1;
+    }
+
+    private boolean mouseIsOnMap(double mouseX, double mouseY) {
+        return mouseX >= frameX && mouseX <= frameX + frameWidth && mouseY >= frameY && mouseY <= frameY + frameHeight;
     }
 }
