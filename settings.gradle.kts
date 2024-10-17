@@ -6,11 +6,12 @@ pluginManagement {
         maven("https://maven.parchmentmc.org")
         maven("https://maven.tocraft.dev/public")
         gradlePluginPortal()
+        mavenLocal()
     }
 }
 
 plugins {
-    id("dev.tocraft.modmaster.settings") version "0.4.3"
+    id("dev.tocraft.modmaster.settings") version "0.4.13"
 }
 
 rootProject.name = "CTGen"

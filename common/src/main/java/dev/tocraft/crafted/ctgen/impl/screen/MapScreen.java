@@ -97,8 +97,8 @@ public class MapScreen extends Screen {
     }
 
     private static void renderPlayerHead(@NotNull AbstractClientPlayer player, @NotNull GuiGraphics context, int x, int y) {
-        context.blit(player.getSkinTextureLocation(), x, y, PLAYER_HEAD_SCALE, PLAYER_HEAD_SCALE, 8.0f, 8, 8, 8, 64, 64);
-        context.blit(player.getSkinTextureLocation(), x, y, PLAYER_HEAD_SCALE, PLAYER_HEAD_SCALE, 40.0f, 8, 8, 8, 64, 64);
+        context.blit(player.getSkinTextureLocation(), x - (PLAYER_HEAD_SCALE / 2), y - (PLAYER_HEAD_SCALE / 2), PLAYER_HEAD_SCALE, PLAYER_HEAD_SCALE, 8.0f, 8, 8, 8, 64, 64);
+        context.blit(player.getSkinTextureLocation(), x - (PLAYER_HEAD_SCALE / 2), y - (PLAYER_HEAD_SCALE / 2), PLAYER_HEAD_SCALE, PLAYER_HEAD_SCALE, 40.0f, 8, 8, 8, 64, 64);
     }
 
     @Override
