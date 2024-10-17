@@ -11,23 +11,41 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class MapScreen extends Screen {
     private static final float MAP_SCALE = 0.875f;
     private static final int PLAYER_HEAD_SCALE = 8;
     private final ResourceLocation mapId;
-    private final int xOffset;
-    private final int yOffset;
+
+    // received from the server
+    private final int pixelOffsetX;
+    private final int pixelOffsetY;
     private final double ratio;
     private final int mapWidth;
     private final int mapHeight;
 
+    private int textureWidth = 0;
+    private int textureHeight = 0;
+    private int textureX = 0;
+    private int textureY = 0;
+
+    private int scaledWidth = 0;
+    private int scaledHeight = 0;
+    private int startX = 0;
+    private int startY = 0;
+
+    private double textureOffsetX = 0;
+    private double textureOffsetY = 0;
+    private double zoom = 1;
+
     public MapScreen(Minecraft minecraft, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
         super(Component.literal("CTGen"));
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+        this.pixelOffsetX = xOffset;
+        this.pixelOffsetY = yOffset;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.ratio = (double) mapWidth / mapHeight;
@@ -52,32 +70,38 @@ public class MapScreen extends Screen {
         if (mapIsPresent(minecraft)) {
 
             // use this.height twice so the aspect ratio will be properly handled
-            final int textureWidth = (int) (ratio * this.height * MAP_SCALE);
-            final int textureHeight = (int) (this.height / ratio * MAP_SCALE);
-            final int mapX = (this.width - textureWidth) / 2;
-            final int mapY = (this.height - textureHeight) / 2;
+            textureWidth = (int) (ratio * this.height * MAP_SCALE);
+            textureHeight = (int) (this.height / ratio * MAP_SCALE);
+            textureX = (this.width - textureWidth) / 2;
+            textureY = (this.height - textureHeight) / 2;
+
+            // apply zoom and offsets
+            scaledWidth = (int) (textureWidth * zoom);
+            scaledHeight = (int) (textureHeight * zoom);
+            startX = (int) ((double) (this.width - scaledWidth) / 2 + textureOffsetX);
+            startY = (int) ((double) (this.height - scaledHeight) / 2  + textureOffsetY);
 
             // only render the area with the map
             double scaleFactor = minecraft.getWindow().getGuiScale();
-            RenderSystem.enableScissor((int) (mapX * scaleFactor), (int) (mapY * scaleFactor), (int) (textureWidth * scaleFactor), (int) (textureHeight * scaleFactor));
+            RenderSystem.enableScissor((int) (textureX * scaleFactor), (int) (textureY * scaleFactor), (int) (textureWidth * scaleFactor), (int) (textureHeight * scaleFactor));
 
-            context.blit(mapId, mapX, mapY, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
+            context.blit(mapId, startX, startY,  0, 0, scaledWidth, scaledHeight, scaledWidth, scaledHeight);
 
             // calculate pixel pos for the player
             BlockPos blockPos = minecraft.player.blockPosition();
-            int pixelX = (blockPos.getX() >> 2) + xOffset;
-            int pixelY = (blockPos.getZ() >> 2) + yOffset;
-            final int playerX = (int) (mapX + (double) pixelX / mapWidth * textureWidth);
-            final int playerY = (int) (mapY + (double) pixelY / mapHeight * textureHeight);
+            int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
+            final int playerX = (int) (startX + (double) pixelX / mapWidth * scaledWidth);
+            final int playerY = (int) (startY + (double) pixelY / mapHeight * scaledHeight);
             renderPlayerHead(minecraft.player, context, playerX, playerY);
 
             // no more cutting, map is rendered
             RenderSystem.disableScissor();
 
             // render cursor position
-            if (mouseX >= mapX && mouseX <= mapX + textureWidth && mouseY >= mapY && mouseY <= mapY + textureHeight) {
-                int mousePixelX = (int) ((double) (mouseX - mapX) / textureWidth * mapWidth);
-                int mousePixelY = (int) ((double) (mouseY - mapY) / textureHeight * mapHeight);
+            if (mouseX >= textureX && mouseX <= textureX + textureWidth && mouseY >= textureY && mouseY <= textureY + textureHeight) {
+                int mousePixelX = (int) ((double) (mouseX - startX) / scaledWidth * mapWidth);
+                int mousePixelY = (int) ((double) (mouseY - startY) / scaledHeight * mapHeight);
                 Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
                 int textWidth = minecraft.font.width(text);
                 PoseStack pose = context.pose();
@@ -103,7 +127,19 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        onClose();
+        if (keyCode == GLFW.GLFW_KEY_W || keyCode == GLFW.GLFW_KEY_UP) {
+            addTextureOffsetY(10); // Move up
+            return true;
+        } else if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
+            addTextureOffsetY(-10); // Move down
+            return true;
+        } else if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
+            addTextureOffsetX(10); // Move left
+            return true;
+        } else if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
+            addTextureOffsetX(-10); // Move right
+            return true;
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
@@ -112,16 +148,11 @@ public class MapScreen extends Screen {
         boolean bl = super.mouseClicked(mouseX, mouseY, button);
         if (bl) return true;
         else {
-            if (button == 0 && minecraft != null && minecraft.player != null && mapIsPresent(minecraft)) {
-                final int textureWidth = (int) (ratio * this.height * MAP_SCALE);
-                final int textureHeight = (int) (this.height / ratio * MAP_SCALE);
-                final int mapX = (this.width - textureWidth) / 2;
-                final int mapY = (this.height - textureHeight) / 2;
-
-                if (mouseX >= mapX && mouseX <= mapX + textureWidth && mouseY >= mapY && mouseY <= mapY + textureHeight) {
+            if (button == 1 && minecraft != null && minecraft.player != null && mapIsPresent(minecraft)) {
+                if (mouseX >= textureX && mouseX <= textureX + textureWidth && mouseY >= textureY && mouseY <= textureY + textureHeight) {
                     // clicked on map
-                    int mousePixelX = (int) ((mouseX - mapX) / textureWidth * mapWidth);
-                    int mousePixelY = (int) ((mouseY - mapY) / textureHeight * mapHeight);
+                    int mousePixelX = (int) ((mouseX - startX) / scaledWidth * mapWidth);
+                    int mousePixelY = (int) ((mouseY - startY) / scaledHeight * mapHeight);
                     if (minecraft.player.hasPermissions(2)) {
                         minecraft.player.connection.sendCommand("ctgen teleport " + mousePixelX + " " + mousePixelY);
                         onClose();
@@ -131,6 +162,56 @@ public class MapScreen extends Screen {
             }
             return false;
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        final float zoomFactor = 1.1F;
+
+        double oZoom = zoom;
+
+        // Zoom in/out with scrolling
+        if (amount > 0) {
+            zoom *= zoomFactor;
+        } else if (amount < 0) {
+            zoom /= zoomFactor;
+        }
+
+        zoom = Math.max(1, zoom);
+
+        if (zoom != oZoom) {
+            double newZ = zoom / oZoom;
+            textureOffsetY *= newZ;
+            textureOffsetX *= newZ;
+        }
+
+        // clamp offsets
+        addTextureOffsetX(0);
+        addTextureOffsetY(0);
+
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0) {
+            addTextureOffsetX(dragX);
+            addTextureOffsetY(dragY);
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    private void addTextureOffsetX(double xOff) {
+        textureOffsetX += xOff;
+        int i = (textureWidth - scaledWidth) / 2;
+        textureOffsetX = Mth.clamp(textureOffsetX, i, -i);
+    }
+
+    private void addTextureOffsetY(double yOff) {
+        textureOffsetY += yOff;
+        int i = (textureHeight - scaledHeight) / 2;
+        textureOffsetY = Mth.clamp(textureOffsetY, i, -i);
     }
 
     private boolean mapIsPresent(Minecraft minecraft) {
