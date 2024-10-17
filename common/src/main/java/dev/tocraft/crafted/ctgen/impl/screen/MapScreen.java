@@ -2,6 +2,7 @@ package dev.tocraft.crafted.ctgen.impl.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -88,8 +89,12 @@ public class MapScreen extends Screen {
             startY = (int) ((double) (this.height - scaledHeight) / 2  + textureOffsetY);
 
             // only render the area with the map
-            double scaleFactor = minecraft.getWindow().getGuiScale();
-            RenderSystem.enableScissor((int) (textureX * scaleFactor), (int) (textureY * scaleFactor), (int) (textureWidth * scaleFactor), (int) (textureHeight * scaleFactor));
+            final double scaleFactor = minecraft.getWindow().getGuiScale();
+            final int frameX = (int) (Mth.clamp(startX, this.width - this.width * MAP_SCALE, textureX) * scaleFactor);
+            final int frameWidth = (int) (Mth.clamp(scaledWidth, textureWidth, this.width * MAP_SCALE * MAP_SCALE) * scaleFactor);
+            final int frameY = (int) (textureY * scaleFactor);
+            final int frameHeight = (int) (textureHeight * scaleFactor);
+            RenderSystem.enableScissor(frameX, frameY, frameWidth, frameHeight);
 
             context.blit(mapId, startX, startY,  0, 0, scaledWidth, scaledHeight, scaledWidth, scaledHeight);
 
