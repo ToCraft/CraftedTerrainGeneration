@@ -6,6 +6,8 @@
     "g": 130,
     "r": 130
   },
+  "dirt_block": "minecraft:stone",
   "height": 50,
-  "perlin_multiplier": 28.0
+  "perlin_multiplier": 28.0,
+  "surface_block": "minecraft:stone"
 }
