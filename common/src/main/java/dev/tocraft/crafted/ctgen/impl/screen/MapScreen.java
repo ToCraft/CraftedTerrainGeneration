@@ -19,6 +19,8 @@ import org.lwjgl.glfw.GLFW;
 public class MapScreen extends Screen {
     private static final float MAP_SCALE = 0.875f;
     private static final int PLAYER_HEAD_SCALE = 8;
+    private static final float ZOOM_FACTOR = 1.1F;
+
     private final ResourceLocation mapId;
 
     // received from the server
@@ -78,6 +80,10 @@ public class MapScreen extends Screen {
             // apply zoom and offsets
             scaledWidth = (int) (textureWidth * zoom);
             scaledHeight = (int) (textureHeight * zoom);
+            int i = (textureWidth - scaledWidth) / 2;
+            textureOffsetX = Mth.clamp(textureOffsetX, i, -i); // clamp x offset
+            int i2 = (textureHeight - scaledHeight) / 2;
+            textureOffsetY = Mth.clamp(textureOffsetY, i2, -i2); // clamp y offset
             startX = (int) ((double) (this.width - scaledWidth) / 2 + textureOffsetX);
             startY = (int) ((double) (this.height - scaledHeight) / 2  + textureOffsetY);
 
@@ -91,8 +97,15 @@ public class MapScreen extends Screen {
             BlockPos blockPos = minecraft.player.blockPosition();
             int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
             int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
-            final int playerX = (int) (startX + (double) pixelX / mapWidth * scaledWidth);
-            final int playerY = (int) (startY + (double) pixelY / mapHeight * scaledHeight);
+            int playerX = (int) (startX + (double) pixelX / mapWidth * scaledWidth);
+            int playerY = (int) (startY + (double) pixelY / mapHeight * scaledHeight);
+
+            // clamp player head inside map texture
+            if (playerX < startX + (PLAYER_HEAD_SCALE / 2)) playerX = startX + (PLAYER_HEAD_SCALE / 2);
+            if (playerY < startY + (PLAYER_HEAD_SCALE / 2)) playerY = startY + (PLAYER_HEAD_SCALE / 2);
+            if (playerX > startX - (PLAYER_HEAD_SCALE / 2) + scaledWidth) playerX = startX - (PLAYER_HEAD_SCALE / 2) + scaledWidth;
+            if (playerY > startY - (PLAYER_HEAD_SCALE / 2)+ scaledHeight) playerY = startY - (PLAYER_HEAD_SCALE / 2)+ scaledHeight;
+
             renderPlayerHead(minecraft.player, context, playerX, playerY);
 
             // no more cutting, map is rendered
@@ -128,16 +141,16 @@ public class MapScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_W || keyCode == GLFW.GLFW_KEY_UP) {
-            addTextureOffsetY(10); // Move up
+            textureOffsetY += 10; // Move up
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_S || keyCode == GLFW.GLFW_KEY_DOWN) {
-            addTextureOffsetY(-10); // Move down
+            textureOffsetY -= 10; // Move down
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT) {
-            addTextureOffsetX(10); // Move left
+            textureOffsetX += 10; // Move left
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT) {
-            addTextureOffsetX(-10); // Move right
+            textureOffsetX -= 10; // Move right
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -166,15 +179,13 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        final float zoomFactor = 1.1F;
-
         double oZoom = zoom;
 
         // Zoom in/out with scrolling
         if (amount > 0) {
-            zoom *= zoomFactor;
+            zoom *= ZOOM_FACTOR;
         } else if (amount < 0) {
-            zoom /= zoomFactor;
+            zoom /= ZOOM_FACTOR;
         }
 
         zoom = Math.max(1, zoom);
@@ -185,33 +196,17 @@ public class MapScreen extends Screen {
             textureOffsetX *= newZ;
         }
 
-        // clamp offsets
-        addTextureOffsetX(0);
-        addTextureOffsetY(0);
-
         return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (button == 0) {
-            addTextureOffsetX(dragX);
-            addTextureOffsetY(dragY);
+            textureOffsetX += dragX;
+            textureOffsetY += dragY;
         }
 
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-    }
-
-    private void addTextureOffsetX(double xOff) {
-        textureOffsetX += xOff;
-        int i = (textureWidth - scaledWidth) / 2;
-        textureOffsetX = Mth.clamp(textureOffsetX, i, -i);
-    }
-
-    private void addTextureOffsetY(double yOff) {
-        textureOffsetY += yOff;
-        int i = (textureHeight - scaledHeight) / 2;
-        textureOffsetY = Mth.clamp(textureOffsetY, i, -i);
     }
 
     private boolean mapIsPresent(Minecraft minecraft) {
