@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,42 +18,34 @@ public class MapScreen extends Screen {
     @Nullable
     private final MapWidget mapWidget;
 
-    public MapScreen(Minecraft minecraft, @Nullable SyncMapPacket packet) {
+    public MapScreen(Minecraft minecraft, SyncMapPacket packet) {
         super(Component.literal("Map Menu"));
         super.init(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
 
-        MapWidget widget = packet != null ? MapWidget.ofPacket(minecraft, 0, 0, 0, 0, packet) : null;
-        if (widget != null) {
-            setSpecs(widget);
-            this.mapWidget = widget;
-        } else {
-            this.mapWidget = null;
-        }
+        int ratio = packet.getMapWidth() / packet.getMapHeight();
+
+        int width = (int) (this.width * MAP_SCALE);
+        int height = (int) ((float) this.height * MAP_SCALE);
+        int x = (this.width - width) / 2;
+        int y = (this.height - height) / 2;
+        this.mapWidget = MapWidget.ofPacket(minecraft, x, y, width, height, packet);
     }
 
-
+    /**
+     * updates the properties for the map widget in case the screen size changed
+     */
     private void setSpecs(@NotNull MapWidget widget) {
-        // update widget specs
-        int width = (int) (this.height * widget.getRatio() * MAP_SCALE);
-        int height = (int) (this.height / widget.getRatio() * MAP_SCALE);
+        int width = (int) (this.width * MAP_SCALE);
+        int height = (int) (this.height * MAP_SCALE);
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // adapt texture size in case screen size changed
-        widget.setTexturePos(x, y);
-        widget.setTextureSize(width, height);
+        widget.setX(x);
+        widget.setY(y);
+        widget.setHeight(height);
+        widget.setWidth(width);
 
-
-        final int frameWidth = (int) (Mth.clamp(widget.getScaledMapWidth(), widget.getTextureWidth(), this.width * MAP_SCALE * MAP_SCALE));
-        final int frameHeight = widget.getTextureHeight();
-
-        widget.setFrameSize(frameWidth, frameHeight);
-
-        // calculate frame pos now - requires widget.getStartX, which depends on the frame width
-        final int frameX = (int) (Mth.clamp(widget.getStartX(), this.width - this.width * MAP_SCALE, widget.getTextureX()));
-        final int frameY = widget.getTextureY();
-
-        widget.setFramePos(frameX, frameY);
+        widget.setMinZoom(widget.defaultZoom());
     }
 
     @Override
@@ -72,14 +63,13 @@ public class MapScreen extends Screen {
                 return;
             }
 
-            // adjust frame
             setSpecs(mapWidget);
 
             // render map
             mapWidget.render(context, mouseX, mouseY, delta);
         } else {
             // print info why there is no map
-            Component text = mapWidget != null && mapWidget.getMapId() != null ? Component.translatable("ctgen.screen.no_texture", mapWidget.getMapId()) : Component.translatable("ctgen.screen.wrong_generation");
+            Component text = mapWidget != null ? Component.translatable("ctgen.screen.no_texture", mapWidget.getMapId()) : Component.translatable("ctgen.screen.wrong_generation");
             // get text specs
             int textWidth = minecraft.font.width(text.getVisualOrderText());
             int textHeight = minecraft.font.lineHeight;
@@ -111,6 +101,16 @@ public class MapScreen extends Screen {
             return mapWidget.mouseClicked(mouseX, mouseY, button);
         } else {
             return super.mouseClicked(mouseX, mouseY, button);
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean bl = super.keyPressed(keyCode, scanCode, modifiers);
+        if (bl) {
+            return true;
+        } else {
+            return mapWidget != null && mapWidget.keyPressed(keyCode, scanCode, modifiers);
         }
     }
 }

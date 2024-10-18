@@ -46,6 +46,8 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
 
     @Override
     protected void apply(Map<ResourceLocation, BufferedImage> preparedMaps, ResourceManager resourceManager, ProfilerFiller profiler) {
+        MAPS.clear();
+        UPSCALED_MAPS.clear();
         MAPS.putAll(preparedMaps);
     }
 
