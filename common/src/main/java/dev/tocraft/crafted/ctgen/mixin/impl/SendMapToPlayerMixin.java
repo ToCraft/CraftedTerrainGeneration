@@ -22,27 +22,19 @@ public abstract class SendMapToPlayerMixin {
 
     @Inject(method = "setServerLevel", at = @At("HEAD"))
     private void onDimChange(@NotNull ServerLevel level, CallbackInfo ci) {
-        ResourceLocation mapId;
-        int xOffset;
-        int yOffset;
-        int mapWidth;
-        int mapHeight;
+        SyncMapPacket packet;
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             MapSettings settings = generator.getSettings();
-            mapId = settings.getMapId();
-            xOffset = settings.xOffset(0);
-            yOffset = settings.yOffset(0);
-            mapWidth = settings.getMapWidth();
-            mapHeight = settings.getMapHeight();
+            ResourceLocation mapId = settings.getMapId();
+            int xOffset = settings.xOffset(0);
+            int yOffset = settings.yOffset(0);
+            int mapWidth = settings.getMapWidth();
+            int mapHeight = settings.getMapHeight();
+            packet = new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
         } else {
-            mapId = null;
-            xOffset = -1;
-            yOffset = -1;
-            mapWidth = -1;
-            mapHeight = -1;
+            packet = SyncMapPacket.empty();
         }
 
-        SyncMapPacket packet = new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
         ctgen$packetStack.addLast(packet);
     }
 

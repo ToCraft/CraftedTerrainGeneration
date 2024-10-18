@@ -2,6 +2,7 @@ package dev.tocraft.crafted.ctgen.impl.screen.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -9,13 +10,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings("unused")
@@ -42,8 +43,11 @@ public class MapWidget extends AbstractWidget {
     // zoom and offsets
     private double textureOffsetX = 0;
     private double textureOffsetY = 0;
+    private float minZoom;
     private final float zoomFactor;
     private double zoom = 1;
+    private boolean showCursorPos;
+    private boolean showPlayer;
 
     // view frame
     private int textureX;
@@ -51,11 +55,31 @@ public class MapWidget extends AbstractWidget {
     private int textureWidth;
     private int textureHeight;
 
+    @Nullable
+    public static MapWidget ofPacket(Minecraft minecraft, int x, int y, int width, int height, @NotNull SyncMapPacket packet) {
+        ResourceLocation mapId = packet.getMapId();
+        int xOffset = packet.getXOffset();
+        int yOffset = packet.getYOffset();
+        int mapWidth = packet.getMapWidth();
+        int mapHeight = packet.getMapHeight();
+        if (mapId != null) {
+            return new MapWidget(minecraft, x, y, width, height, new ResourceLocation(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), xOffset, yOffset, mapWidth, mapHeight);
+        }
+        return null;
+    }
+
     /**
-     * @see MapWidgetBuilder
+     * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
+     */
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
+        this(minecraft, x, y, width, height, mapId, xOffset, yOffset, mapWidth, mapHeight, 1.1F, 1.0F, 8, true, true);
+    }
+
+    /**
+     * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     @ApiStatus.Internal
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float zoomFactor, int headScale) {
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float zoomFactor, float minZoom, int headScale, boolean showCursorPos, boolean showPlayer) {
         super(x, y, width, height, Component.literal("Map Widget"));
         this.minecraft = minecraft;
         this.pixelOffsetX = xOffset;
@@ -65,30 +89,51 @@ public class MapWidget extends AbstractWidget {
         this.ratio = (double) mapWidth / mapHeight;
         this.mapId = mapId;
         this.playerHeadScale = headScale;
+        this.minZoom = minZoom;
         this.zoomFactor = zoomFactor;
+        this.showCursorPos = showCursorPos;
+        this.showPlayer = showPlayer;
         this.textureWidth = width;
         this.textureHeight = height;
+        updateMapWidth();
+        updateMapHeight();
         this.textureX = x;
         this.textureY = y;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
-        this.textureHeight = height;
+    public void setMinZoom(float minZoom) {
+        this.minZoom = minZoom;
     }
 
+    /**
+     * Sets the frame height and the texture height to a new value
+     */
+    public void setHeight(int height) {
+        this.height = height;
+        setTextureHeight(height);
+    }
+
+    /**
+     * Sets the frame width and the texture width to a new value
+     */
     @Override
     public void setWidth(int width) {
         super.setWidth(width);
-        this.textureWidth = width;
+        setTextureWidth(width);
     }
 
+    /**
+     * Sets the frame x and the texture x to a new value
+     */
     @Override
     public void setX(int x) {
         super.setX(x);
         this.textureX = x;
     }
 
+    /**
+     * Sets the frame y and the texture y to a new value
+     */
     @Override
     public void setY(int y) {
         super.setY(y);
@@ -127,18 +172,20 @@ public class MapWidget extends AbstractWidget {
      * @return the height of the map texture while rendering (zoom applied)
      */
     public int getScaledMapHeight() {
-        return scaledMapHeight;
+        return (int) (textureHeight * zoom);
     }
 
     /**
      * @return the width of the map texture while rendering (zoom applied)
      */
     public int getScaledMapWidth() {
-        return scaledMapWidth;
+        return (int) (textureWidth * zoom);
     }
 
     public void setZoom(double zoom) {
-        this.zoom = zoom;
+        this.zoom = Math.max(minZoom, zoom);
+        updateMapHeight();
+        updateMapWidth();
     }
 
     public double getZoom() {
@@ -161,39 +208,68 @@ public class MapWidget extends AbstractWidget {
         return textureX;
     }
 
-    public void updateTexture(int x, int y, int width, int height) {
+    public void setTexturePos(int x, int y) {
         this.textureX = x;
         this.textureY = y;
-        this.textureWidth = width;
-        this.textureHeight = height;
     }
 
-    public void updateFrame(int x, int y, int width, int height) {
+    public void setTextureSize(int width, int height) {
+        if ((double) width / height != ratio) {
+            throw new IllegalArgumentException("texture width and height are in the wrong aspect ratio!");
+        }
+        setTextureWidth(width);
+        setTextureHeight(height);
+    }
+
+    public void setFramePos(int x, int y) {
         super.setX(x);
         super.setY(y);
-        super.setWidth(width);
-        this.height = height;
     }
 
-    public void updateVars() {
-        // apply zoom
-        scaledMapWidth = (int) (textureWidth * zoom);
-        scaledMapHeight = (int) (textureHeight * zoom);
+    public void setFrameSize(int width, int height) {
+        super.setWidth(width);
+        this.height = height;
+        updateMapHeight();
+        updateMapWidth();
+    }
 
-        // handle offsets
+    @ApiStatus.Experimental
+    public void setTextureWidth(int width) {
+        this.textureWidth = width;
+        updateMapWidth();
+    }
+
+    @ApiStatus.Experimental
+    public void setTextureHeight(int height) {
+        this.textureHeight = height;
+        updateMapHeight();
+    }
+
+    private void updateMapWidth() {
+        scaledMapWidth = (int) (textureWidth * zoom);
         double d = (double) (width - scaledMapWidth) / 2;
         textureOffsetX = Mth.clamp(textureOffsetX, d, -d); // clamp x offset
-        double d2 = (double) (height - scaledMapHeight) / 2;
-        textureOffsetY = Mth.clamp(textureOffsetY, d2, -d2); // clamp y offset
         startX = textureX + (int) ((double) (textureWidth - scaledMapWidth) / 2 + textureOffsetX);
+    }
+
+    private void updateMapHeight() {
+        scaledMapHeight = (int) (textureHeight * zoom);
+        double d = (double) (height - scaledMapHeight) / 2;
+        textureOffsetY = Mth.clamp(textureOffsetY, d, -d); // clamp y offset
         startY = textureY + (int) ((double) (textureHeight - scaledMapHeight) / 2  + textureOffsetY);
+    }
+
+    public void setShowCursorPos(boolean showCursorPos) {
+        this.showCursorPos = showCursorPos;
+    }
+
+    public void setShowPlayer(boolean showPlayer) {
+        this.showPlayer = showPlayer;
     }
 
     @Override
     public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         assert minecraft != null && minecraft.player != null;
-
-        updateVars();
 
         // cut widget
         final double scaleFactor = minecraft.getWindow().getGuiScale();
@@ -202,23 +278,30 @@ public class MapWidget extends AbstractWidget {
         // render actual map
         context.blit(mapId, startX, startY,  0, 0, scaledMapWidth, scaledMapHeight, scaledMapWidth, scaledMapHeight);
 
-        // calculate pixel pos for the player
-        BlockPos blockPos = minecraft.player.blockPosition();
-        int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
-        int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
-        int playerX = (int) (startX + (double) pixelX / mapWidth * scaledMapWidth);
-        int playerY = (int) (startY + (double) pixelY / mapHeight * scaledMapHeight);
+        if (showPlayer) {
+            // calculate pixel pos for the player
+            BlockPos blockPos = minecraft.player.blockPosition();
+            int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
+            int playerX = (int) (startX + (double) pixelX / mapWidth * scaledMapWidth);
+            int playerY = (int) (startY + (double) pixelY / mapHeight * scaledMapHeight);
 
-        // clamp player head inside map texture
-        if (playerX < startX + (playerHeadScale / 2)) playerX = startX + (playerHeadScale / 2);
-        if (playerY < startY + (playerHeadScale / 2)) playerY = startY + (playerHeadScale / 2);
-        if (playerX > startX - (playerHeadScale / 2) + scaledMapWidth) playerX = startX - (playerHeadScale / 2) + scaledMapWidth;
-        if (playerY > startY - (playerHeadScale / 2) + scaledMapHeight) playerY = startY - (playerHeadScale / 2) + scaledMapHeight;
+            int halfHead = playerHeadScale / 2;
 
-        renderPlayerHead(minecraft.player, context, playerX, playerY);
+            // clamp player head inside map texture
+            if (playerX < startX + halfHead) playerX = startX + halfHead;
+            if (playerY < startY + halfHead) playerY = startY + halfHead;
+            if (playerX > startX - halfHead + scaledMapWidth) playerX = startX - halfHead + scaledMapWidth;
+            if (playerY > startY - halfHead + scaledMapHeight) playerY = startY - halfHead + scaledMapHeight;
+
+            // render player head
+            ResourceLocation skin = minecraft.player.getSkinTextureLocation();
+            context.blit(skin, playerX - halfHead, playerY - halfHead, playerHeadScale, playerHeadScale, 8.0f, 8, 8, 8, 64, 64);
+            context.blit(skin, playerX - halfHead, playerY - halfHead, playerHeadScale, playerHeadScale, 40.0f, 8, 8, 8, 64, 64);
+        }
 
         // render cursor position
-        if (isHovered) {
+        if (isHovered && showCursorPos) {
             int mousePixelX = (int) ((double) (mouseX - startX) / scaledMapWidth * mapWidth);
             int mousePixelY = (int) ((double) (mouseY - startY) / scaledMapHeight * mapHeight);
             Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
@@ -235,11 +318,6 @@ public class MapWidget extends AbstractWidget {
 
         // widget is rendered - no need for the scissors anymore
         RenderSystem.disableScissor();
-    }
-
-    private void renderPlayerHead(@NotNull AbstractClientPlayer player, @NotNull GuiGraphics context, int x, int y) {
-        context.blit(player.getSkinTextureLocation(), x - (playerHeadScale / 2), y - (playerHeadScale / 2), playerHeadScale, playerHeadScale, 8.0f, 8, 8, 8, 64, 64);
-        context.blit(player.getSkinTextureLocation(), x - (playerHeadScale / 2), y - (playerHeadScale / 2), playerHeadScale, playerHeadScale, 40.0f, 8, 8, 8, 64, 64);
     }
 
     @Override
@@ -293,12 +371,10 @@ public class MapWidget extends AbstractWidget {
 
         // Zoom in/out with scrolling
         if (amount > 0) {
-            zoom *= zoomFactor;
+            setZoom(zoom * zoomFactor);
         } else if (amount < 0) {
-            zoom /= zoomFactor;
+            setZoom(zoom / zoomFactor);
         }
-
-        zoom = Math.max(1, zoom);
 
         if (zoom != oZoom) {
             double newZ = zoom / oZoom;

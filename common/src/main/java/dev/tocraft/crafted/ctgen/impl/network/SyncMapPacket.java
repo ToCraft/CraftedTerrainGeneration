@@ -10,7 +10,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@ApiStatus.Internal
 public class SyncMapPacket {
     public static final ResourceLocation PACKET_ID = CTerrainGeneration.id("sync_map_id");
 
@@ -21,6 +20,7 @@ public class SyncMapPacket {
     private final int mapWidth;
     private final int mapHeight;
 
+    @ApiStatus.Internal
     public SyncMapPacket(@Nullable ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
         this.mapId = mapId;
         this.xOffset = xOffset;
@@ -29,6 +29,7 @@ public class SyncMapPacket {
         this.mapHeight = mapHeight;
     }
 
+    @ApiStatus.Internal
     public void encode(@NotNull FriendlyByteBuf buf) {
         boolean bl = this.mapId != null;
         buf.writeBoolean(bl);
@@ -41,6 +42,7 @@ public class SyncMapPacket {
         }
     }
 
+    @ApiStatus.Internal
     public static @NotNull SyncMapPacket decode(@NotNull FriendlyByteBuf buf) {
         boolean bl = buf.readBoolean();
         if (bl) {
@@ -52,39 +54,41 @@ public class SyncMapPacket {
             return new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
         }
         else {
-            return new SyncMapPacket(null, -1, -1, -1, -1);
+            return empty();
         }
     }
 
+    @ApiStatus.Internal
+    public static SyncMapPacket empty() {
+        return new SyncMapPacket(null, -1, -1, -1, -1);
+    }
+
+    @ApiStatus.Internal
     public void handle() {
         CTGClient.LAST_SYNC_MAP_PACKET.set(this);
     }
 
+    @ApiStatus.Internal
     public void send(ServerPlayer to) {
         ServerPlatform.INSTANCE.send(this, to);
     }
 
-    @ApiStatus.Internal
     public @Nullable ResourceLocation getMapId() {
         return mapId;
     }
 
-    @ApiStatus.Internal
     public int getXOffset() {
         return xOffset;
     }
 
-    @ApiStatus.Internal
     public int getYOffset() {
         return yOffset;
     }
 
-    @ApiStatus.Internal
     public int getMapHeight() {
         return mapHeight;
     }
 
-    @ApiStatus.Internal
     public int getMapWidth() {
         return mapWidth;
     }

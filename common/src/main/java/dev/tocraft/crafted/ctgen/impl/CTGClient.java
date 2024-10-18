@@ -7,28 +7,46 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 @Environment(EnvType.CLIENT)
 @ApiStatus.Internal
 public class CTGClient {
+    @ApiStatus.Internal
     public static final AtomicReference<SyncMapPacket> LAST_SYNC_MAP_PACKET = new AtomicReference<>(null);
+    @ApiStatus.Internal
     public static final KeyMapping OPEN_MAP_KEY = new KeyMapping("key.ctgen_map", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.ui");
-    private static final AtomicBoolean MENU = new AtomicBoolean(true);
+    private static final Map<ResourceLocation, BiFunction<Minecraft, SyncMapPacket, Screen>> MENU_REGISTRY = new ConcurrentHashMap<>();
 
-    public static void tick(Minecraft minecraft) {
+    @ApiStatus.Internal
+    public static void tick(@NotNull Minecraft minecraft) {
         assert minecraft.player != null;
 
-        if (OPEN_MAP_KEY.consumeClick() && MENU.get()) {
-            minecraft.setScreen(new MapScreen(minecraft));
+        if (OPEN_MAP_KEY.consumeClick()) {
+            SyncMapPacket packet = CTGClient.LAST_SYNC_MAP_PACKET.get();
+            BiFunction<Minecraft, SyncMapPacket, Screen> screenFunc = MapScreen::new;
+            if (packet != null) {
+                ResourceLocation mapId = packet.getMapId();
+                if (mapId != null && MENU_REGISTRY.containsKey(mapId)) {
+                    screenFunc = MENU_REGISTRY.get(mapId);
+                }
+            }
+            minecraft.setScreen(screenFunc.apply(minecraft, packet));
         }
     }
 
-    public static void disableMapMenu() {
-        MENU.set(false);
+    @SuppressWarnings("unused")
+    @ApiStatus.Internal
+    public static void registerMenu(ResourceLocation mapId, BiFunction<Minecraft, SyncMapPacket, Screen> entry) {
+        MENU_REGISTRY.put(mapId, entry);
     }
 }
