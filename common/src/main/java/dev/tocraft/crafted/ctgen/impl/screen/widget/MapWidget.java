@@ -27,7 +27,6 @@ public class MapWidget extends AbstractWidget {
     // texture to be used as map
     private final ResourceLocation mapId;
     private final Minecraft minecraft;
-    private final int playerHeadScale;
 
     // received from the server
     private final int pixelOffsetX;
@@ -67,14 +66,14 @@ public class MapWidget extends AbstractWidget {
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
-        this(minecraft, x, y, width, height, mapId, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), 8, true, true);
+        this(minecraft, x, y, width, height, mapId, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true);
     }
 
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     @ApiStatus.Internal
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, int headScale, boolean showCursorPos, boolean showPlayer) {
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer) {
         super(x, y, width, height, Component.literal("Map Widget"));
         this.minecraft = minecraft;
         this.pixelOffsetX = xOffset;
@@ -83,7 +82,6 @@ public class MapWidget extends AbstractWidget {
         this.mapHeight = mapHeight;
         this.ratio = (double) mapWidth / mapHeight;
         this.mapId = mapId;
-        this.playerHeadScale = headScale;
         this.minZoom = minZoom;
         this.zoom = minZoom;
         this.showCursorPos = showCursorPos;
@@ -246,18 +244,16 @@ public class MapWidget extends AbstractWidget {
             int playerX = (int) (getTextureX() + (double) pixelX / mapWidth * zoomedWidth);
             int playerY = (int) (getTextureY() + (double) pixelY / mapHeight * zoomedHeight);
 
-            int halfHead = playerHeadScale / 2;
-
             // clamp player head inside map texture
-            if (playerX < getTextureX() + halfHead) playerX = getTextureX() + halfHead;
-            if (playerY < getTextureY() + halfHead) playerY = getTextureY() + halfHead;
-            if (playerX > getTextureX() - halfHead + zoomedWidth) playerX = getTextureX() - halfHead + zoomedWidth;
-            if (playerY > getTextureY() - halfHead + zoomedHeight) playerY = getTextureY() - halfHead + zoomedHeight;
+            if (playerX < getTextureX() + 4) playerX = getTextureX() + 4;
+            if (playerY < getTextureY() + 4) playerY = getTextureY() + 4;
+            if (playerX > getTextureX() - 4 + zoomedWidth) playerX = getTextureX() - 4 + zoomedWidth;
+            if (playerY > getTextureY() - 4 + zoomedHeight) playerY = getTextureY() - 4 + zoomedHeight;
 
             // render player head
             ResourceLocation skin = minecraft.player.getSkinTextureLocation();
-            context.blit(skin, playerX - halfHead, playerY - halfHead, playerHeadScale, playerHeadScale, 8.0f, 8, 8, 8, 64, 64);
-            context.blit(skin, playerX - halfHead, playerY - halfHead, playerHeadScale, playerHeadScale, 40.0f, 8, 8, 8, 64, 64);
+            context.blit(skin, playerX - 4, playerY - 4, 8, 8, 8.0f, 8, 8, 8, 64, 64);
+            context.blit(skin, playerX - 4, playerY - 4, 8, 8, 40.0f, 8, 8, 8, 64, 64);
         }
 
         // render cursor position
