@@ -2,8 +2,10 @@ package dev.tocraft.crafted.ctgen.zone;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.util.NoiseSelector;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.RegistryFileCodec;
@@ -11,25 +13,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.awt.*;
 import java.util.Optional;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block stoneBlock, Block dirtBlock,
-                   Block surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
+public record Zone(Holder<Biome> biome, int color, NoiseSelector<Block> deepslateBlock, NoiseSelector<Block> stoneBlock, NoiseSelector<Block> dirtBlock,
+                   NoiseSelector<Block> surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
                    Optional<Integer> thresholdModifier) {
 
-    @ApiStatus.Internal
-    private Zone(Holder<Biome> biome, Color color, ResourceLocation deepslateBlock, ResourceLocation stoneBlock, ResourceLocation dirtBlock, ResourceLocation surfaceBlock, int height, double perlinMultiplier, double pixelWeight, Optional<Integer> thresholdModifier) {
-        this(biome, color.getRGB(), BuiltInRegistries.BLOCK.get(deepslateBlock), BuiltInRegistries.BLOCK.get(stoneBlock), BuiltInRegistries.BLOCK.get(dirtBlock), BuiltInRegistries.BLOCK.get(surfaceBlock), height, perlinMultiplier, pixelWeight, thresholdModifier);
-    }
-
-    public static final Block DEFAULT_DEEPSLATE_BLOCK = Blocks.DEEPSLATE;
-    public static final Block DEFAULT_STONE_BLOCK = Blocks.STONE;
-    public static final Block DEFAULT_DIRT_BLOCK = Blocks.DIRT;
-    public static final Block DEFAULT_SURFACE_BLOCK = Blocks.GRASS_BLOCK;
+    public static final NoiseSelector<Block> DEFAULT_DEEPSLATE_BLOCK = NoiseSelector.of(Blocks.DEEPSLATE);
+    public static final NoiseSelector<Block> DEFAULT_STONE_BLOCK = NoiseSelector.of(Blocks.STONE);
+    public static final NoiseSelector<Block> DEFAULT_DIRT_BLOCK = NoiseSelector.of(Blocks.DIRT);
+    public static final NoiseSelector<Block> DEFAULT_SURFACE_BLOCK = NoiseSelector.of(Blocks.GRASS_BLOCK);
     public static final int DEFAULT_HEIGHT = 0;
     public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
     public static final double DEFAULT_PIXEL_WEIGHT = 1;
@@ -40,16 +35,27 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
             Codec.INT.fieldOf("b").forGetter(Color::getBlue)
     ).apply(instance, instance.stable(Color::new)));
 
-    public static final Codec<Color> COLOR_CODEC = Codec.either(Codec.INT, COLOR_DIRECT_CODEC)
-            .xmap(either -> either.right().orElseGet(() -> new Color(either.left().orElseThrow())), color -> color.getAlpha() < 255 ? Either.left(color.getRGB()) : Either.right(color));
+    public static final Codec<Integer> COLOR_CODEC = Codec.either(COLOR_DIRECT_CODEC, Codec.INT)
+            .xmap(either -> either.right().orElseGet(() -> either.left().orElseThrow().getRGB()), rgb -> {
+                Color color = new Color(rgb);
+                if (color.getAlpha() < 255) {
+                    return Either.right(rgb);
+                } else {
+                    return Either.left(color);
+                }
+            });
+
+    public static final Codec<Block> BLOCK_CODEC = ResourceLocation.CODEC.comapFlatMap(id -> BuiltInRegistries.BLOCK.containsKey(id) ? DataResult.success(BuiltInRegistries.BLOCK.get(id)) : DataResult.error(() -> String.format("Block %s not found!", id)), BuiltInRegistries.BLOCK::getKey).stable();
+
+    private static final Codec<NoiseSelector<Block>> BLOCK_SELECTOR = NoiseSelector.codec(BLOCK_CODEC);
 
     public static final Codec<Zone> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             Biome.CODEC.fieldOf("biome").forGetter(Zone::biome),
-            COLOR_CODEC.fieldOf("color").forGetter(zone -> new Color(zone.color)),
-            ResourceLocation.CODEC.optionalFieldOf("deepslate_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DEEPSLATE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.deepslateBlock)),
-            ResourceLocation.CODEC.optionalFieldOf("stone_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_STONE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.stoneBlock)),
-            ResourceLocation.CODEC.optionalFieldOf("dirt_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_DIRT_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.dirtBlock)),
-            ResourceLocation.CODEC.optionalFieldOf("surface_block", BuiltInRegistries.BLOCK.getKey(DEFAULT_SURFACE_BLOCK)).forGetter(o -> BuiltInRegistries.BLOCK.getKey(o.surfaceBlock)),
+            COLOR_CODEC.fieldOf("color").forGetter(Zone::color),
+            BLOCK_SELECTOR.optionalFieldOf("deepslate_block", DEFAULT_DEEPSLATE_BLOCK).forGetter(Zone::deepslateBlock),
+            BLOCK_SELECTOR.optionalFieldOf("stone_block", DEFAULT_STONE_BLOCK).forGetter(Zone::stoneBlock),
+            BLOCK_SELECTOR.optionalFieldOf("dirt_block", DEFAULT_DIRT_BLOCK).forGetter(Zone::dirtBlock),
+            BLOCK_SELECTOR.optionalFieldOf("surface_block", DEFAULT_SURFACE_BLOCK).forGetter(Zone::surfaceBlock),
             Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(Zone::height),
             Codec.DOUBLE.optionalFieldOf("perlin_multiplier", DEFAULT_PERLIN_MULTIPLIER).forGetter(Zone::perlinMultiplier),
             Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(Zone::pixelWeight),

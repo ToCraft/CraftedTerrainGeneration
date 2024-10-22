@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, new Noise(List.of(1f, 2f, 4f), 0.5f, 250), Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, Noise.DEFAULT, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),

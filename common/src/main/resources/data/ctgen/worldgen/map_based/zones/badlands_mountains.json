@@ -8,5 +8,16 @@
   "dirt_block": "minecraft:red_concrete",
   "height": 28,
   "perlin_multiplier": 24.0,
-  "surface_block": "minecraft:brown_concrete"
+  "surface_block": {
+    "default": "minecraft:brown_concrete",
+    "noise": {
+      "octaves": [
+        1
+      ]
+    },
+    "values": {
+      "-0.5": "minecraft:orange_concrete",
+      "0": "minecraft:red_concrete"
+    }
+  }
 }
