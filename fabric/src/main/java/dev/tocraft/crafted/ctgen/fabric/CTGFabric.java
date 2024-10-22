@@ -6,11 +6,11 @@ import dev.tocraft.crafted.ctgen.impl.CTGCommand;
 import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -25,8 +25,9 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("unused")
 @ApiStatus.Internal
-public class CTGFabric {
-    public static void initialize() {
+public class CTGFabric implements ModInitializer {
+    @Override
+    public void onInitialize() {
         Registry.register(BuiltInRegistries.BIOME_SOURCE, CTerrainGeneration.id("map_based_biome_source"), MapBasedBiomeSource.CODEC);
         Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedChunkGenerator.CODEC);
 

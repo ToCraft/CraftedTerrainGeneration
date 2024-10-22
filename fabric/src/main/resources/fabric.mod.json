@@ -15,7 +15,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.tocraft.crafted.ctgen.fabric.CTGFabric::initialize"
+      "dev.tocraft.crafted.ctgen.fabric.CTGFabric"
     ],
     "client": [
       "dev.tocraft.crafted.ctgen.fabric.CTGFabricClient::initialize"

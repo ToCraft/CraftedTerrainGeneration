@@ -2,7 +2,7 @@ package dev.tocraft.crafted.ctgen.zone;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.util.Noise;
-import dev.tocraft.crafted.ctgen.util.NoiseSelector;
+import dev.tocraft.crafted.ctgen.blockplacer.NoisePlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -57,7 +57,7 @@ public class Zones {
         // Western Continent
         context.register(DESERT, new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setDirtBlock(Blocks.SANDSTONE).setSurfaceBlock(Blocks.SAND).setHeight(5).setPerlinMultiplier(4).build());
         context.register(BADLANDS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(Blocks.BROWN_CONCRETE).setHeight(18).setPerlinMultiplier(12).build());
-        context.register(BADLANDS_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(NoiseSelector.of(new Noise(List.of(1f), 1, 1), new HashMap<Double, Block>() {
+        context.register(BADLANDS_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(NoisePlacer.of(new Noise(List.of(1f), 1, 1), new HashMap<Double, Block>() {
             {
                 put(-0.5d, Blocks.ORANGE_CONCRETE);
                 put(0d, Blocks.RED_CONCRETE);
