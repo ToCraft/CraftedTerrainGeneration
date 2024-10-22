@@ -32,7 +32,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
-    private static final int BEDROCK_SIZE = 2;
+    private static final int BEDROCK_SIZE = 3;
     private static final int DIRT_SIZE = 6;
 
     protected final MapBasedBiomeSource biomeSource;
@@ -119,14 +119,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         double addThreshold = height * height * height * height * mod;
 
         for (CarverSetting carver : getSettings().carverSettings) {
-            double perlin = 0;
-            float i = 0;
-            for (float octave : carver.octaves()) {
-                perlin += noise.getValue((double) pos.getX() / carver.caveStretchXZ() * octave, (double) pos.getY() / carver.caveStretchY() * octave, (double) pos.getZ() / carver.caveStretchXZ() * octave);
-                i += octave;
-            }
-
-            perlin = perlin / i;
+            double perlin = carver.noise().getPerlin(this.noise, pos.getX(), pos.getY(), pos.getZ());
 
             double threshold = carver.threshold() + addThreshold;
             if (perlin > threshold) {

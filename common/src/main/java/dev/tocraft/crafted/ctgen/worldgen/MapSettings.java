@@ -3,6 +3,7 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
+import dev.tocraft.crafted.ctgen.util.Noise;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
@@ -22,7 +23,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, 250, 3, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, new Noise(List.of(1f, 2f, 4f), 0.5f, 250), Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
@@ -36,8 +37,7 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
             Codec.INT.optionalFieldOf("sea_level", DEFAULT.seaLevel).forGetter(o -> o.seaLevel),
             Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
-            Codec.INT.optionalFieldOf("noise_stretch", DEFAULT.noiseStretch).forGetter(o -> o.noiseStretch),
-            Codec.INT.optionalFieldOf("noise_detail", DEFAULT.noiseDetail).forGetter(o -> o.noiseDetail),
+            Noise.CODEC.optionalFieldOf("noise", DEFAULT.noise).forGetter(o -> o.noise),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
             Codec.list(CarverSetting.CODEC).optionalFieldOf("cave_carver", DEFAULT.carverSettings).forGetter(o -> o.carverSettings)
@@ -54,15 +54,14 @@ public final class MapSettings {
     final int genHeight;
     final int seaLevel;
     final int transition;
-    final int noiseStretch;
-    final int noiseDetail;
+    final Noise noise;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
     final List<CarverSetting> carverSettings;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, int noiseStretch, int noiseDetail, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, Noise noise, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.thresholdModifier = thresholdModifier;
@@ -74,8 +73,7 @@ public final class MapSettings {
         this.genHeight = genHeight;
         this.seaLevel = seaLevel;
         this.transition = transition;
-        this.noiseStretch = noiseStretch;
-        this.noiseDetail = noiseDetail;
+        this.noise = noise;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX.map(sX -> {
             if (pixelsAreChunks) {
@@ -129,12 +127,7 @@ public final class MapSettings {
     }
 
     public double getPerlin(SimplexNoise noise, int x, int z) {
-        double perlin = 0;
-        for (int i = 0; i < noiseDetail; i++) {
-            perlin += Math.pow(0.5, i) * noise.getValue(x * Math.pow(2, i) / noiseStretch, z * Math.pow(2, i) / noiseStretch);
-        }
-        perlin = perlin / (1 - Math.pow(0.5, noiseDetail));
-        return perlin;
+        return this.noise.getPerlin(noise, x, z);
     }
 
     double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
@@ -205,9 +198,7 @@ public final class MapSettings {
                 this.minY == that.minY &&
                 this.genHeight == that.genHeight &&
                 this.seaLevel == that.seaLevel &&
-                this.transition == that.transition &&
-                this.noiseStretch == that.noiseStretch &&
-                this.noiseDetail == that.noiseDetail;
+                this.transition == that.transition;
     }
 
     @Nullable

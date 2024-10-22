@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
 @Environment(EnvType.CLIENT)
-@ApiStatus.Internal
 public class CTGClient {
     @ApiStatus.Internal
     public static final AtomicReference<SyncMapPacket> LAST_SYNC_MAP_PACKET = new AtomicReference<>(SyncMapPacket.empty());
@@ -45,7 +44,6 @@ public class CTGClient {
     }
 
     @SuppressWarnings("unused")
-    @ApiStatus.Internal
     public static void registerMenu(ResourceLocation mapId, BiFunction<Minecraft, SyncMapPacket, Screen> entry) {
         MENU_REGISTRY.put(mapId, entry);
     }

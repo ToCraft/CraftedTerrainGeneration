@@ -1,5 +1,6 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
+import dev.tocraft.crafted.ctgen.util.Noise;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
@@ -21,8 +22,7 @@ public class MapSettingsBuilder {
     private int genHeight = MapSettings.DEFAULT.genHeight;
     private int seaLevel = MapSettings.DEFAULT.seaLevel;
     private int transition = MapSettings.DEFAULT.transition;
-    private int noiseStretch = MapSettings.DEFAULT.noiseStretch;
-    private int noiseDetail = MapSettings.DEFAULT.noiseDetail;
+    private Noise noise = MapSettings.DEFAULT.noise;
     private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
     private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
     private List<CarverSetting> carverSettings = MapSettings.DEFAULT.carverSettings;
@@ -82,13 +82,8 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setNoiseStretch(int noiseStretch) {
-        this.noiseStretch = noiseStretch;
-        return this;
-    }
-
-    public MapSettingsBuilder setNoiseDetail(int noiseDetail) {
-        this.noiseDetail = noiseDetail;
+    public MapSettingsBuilder setNoise(Noise noise) {
+        this.noise = noise;
         return this;
     }
 
@@ -108,6 +103,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noiseStretch, noiseDetail, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noise, spawnX, spawnY, carverSettings);
     }
 }

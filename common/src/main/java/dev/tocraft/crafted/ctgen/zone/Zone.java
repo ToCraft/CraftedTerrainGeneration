@@ -1,5 +1,6 @@
 package dev.tocraft.crafted.ctgen.zone;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
@@ -33,11 +34,14 @@ public record Zone(Holder<Biome> biome, int color, Block deepslateBlock, Block s
     public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
     public static final double DEFAULT_PIXEL_WEIGHT = 1;
 
-    private static final Codec<Color> COLOR_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<Color> COLOR_DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("r").forGetter(Color::getRed),
             Codec.INT.fieldOf("g").forGetter(Color::getGreen),
             Codec.INT.fieldOf("b").forGetter(Color::getBlue)
     ).apply(instance, instance.stable(Color::new)));
+
+    public static final Codec<Color> COLOR_CODEC = Codec.either(Codec.INT, COLOR_DIRECT_CODEC)
+            .xmap(either -> either.right().orElseGet(() -> new Color(either.left().orElseThrow())), color -> color.getAlpha() < 255 ? Either.left(color.getRGB()) : Either.right(color));
 
     public static final Codec<Zone> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             Biome.CODEC.fieldOf("biome").forGetter(Zone::biome),
