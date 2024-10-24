@@ -5,9 +5,11 @@
     "g": 192,
     "r": 192
   },
-  "dirt_block": "minecraft:snow_block",
   "height": 24,
   "perlin_multiplier": 20.0,
   "pixel_weight": 1.5,
-  "surface_block": "minecraft:snow_block"
+  "layers": {
+    "dirt": "minecraft:snow_block",
+    "surface": "minecraft:snow_block"
+  }
 }

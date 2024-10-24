@@ -89,6 +89,7 @@ public class MapWidget extends AbstractWidget {
 
         updateZoomedWidth();
         updateZoomedHeight();
+        resetTextureOffsets();
     }
 
     public float defaultZoom() {

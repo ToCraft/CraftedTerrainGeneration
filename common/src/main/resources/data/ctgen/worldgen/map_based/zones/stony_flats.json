@@ -5,7 +5,9 @@
     "g": 140,
     "r": 130
   },
-  "dirt_block": "minecraft:stone",
   "height": 12,
-  "surface_block": "minecraft:stone"
+  "layers": {
+    "dirt": "minecraft:stone",
+    "surface": "minecraft:stone"
+  }
 }

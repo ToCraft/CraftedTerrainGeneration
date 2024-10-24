@@ -3,6 +3,9 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.blockplacer.BasicPlacer;
+import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
+import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.BlockPos;
@@ -22,6 +25,7 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +37,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
     private static final int BEDROCK_SIZE = 3;
-    private static final int DIRT_SIZE = 6;
 
     protected final MapBasedBiomeSource biomeSource;
     private SimplexNoise noise = null;
@@ -72,40 +75,38 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
                 int thresholdModifier = (int) getSettings().getValueWithTransition(xOff, zOff, zo -> (double) zo.thresholdModifier().orElse(getSettings().thresholdModifier));
 
-                Block surfaceBlock = zone.surfaceBlock().get(noise, xOff, zOff, "");
-                // no grass underwater
-                if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
-                    surfaceBlock = Blocks.DIRT;
-                }
-
                 int shift = (int) (noise.getValue(xOff, zOff) * 3);
                 int bedrockLevel = minHeight + shift;
-                int deepslateLevel = getSettings().deepslateLevel + shift;
-                int dirtLevel = (int) (surfaceHeight - DIRT_SIZE + shift);
 
-                for (int y = getSettings().minY; y <= surfaceHeight || y <= getSeaLevel(); y++) {
+                for (int y = getSettings().minY; y < surfaceHeight || y <= getSeaLevel(); y++) {
                     BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
                     if (y < bedrockLevel) {
                         // place bedrock
                         chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
-                    } else if (y > surfaceHeight && surfaceHeight < getSeaLevel()) {
-                        // place oceans if the surface isn't higher than the sea level
-                        chunk.setBlockState(pos, Blocks.WATER.defaultBlockState(), false);
-                        // check for caves
-                    } else if (canSetBlock(pos, surfaceHeight, getSettings().deepslateLevel, minHeight + 3, thresholdModifier)) {
-                        if (y < deepslateLevel && deepslateLevel < surfaceHeight) {
-                            // place deepslate
-                            chunk.setBlockState(pos, zone.deepslateBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
-                        } else if (y < dirtLevel) {
-                            // place stone between deepslate and dirt
-                            chunk.setBlockState(pos, zone.stoneBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
-                        } else if (y < surfaceHeight - 1) {
-                            // place dirt below surface
-                            chunk.setBlockState(pos, zone.dirtBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
+                    } else {
+                        @Nullable BlockLayer layer = null;
+                        for (BlockLayer blockLayer : getSettings().getLayers()) {
+                            if (blockLayer.is(this.noise, x, y, z, zone, getMinY(), getSeaLevel(), surfaceHeight, getGenDepth(), shift)) {
+                                layer = blockLayer;
+                                break;
+                            }
                         }
-                        // only surface is missing
-                        else {
-                            chunk.setBlockState(pos, surfaceBlock.defaultBlockState(), false);
+
+                        BlockPlacer placer = layer != null ? zone.layers().getOrDefault(layer.getName(), layer.getFallback()) : BasicPlacer.AIR;
+                        Block block = placer.get(this.noise, x, y, z, layer != null ? layer.getName() : "fill");
+
+                        if (layer != null && !layer.hasCaves() || canSetBlock(pos, surfaceHeight, minHeight, thresholdModifier)) {
+                            // no grass underwater
+                            if (surfaceHeight < getSeaLevel() && block == Blocks.GRASS_BLOCK) {
+                                block = Blocks.DIRT;
+                            }
+
+                            BlockState blockState = block.defaultBlockState();
+
+                            // is air by default, no need to place it again
+                            if (!blockState.isAir()) {
+                                chunk.setBlockState(pos, blockState, false);
+                            }
                         }
                     }
                 }
@@ -113,10 +114,9 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         }
     }
 
-    private boolean canSetBlock(BlockPos pos, double surfaceHeight, int deepslateLevel, int bedrockLevel, int thresholdModifier) {
-        double height = (double) (pos.getY() - bedrockLevel) / (surfaceHeight - bedrockLevel) - 0.5;
-        int mod = height > (deepslateLevel / (surfaceHeight - bedrockLevel) - 0.5) ? thresholdModifier : 16;
-        double addThreshold = height * height * height * height * mod;
+    private boolean canSetBlock(BlockPos pos, double surfaceHeight, int minHeight, int thresholdModifier) {
+        double height = (double) (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
+        double addThreshold = height * height * height * height * thresholdModifier;
 
         for (CarverSetting carver : getSettings().carverSettings) {
             double perlin = carver.noise().getPerlin(this.noise, pos.getX(), pos.getY(), pos.getZ());

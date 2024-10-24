@@ -9,5 +9,7 @@
   "dirt_block": "minecraft:stone",
   "height": 60,
   "perlin_multiplier": 28.0,
-  "surface_block": "minecraft:snow_block"
+  "layers": {
+    "surface": "minecraft:snow_block"
+  }
 }

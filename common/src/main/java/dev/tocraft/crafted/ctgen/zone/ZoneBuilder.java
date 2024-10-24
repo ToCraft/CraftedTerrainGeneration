@@ -7,6 +7,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
@@ -16,10 +18,7 @@ public class ZoneBuilder {
     private int height = Zone.DEFAULT_HEIGHT;
     private double perlinMultiplier = Zone.DEFAULT_PERLIN_MULTIPLIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
-    private BlockPlacer deepslateBlock = Zone.DEFAULT_DEEPSLATE_BLOCK;
-    private BlockPlacer stoneBlock = Zone.DEFAULT_STONE_BLOCK;
-    private BlockPlacer dirtBlock = Zone.DEFAULT_DIRT_BLOCK;
-    private BlockPlacer surfaceBlock = Zone.DEFAULT_SURFACE_BLOCK;
+    private Map<String, BlockPlacer> layers = new HashMap<>();
     private Optional<Integer> thresholdModifier = Optional.empty();
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
@@ -52,43 +51,33 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setDeepslateBlockPlacer(BlockPlacer deepslateBlock) {
-        this.deepslateBlock = deepslateBlock;
+    public ZoneBuilder setLayers(Map<String, BlockPlacer> layers) {
+        this.layers = layers;
         return this;
     }
 
-    public ZoneBuilder setStoneBlockPlacer(BlockPlacer stoneBlock) {
-        this.stoneBlock = stoneBlock;
+    public ZoneBuilder putLayer(String layer, BlockPlacer placer) {
+        this.layers.put(layer, placer);
         return this;
     }
 
-    public ZoneBuilder setDirtBlockPlacer(BlockPlacer dirtBlock) {
-        this.dirtBlock = dirtBlock;
+    public ZoneBuilder setDeepslateBlock(Block block) {
+        this.layers.put("deepslate", new BasicPlacer(block));
         return this;
     }
 
-    public ZoneBuilder setSurfaceBlockPlacer(BlockPlacer surfaceBlock) {
-        this.surfaceBlock = surfaceBlock;
+    public ZoneBuilder setStoneBlock(Block block) {
+        this.layers.put("stone", new BasicPlacer(block));
         return this;
     }
 
-    public ZoneBuilder setDeepslateBlock(Block deepslateBlock) {
-        this.deepslateBlock = new BasicPlacer(deepslateBlock);
+    public ZoneBuilder setDirtBlock(Block block) {
+        this.layers.put("dirt", new BasicPlacer(block));
         return this;
     }
 
-    public ZoneBuilder setStoneBlock(Block stoneBlock) {
-        this.stoneBlock = new BasicPlacer(stoneBlock);
-        return this;
-    }
-
-    public ZoneBuilder setDirtBlock(Block dirtBlock) {
-        this.dirtBlock = new BasicPlacer(dirtBlock);
-        return this;
-    }
-
-    public ZoneBuilder setSurfaceBlock(Block surfaceBlock) {
-        this.surfaceBlock = new BasicPlacer(surfaceBlock);
+    public ZoneBuilder setSurfaceBlock(Block block) {
+        this.layers.put("surface", new BasicPlacer(block));
         return this;
     }
 
@@ -98,6 +87,6 @@ public class ZoneBuilder {
     }
 
     public Zone build() {
-        return new Zone(biome, color, deepslateBlock, stoneBlock, dirtBlock, surfaceBlock, height, perlinMultiplier, pixelWeight, thresholdModifier);
+        return new Zone(biome, color, layers, height, perlinMultiplier, pixelWeight, thresholdModifier);
     }
 }

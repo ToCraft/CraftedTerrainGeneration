@@ -7,6 +7,7 @@ import dev.tocraft.crafted.ctgen.zone.Codecs;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -33,8 +34,10 @@ public abstract class BlockPlacer {
         Registry.register(CTRegistries.BLOCK_PLACER, NoisePlacer.ID, NoisePlacer.CODEC);
     }
 
+    @NotNull
     public abstract Block get(SimplexNoise noise, double x, double y, double z, String layer);
 
+    @NotNull
     public abstract Block get(SimplexNoise noise, double x, double z, String layer);
 
     protected abstract Codec<? extends BlockPlacer> codec();

@@ -3,6 +3,7 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
+import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.util.Noise;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
@@ -16,14 +17,13 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, true, 6, new ArrayList<>(), null, 0, 66, -64, 279, 64, 31, Noise.DEFAULT, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, 31, Noise.DEFAULT, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
@@ -31,7 +31,7 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("default_threshold_modifier", DEFAULT.thresholdModifier).forGetter(o -> o.thresholdModifier),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
-            Codec.INT.optionalFieldOf("deepslate_level", DEFAULT.deepslateLevel).forGetter(o -> o.deepslateLevel),
+            Codec.list(BlockLayer.CODEC).optionalFieldOf("layers", DEFAULT.layers).forGetter(o -> o.layers),
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
             Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
             Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
@@ -48,7 +48,6 @@ public final class MapSettings {
     final int thresholdModifier;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
-    final int deepslateLevel;
     final int surfaceLevel;
     final int minY;
     final int genHeight;
@@ -59,15 +58,16 @@ public final class MapSettings {
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
     final List<CarverSetting> carverSettings;
+    private final List<BlockLayer> layers;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int deepslateLevel, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, Noise noise, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, Noise noise, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.thresholdModifier = thresholdModifier;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
-        this.deepslateLevel = deepslateLevel;
+        this.layers = layers;
         this.surfaceLevel = surfaceLevel;
         this.minY = minY;
         this.genHeight = genHeight;
@@ -90,6 +90,10 @@ public final class MapSettings {
             }
         });
         this.carverSettings = carverSettings;
+    }
+
+    public List<BlockLayer> getLayers() {
+        return layers;
     }
 
     /**
@@ -183,22 +187,6 @@ public final class MapSettings {
 
     public int yOffset(int y) {
         return y + spawnY.orElseGet(() -> mapImage.get().getHeight() / 2);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (MapSettings) obj;
-        return Objects.equals(this.mapId, that.mapId) &&
-                Objects.equals(this.zones, that.zones) &&
-                Objects.equals(this.defaultBiome, that.defaultBiome) &&
-                this.deepslateLevel == that.deepslateLevel &&
-                this.surfaceLevel == that.surfaceLevel &&
-                this.minY == that.minY &&
-                this.genHeight == that.genHeight &&
-                this.seaLevel == that.seaLevel &&
-                this.transition == that.transition;
     }
 
     @Nullable

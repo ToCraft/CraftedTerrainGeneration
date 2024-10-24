@@ -5,8 +5,10 @@
     "g": 84,
     "r": 84
   },
-  "dirt_block": "minecraft:red_concrete",
   "height": 18,
   "perlin_multiplier": 12.0,
-  "surface_block": "red_sand"
+  "layers": {
+    "dirt": "minecraft:red_concrete",
+    "surface": "minecraft:red_sand"
+  }
 }

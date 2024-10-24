@@ -56,7 +56,7 @@ public class Zones {
         // Western Continent
         context.register(DESERT, new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setDirtBlock(Blocks.SANDSTONE).setSurfaceBlock(Blocks.SAND).setHeight(5).setPerlinMultiplier(4).build());
         context.register(BADLANDS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(Blocks.BROWN_CONCRETE).setHeight(18).setPerlinMultiplier(12).build());
-        context.register(BADLANDS_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlockPlacer(NoisePlacer.of(new Noise(List.of(1f), 1, 1), new HashMap<>() {
+        context.register(BADLANDS_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).putLayer("surface", NoisePlacer.of(new Noise(List.of(1f), 1, 1), new HashMap<>() {
             {
                 put(-0.5d, Blocks.ORANGE_CONCRETE);
                 put(0d, Blocks.RED_CONCRETE);

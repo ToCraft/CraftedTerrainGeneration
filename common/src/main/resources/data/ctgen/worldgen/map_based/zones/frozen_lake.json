@@ -7,6 +7,8 @@
   },
   "height": -20,
   "pixel_weight": 3.0,
-  "surface_block": "minecraft:sand",
+  "layers": {
+    "surface": "minecraft:sand"
+  },
   "threshold_modifier": 26
 }

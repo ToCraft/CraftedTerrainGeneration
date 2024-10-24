@@ -1,5 +1,6 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
+import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.util.Noise;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
@@ -16,7 +17,7 @@ public class MapSettingsBuilder {
     private int thresholdModifier = MapSettings.DEFAULT.thresholdModifier;
     private List<Holder<Zone>> zones = MapSettings.DEFAULT.zones;
     private Holder<Zone> defaultBiome;
-    private int deepslateLevel = MapSettings.DEFAULT.deepslateLevel;
+    private List<BlockLayer> layers = MapSettings.DEFAULT.getLayers();
     private int surfaceLevel = MapSettings.DEFAULT.surfaceLevel;
     private int minY = MapSettings.DEFAULT.minY;
     private int genHeight = MapSettings.DEFAULT.genHeight;
@@ -52,8 +53,13 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setDeepslateLevel(int deepslateLevel) {
-        this.deepslateLevel = deepslateLevel;
+    public MapSettingsBuilder setLayers(List<BlockLayer> layers) {
+        this.layers = layers;
+        return this;
+    }
+
+    public MapSettingsBuilder addLayer(BlockLayer layer) {
+        this.layers.add(layer);
         return this;
     }
 
@@ -103,6 +109,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, deepslateLevel, surfaceLevel, minY, genHeight, seaLevel, transition, noise, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, transition, noise, spawnX, spawnY, carverSettings);
     }
 }

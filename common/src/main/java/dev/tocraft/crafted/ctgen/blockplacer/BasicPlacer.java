@@ -6,10 +6,18 @@ import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.zone.Codecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.NotNull;
 
 public class BasicPlacer extends BlockPlacer {
+    public static final BlockPlacer DEEPSLATE_BLOCK = new BasicPlacer(Blocks.DEEPSLATE);
+    public static final BlockPlacer STONE_BLOCK = new BasicPlacer(Blocks.STONE);
+    public static final BlockPlacer DIRT_BLOCK = new BasicPlacer(Blocks.DIRT);
+    public static final BlockPlacer GRASS_BLOCK = new BasicPlacer(Blocks.GRASS_BLOCK);
+    public static final BlockPlacer WATER_BLOCK = new BasicPlacer(Blocks.WATER);
+    public static final BlockPlacer AIR = new BasicPlacer(Blocks.AIR);
+
     @NotNull
     private final Block value;
 
@@ -17,12 +25,12 @@ public class BasicPlacer extends BlockPlacer {
         this.value = value;
     }
 
-    public Block get(SimplexNoise noise, double x, double y, double z, String layer) {
+    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, String layer) {
         return value;
     }
 
     @Override
-    public Block get(SimplexNoise noise, double x, double z, String layer) {
+    public @NotNull Block get(SimplexNoise noise, double x, double z, String layer) {
         return value;
     }
 

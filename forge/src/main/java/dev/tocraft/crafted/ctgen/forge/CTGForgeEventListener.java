@@ -4,6 +4,7 @@ import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
+import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.util.CTRegistries;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
@@ -52,5 +53,6 @@ public class CTGForgeEventListener {
 
         // values for the built-in registries
         BlockPlacer.register();
+        BlockLayer.register();
     }
 }

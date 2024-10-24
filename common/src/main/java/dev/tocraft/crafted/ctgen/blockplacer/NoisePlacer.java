@@ -38,7 +38,7 @@ public class NoisePlacer extends BlockPlacer {
         return noise != null && !thresholdMap.isEmpty();
     }
 
-    public Block get(SimplexNoise noise, double x, double y, double z, String layer) {
+    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, String layer) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {
@@ -60,7 +60,7 @@ public class NoisePlacer extends BlockPlacer {
     }
 
     @Override
-    public Block get(SimplexNoise noise, double x, double z, String layer) {
+    public @NotNull Block get(SimplexNoise noise, double x, double z, String layer) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {

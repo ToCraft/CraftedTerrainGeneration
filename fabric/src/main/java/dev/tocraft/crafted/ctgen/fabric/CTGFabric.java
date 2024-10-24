@@ -4,6 +4,7 @@ import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
+import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import net.fabricmc.api.ModInitializer;
@@ -52,6 +53,8 @@ public class CTGFabric implements ModInitializer {
 
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> CTGCommand.register(dispatcher, context));
 
+        // register built-in registry entries
         BlockPlacer.register();
+        BlockLayer.register();
     }
 }
