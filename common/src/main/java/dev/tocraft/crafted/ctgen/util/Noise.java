@@ -28,7 +28,7 @@ public record Noise(List<Float> octaves, double persistence, int stretchXZ, int 
         double total = 0;
         double amplitude = 1;
         double totalAmplitude = 0;
-        for(float frequency : octaves) {
+        for (float frequency : octaves) {
             total += noise.getValue(x2 * frequency, y2 * frequency, z2 * frequency) * amplitude;
             totalAmplitude += amplitude;
             amplitude *= persistence;
@@ -45,7 +45,7 @@ public record Noise(List<Float> octaves, double persistence, int stretchXZ, int 
         double amplitude = 1;
         double totalAmplitude = 0;
 
-        for(float frequency : octaves) {
+        for (float frequency : octaves) {
             total += noise.getValue(x2 * frequency, z2 * frequency) * amplitude;
             totalAmplitude += amplitude;
             amplitude *= persistence;

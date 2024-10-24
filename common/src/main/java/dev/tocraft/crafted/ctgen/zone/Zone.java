@@ -3,8 +3,8 @@ package dev.tocraft.crafted.ctgen.zone;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.blockplacer.BasicPlacer;
 import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
-import dev.tocraft.crafted.ctgen.blockplacer.NoisePlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.world.level.biome.Biome;
@@ -12,14 +12,15 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Optional;
 
-public record Zone(Holder<Biome> biome, int color, BlockPlacer deepslateBlock, BlockPlacer stoneBlock, BlockPlacer dirtBlock,
+public record Zone(Holder<Biome> biome, int color, BlockPlacer deepslateBlock, BlockPlacer stoneBlock,
+                   BlockPlacer dirtBlock,
                    BlockPlacer surfaceBlock, int height, double perlinMultiplier, double pixelWeight,
                    Optional<Integer> thresholdModifier) {
 
-    public static final BlockPlacer DEFAULT_DEEPSLATE_BLOCK = NoisePlacer.of(Blocks.DEEPSLATE);
-    public static final BlockPlacer DEFAULT_STONE_BLOCK = NoisePlacer.of(Blocks.STONE);
-    public static final BlockPlacer DEFAULT_DIRT_BLOCK = NoisePlacer.of(Blocks.DIRT);
-    public static final BlockPlacer DEFAULT_SURFACE_BLOCK = NoisePlacer.of(Blocks.GRASS_BLOCK);
+    public static final BlockPlacer DEFAULT_DEEPSLATE_BLOCK = new BasicPlacer(Blocks.DEEPSLATE);
+    public static final BlockPlacer DEFAULT_STONE_BLOCK = new BasicPlacer(Blocks.STONE);
+    public static final BlockPlacer DEFAULT_DIRT_BLOCK = new BasicPlacer(Blocks.DIRT);
+    public static final BlockPlacer DEFAULT_SURFACE_BLOCK = new BasicPlacer(Blocks.GRASS_BLOCK);
     public static final int DEFAULT_HEIGHT = 0;
     public static final double DEFAULT_PERLIN_MULTIPLIER = 8;
     public static final double DEFAULT_PIXEL_WEIGHT = 1;

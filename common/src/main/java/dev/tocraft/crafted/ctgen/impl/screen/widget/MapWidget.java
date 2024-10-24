@@ -164,6 +164,37 @@ public class MapWidget extends AbstractWidget {
         return ratio;
     }
 
+    public void resetTextureOffsets() {
+        // calculate pixel pos for the player
+        double pixelX;
+        double pixelY;
+        if (minecraft.player != null) {
+            BlockPos blockPos = minecraft.player.blockPosition();
+            pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
+            pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
+        } else {
+            pixelX = pixelOffsetX;
+            pixelY = pixelOffsetY;
+        }
+
+        // calculate offset for pixel pos
+        int tX = (int) (pixelX / mapWidth * zoomedWidth + getTextureX());
+        int tY = (int) (pixelY / mapHeight * zoomedHeight + getTextureY());
+
+        setTextureOffsetX(tX);
+        setTextureOffsetY(tY);
+    }
+
+    public void setTextureOffsetX(double textureOffsetX) {
+        this.textureOffsetX = textureOffsetX;
+        updateZoomedWidth();
+    }
+
+    public void setTextureOffsetY(double textureOffsetY) {
+        this.textureOffsetY = textureOffsetY;
+        updateZoomedHeight();
+    }
+
     /**
      * @return the virtual y point, where the map texture starts
      */

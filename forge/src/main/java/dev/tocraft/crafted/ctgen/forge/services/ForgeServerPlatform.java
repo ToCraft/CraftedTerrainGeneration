@@ -6,8 +6,6 @@ import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.crafted.ctgen.impl.services.ServerPlatform;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.core.WritableRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -21,9 +19,6 @@ public final class ForgeServerPlatform implements ServerPlatform {
     @Override
     public <T> Registry<T> simpleRegistry(ResourceKey<Registry<T>> registryKey) {
         Lifecycle lifecycle = Lifecycle.stable();
-        MappedRegistry<T> registry = new MappedRegistry<>(registryKey, lifecycle, false);
-        //noinspection unchecked
-        ((WritableRegistry<WritableRegistry<?>>) BuiltInRegistries.REGISTRY).register((ResourceKey<WritableRegistry<?>>) (ResourceKey<?>) registryKey, registry, Lifecycle.stable());
-        return registry;
+        return new MappedRegistry<>(registryKey, lifecycle, false);
     }
 }

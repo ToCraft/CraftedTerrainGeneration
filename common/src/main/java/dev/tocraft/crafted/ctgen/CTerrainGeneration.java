@@ -1,5 +1,6 @@
 package dev.tocraft.crafted.ctgen;
 
+import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

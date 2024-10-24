@@ -72,7 +72,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
                 int thresholdModifier = (int) getSettings().getValueWithTransition(xOff, zOff, zo -> (double) zo.thresholdModifier().orElse(getSettings().thresholdModifier));
 
-                Block surfaceBlock = zone.surfaceBlock().get(noise, xOff, zOff);
+                Block surfaceBlock = zone.surfaceBlock().get(noise, xOff, zOff, "");
                 // no grass underwater
                 if (surfaceHeight < getSeaLevel() && surfaceBlock == Blocks.GRASS_BLOCK) {
                     surfaceBlock = Blocks.DIRT;
@@ -95,13 +95,13 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                     } else if (canSetBlock(pos, surfaceHeight, getSettings().deepslateLevel, minHeight + 3, thresholdModifier)) {
                         if (y < deepslateLevel && deepslateLevel < surfaceHeight) {
                             // place deepslate
-                            chunk.setBlockState(pos, zone.deepslateBlock().get(noise, pos.getX(), pos.getY(), pos.getZ()).defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.deepslateBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
                         } else if (y < dirtLevel) {
                             // place stone between deepslate and dirt
-                            chunk.setBlockState(pos, zone.stoneBlock().get(noise, pos.getX(), pos.getY(), pos.getZ()).defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.stoneBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
                         } else if (y < surfaceHeight - 1) {
                             // place dirt below surface
-                            chunk.setBlockState(pos, zone.dirtBlock().get(noise, pos.getX(), pos.getY(), pos.getZ()).defaultBlockState(), false);
+                            chunk.setBlockState(pos, zone.dirtBlock().get(noise, pos.getX(), pos.getY(), pos.getZ(), "").defaultBlockState(), false);
                         }
                         // only surface is missing
                         else {

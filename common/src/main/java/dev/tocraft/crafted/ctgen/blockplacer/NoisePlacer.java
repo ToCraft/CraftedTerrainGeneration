@@ -1,10 +1,11 @@
 package dev.tocraft.crafted.ctgen.blockplacer;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.util.Noise;
 import dev.tocraft.crafted.ctgen.zone.Codecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.Contract;
@@ -22,19 +23,10 @@ public class NoisePlacer extends BlockPlacer {
     @NotNull
     private final Block defaultValue;
 
-    private NoisePlacer(Block value) {
-        this(null, new HashMap<>(), value);
-    }
-
-    private NoisePlacer(@Nullable Noise noise, @NotNull Map<Double,Block> thresholdMap, @NotNull Block defaultValue) {
+    private NoisePlacer(@Nullable Noise noise, @NotNull Map<Double, Block> thresholdMap, @NotNull Block defaultValue) {
         this.noise = noise;
         this.thresholdMap = thresholdMap;
         this.defaultValue = defaultValue;
-    }
-
-    @Contract("_ -> new")
-    public static @NotNull NoisePlacer of(@NotNull Block value) {
-        return new NoisePlacer(value);
     }
 
     @Contract(value = "_, _, _ -> new", pure = true)
@@ -46,12 +38,12 @@ public class NoisePlacer extends BlockPlacer {
         return noise != null && !thresholdMap.isEmpty();
     }
 
-    public Block get(SimplexNoise noise, double x, double y, double z) {
+    public Block get(SimplexNoise noise, double x, double y, double z, String layer) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {
             perlin = this.noise.getPerlin(noise, x, y, z);
-        } else  {
+        } else {
             perlin = 0;
         }
 
@@ -68,12 +60,12 @@ public class NoisePlacer extends BlockPlacer {
     }
 
     @Override
-    public Block get(SimplexNoise noise, double x, double z) {
+    public Block get(SimplexNoise noise, double x, double z, String layer) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {
             perlin = this.noise.getPerlin(noise, x, z);
-        } else  {
+        } else {
             perlin = 0;
         }
 
@@ -106,14 +98,13 @@ public class NoisePlacer extends BlockPlacer {
             }
     );
 
-    public static final Codec<NoisePlacer> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<NoisePlacer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise),
-            VALUE_MAP_CODEC.optionalFieldOf("values", new HashMap<>()).forGetter(o -> o.thresholdMap),
+            VALUE_MAP_CODEC.fieldOf("values").forGetter(o -> o.thresholdMap),
             Codecs.BLOCK.fieldOf("default").forGetter(o -> o.defaultValue)
     ).apply(instance, instance.stable(NoisePlacer::new)));
 
-    public static final Codec<NoisePlacer> CODEC = Codec.either(Codecs.BLOCK, DIRECT_CODEC)
-            .xmap(either -> either.right().orElseGet(() -> of(either.left().orElseThrow())), selector -> selector.hasNoise() ? Either.right(selector) : Either.left(selector.defaultValue));
+    public static final ResourceLocation ID = CTerrainGeneration.id("noise");
 
     @Override
     public Codec<NoisePlacer> codec() {

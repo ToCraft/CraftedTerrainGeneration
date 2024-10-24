@@ -1,7 +1,6 @@
 package dev.tocraft.crafted.ctgen.impl.services;
 
 import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;

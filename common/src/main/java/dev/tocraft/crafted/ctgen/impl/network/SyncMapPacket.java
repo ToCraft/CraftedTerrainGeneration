@@ -52,8 +52,7 @@ public class SyncMapPacket {
             int mapWidth = buf.readInt();
             int mapHeight = buf.readInt();
             return new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
-        }
-        else {
+        } else {
             return empty();
         }
     }

@@ -9,6 +9,7 @@
   "height": 28,
   "perlin_multiplier": 24.0,
   "surface_block": {
+    "type": "ctgen:noise",
     "default": "minecraft:brown_concrete",
     "noise": {
       "octaves": [
@@ -17,7 +18,8 @@
     },
     "values": {
       "-0.5": "minecraft:orange_concrete",
-      "0": "minecraft:red_concrete"
+      "0": "minecraft:red_concrete",
+      "0.5": "minecraft:gray_concrete"
     }
   }
 }

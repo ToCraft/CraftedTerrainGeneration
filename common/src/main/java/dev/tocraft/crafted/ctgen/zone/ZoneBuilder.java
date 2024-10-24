@@ -1,10 +1,10 @@
 package dev.tocraft.crafted.ctgen.zone;
 
-import dev.tocraft.crafted.ctgen.blockplacer.NoisePlacer;
+import dev.tocraft.crafted.ctgen.blockplacer.BasicPlacer;
+import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 import java.awt.*;
 import java.util.Optional;
@@ -16,10 +16,10 @@ public class ZoneBuilder {
     private int height = Zone.DEFAULT_HEIGHT;
     private double perlinMultiplier = Zone.DEFAULT_PERLIN_MULTIPLIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
-    private NoisePlacer deepslateBlock = NoisePlacer.of(Blocks.DEEPSLATE);
-    private NoisePlacer stoneBlock = NoisePlacer.of(Blocks.STONE);
-    private NoisePlacer dirtBlock = NoisePlacer.of(Blocks.DIRT);
-    private NoisePlacer surfaceBlock = NoisePlacer.of(Blocks.GRASS_BLOCK);
+    private BlockPlacer deepslateBlock = Zone.DEFAULT_DEEPSLATE_BLOCK;
+    private BlockPlacer stoneBlock = Zone.DEFAULT_STONE_BLOCK;
+    private BlockPlacer dirtBlock = Zone.DEFAULT_DIRT_BLOCK;
+    private BlockPlacer surfaceBlock = Zone.DEFAULT_SURFACE_BLOCK;
     private Optional<Integer> thresholdModifier = Optional.empty();
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
@@ -52,43 +52,43 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setDeepslateBlock(NoisePlacer deepslateBlock) {
+    public ZoneBuilder setDeepslateBlockPlacer(BlockPlacer deepslateBlock) {
         this.deepslateBlock = deepslateBlock;
         return this;
     }
 
-    public ZoneBuilder setStoneBlock(NoisePlacer stoneBlock) {
+    public ZoneBuilder setStoneBlockPlacer(BlockPlacer stoneBlock) {
         this.stoneBlock = stoneBlock;
         return this;
     }
 
-    public ZoneBuilder setDirtBlock(NoisePlacer dirtBlock) {
+    public ZoneBuilder setDirtBlockPlacer(BlockPlacer dirtBlock) {
         this.dirtBlock = dirtBlock;
         return this;
     }
 
-    public ZoneBuilder setSurfaceBlock(NoisePlacer surfaceBlock) {
+    public ZoneBuilder setSurfaceBlockPlacer(BlockPlacer surfaceBlock) {
         this.surfaceBlock = surfaceBlock;
         return this;
     }
 
     public ZoneBuilder setDeepslateBlock(Block deepslateBlock) {
-        this.deepslateBlock = NoisePlacer.of(deepslateBlock);
+        this.deepslateBlock = new BasicPlacer(deepslateBlock);
         return this;
     }
 
     public ZoneBuilder setStoneBlock(Block stoneBlock) {
-        this.stoneBlock = NoisePlacer.of(stoneBlock);
+        this.stoneBlock = new BasicPlacer(stoneBlock);
         return this;
     }
 
     public ZoneBuilder setDirtBlock(Block dirtBlock) {
-        this.dirtBlock = NoisePlacer.of(dirtBlock);
+        this.dirtBlock = new BasicPlacer(dirtBlock);
         return this;
     }
 
     public ZoneBuilder setSurfaceBlock(Block surfaceBlock) {
-        this.surfaceBlock = NoisePlacer.of(surfaceBlock);
+        this.surfaceBlock = new BasicPlacer(surfaceBlock);
         return this;
     }
 

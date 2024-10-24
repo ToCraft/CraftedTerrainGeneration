@@ -1,13 +1,12 @@
 package dev.tocraft.crafted.ctgen.fabric;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
-import dev.tocraft.crafted.ctgen.impl.network.SyncMapPacket;
-import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
+import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -53,12 +52,6 @@ public class CTGFabric implements ModInitializer {
 
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> CTGCommand.register(dispatcher, context));
 
-        ClientPlayNetworking.registerGlobalReceiver(
-                SyncMapPacket.PACKET_ID,
-                (client, handler, buf, sender) -> {
-                    SyncMapPacket packet = SyncMapPacket.decode(buf);
-                    packet.handle();
-                }
-        );
+        BlockPlacer.register();
     }
 }
