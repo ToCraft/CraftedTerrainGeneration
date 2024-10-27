@@ -33,7 +33,5 @@ public class CTGForge {
         if (FMLEnvironment.dist.isClient()) {
             new CTGForgeClient();
         }
-
-        CTerrainGeneration.initialize();
     }
 }

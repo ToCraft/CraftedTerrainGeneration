@@ -11,7 +11,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.tocraft.modmaster.settings") version "0.4.13"
+    id("dev.tocraft.modmaster.settings") version "0.5"
 }
 
 rootProject.name = "CTGen"
