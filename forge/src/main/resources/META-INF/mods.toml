@@ -12,6 +12,7 @@ authors = "To_Craft"
 description = '''
 Create your own world by using a drawn map!
 '''
+logoFile = "icon.png"
 
 [[dependencies.ctgen]]
 modId = "minecraft"
