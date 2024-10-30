@@ -63,8 +63,11 @@ public class CTGTeleportCommand {
     private static int teleportToPos(CommandSourceStack source, Collection<? extends Entity> targets, ServerLevel level, Vec2 dest) throws CommandSyntaxException {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             MapSettings settings = generator.getSettings();
-            int x = ((int) dest.x) - settings.xOffset(0) << 2;
-            int z = ((int) dest.y) - settings.yOffset(0) << 2;
+
+            int i = settings.isPixelsAreChunks() ? 4 : 2;
+
+            int x = ((int) dest.x) - settings.xOffset(0) << i;
+            int z = ((int) dest.y) - settings.yOffset(0) << i;
             int y = level.getChunk(x >> 4, z >> 4).getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) + 1;
             BlockPos pos = new BlockPos(x, y, z);
 

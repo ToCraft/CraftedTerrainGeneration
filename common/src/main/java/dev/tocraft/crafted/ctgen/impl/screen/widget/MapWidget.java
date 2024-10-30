@@ -24,9 +24,12 @@ public class MapWidget extends AbstractWidget {
     private static final float ZOOM_FACTOR = 1.1F;
     private static final int MOVE_SPEED = 10;
 
+    // generic
+    private final Minecraft minecraft;
+
     // texture to be used as map
     private final ResourceLocation mapId;
-    private final Minecraft minecraft;
+    private final boolean pixelsAreChunks;
 
     // received from the server
     private final int pixelOffsetX;
@@ -52,12 +55,13 @@ public class MapWidget extends AbstractWidget {
     @Nullable
     public static MapWidget ofPacket(Minecraft minecraft, int x, int y, int width, int height, @NotNull SyncMapPacket packet) {
         ResourceLocation mapId = packet.getMapId();
+        boolean pixelsAreChunks = packet.isPixelsAreChunks();
         int xOffset = packet.getXOffset();
         int yOffset = packet.getYOffset();
         int mapWidth = packet.getMapWidth();
         int mapHeight = packet.getMapHeight();
         if (mapId != null) {
-            return new MapWidget(minecraft, x, y, width, height, new ResourceLocation(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), xOffset, yOffset, mapWidth, mapHeight);
+            return new MapWidget(minecraft, x, y, width, height, new ResourceLocation(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
         }
         return null;
     }
@@ -65,15 +69,15 @@ public class MapWidget extends AbstractWidget {
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
-        this(minecraft, x, y, width, height, mapId, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true);
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight) {
+        this(minecraft, x, y, width, height, mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true);
     }
 
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     @ApiStatus.Internal
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer) {
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer) {
         super(x, y, width, height, Component.literal("Map Widget"));
         this.minecraft = minecraft;
         this.pixelOffsetX = xOffset;
@@ -82,6 +86,7 @@ public class MapWidget extends AbstractWidget {
         this.mapHeight = mapHeight;
         this.ratio = (double) mapWidth / mapHeight;
         this.mapId = mapId;
+        this.pixelsAreChunks = pixelsAreChunks;
         this.minZoom = minZoom;
         this.zoom = minZoom;
         this.showCursorPos = showCursorPos;
@@ -271,8 +276,9 @@ public class MapWidget extends AbstractWidget {
         if (showPlayer) {
             // calculate pixel pos for the player
             BlockPos blockPos = minecraft.player.blockPosition();
-            int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
-            int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
+            int i = pixelsAreChunks ? 4 : 2;
+            int pixelX = (blockPos.getX() >> i) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> i) + pixelOffsetY;
             int playerX = (int) (getTextureX() + (double) pixelX / mapWidth * zoomedWidth);
             int playerY = (int) (getTextureY() + (double) pixelY / mapHeight * zoomedHeight);
 
@@ -290,8 +296,8 @@ public class MapWidget extends AbstractWidget {
 
         // render cursor position
         if (isHovered && showCursorPos) {
-            int mousePixelX = (int) ((double) (mouseX - getTextureX()) / zoomedWidth * mapWidth);
-            int mousePixelY = (int) ((double) (mouseY - getTextureY()) / zoomedHeight * mapHeight);
+            int mousePixelX = mousePixelX(mouseX);
+            int mousePixelY = mousePixelY(mouseY);
             Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
 
             // resize text

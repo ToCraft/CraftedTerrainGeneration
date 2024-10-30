@@ -200,6 +200,10 @@ public final class MapSettings {
         return mapId;
     }
 
+    public boolean isPixelsAreChunks() {
+        return pixelsAreChunks;
+    }
+
     @ApiStatus.Internal
     public int getMapWidth() {
         return mapImage.get().getWidth();
