@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.worldgen;
 
-import dev.tocraft.crafted.ctgen.layer.BlockLayer;
-import dev.tocraft.crafted.ctgen.util.Noise;
+import dev.tocraft.crafted.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.crafted.ctgen.xtend.terrain.TerrainHeight;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
@@ -22,8 +22,8 @@ public class MapSettingsBuilder {
     private int minY = MapSettings.DEFAULT.minY;
     private int genHeight = MapSettings.DEFAULT.genHeight;
     private int seaLevel = MapSettings.DEFAULT.seaLevel;
+    private TerrainHeight terrain = MapSettings.DEFAULT.terrain;
     private int transition = MapSettings.DEFAULT.transition;
-    private Noise noise = MapSettings.DEFAULT.noise;
     private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
     private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
     private List<CarverSetting> carverSettings = MapSettings.DEFAULT.carverSettings;
@@ -83,13 +83,13 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setTransition(int transition) {
-        this.transition = transition;
+    public MapSettingsBuilder setTerrainHeight(TerrainHeight terrain) {
+        this.terrain = terrain;
         return this;
     }
 
-    public MapSettingsBuilder setNoise(Noise noise) {
-        this.noise = noise;
+    public MapSettingsBuilder setTransition(int transition) {
+        this.transition = transition;
         return this;
     }
 
@@ -109,6 +109,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, transition, noise, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, 31, spawnX, spawnY, carverSettings);
     }
 }

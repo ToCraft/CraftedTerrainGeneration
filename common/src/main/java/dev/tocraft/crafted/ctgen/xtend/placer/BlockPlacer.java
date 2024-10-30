@@ -1,8 +1,8 @@
-package dev.tocraft.crafted.ctgen.blockplacer;
+package dev.tocraft.crafted.ctgen.xtend.placer;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import dev.tocraft.crafted.ctgen.util.CTRegistries;
+import dev.tocraft.crafted.ctgen.xtend.CTRegistries;
 import dev.tocraft.crafted.ctgen.zone.Codecs;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;

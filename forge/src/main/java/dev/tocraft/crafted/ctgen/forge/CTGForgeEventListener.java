@@ -1,13 +1,14 @@
 package dev.tocraft.crafted.ctgen.forge;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
-import dev.tocraft.crafted.ctgen.layer.BlockLayer;
-import dev.tocraft.crafted.ctgen.util.CTRegistries;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.crafted.ctgen.xtend.CTRegistries;
+import dev.tocraft.crafted.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
+import dev.tocraft.crafted.ctgen.xtend.terrain.TerrainHeight;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -50,9 +51,11 @@ public class CTGForgeEventListener {
         // custom built-in registries
         Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.BLOCK_PLAYER_KEY, CTRegistries.BLOCK_PLACER);
         Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.BLOCK_LAYER_KEY, CTRegistries.BLOCK_LAYER);
+        Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.TERRAIN_KEY, CTRegistries.TERRAIN);
 
         // values for the built-in registries
         BlockPlacer.register();
         BlockLayer.register();
+        TerrainHeight.register();
     }
 }

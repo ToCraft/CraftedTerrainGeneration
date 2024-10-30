@@ -17,3 +17,19 @@ tasks.withType<ProcessResources> {
 
     outputs.upToDateWhen { false }
 }
+
+loom {
+    runs {
+        create("dataGen") {
+            // use client and server code base
+            client()
+            server()
+
+            // set vm args to use data generation
+            name = "Data Generation"
+            vmArg("-Dfabric-api.datagen")
+            vmArg("-Dfabric-api.datagen.modid=${rootProject.properties["archives_base_name"]}")
+            vmArg("-Dfabric-api.datagen.output-dir=${parent!!.project("common").projectDir.resolve("src/main/generated")}")
+        }
+    }
+}

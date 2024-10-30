@@ -3,8 +3,9 @@ package dev.tocraft.crafted.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
-import dev.tocraft.crafted.ctgen.layer.BlockLayer;
-import dev.tocraft.crafted.ctgen.util.Noise;
+import dev.tocraft.crafted.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.crafted.ctgen.xtend.terrain.BasicSurface;
+import dev.tocraft.crafted.ctgen.xtend.terrain.TerrainHeight;
 import dev.tocraft.crafted.ctgen.zone.CarverSetting;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, true, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, 31, Noise.DEFAULT, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, true, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, BasicSurface.DEFAULT, 31, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
@@ -36,8 +37,8 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
             Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
             Codec.INT.optionalFieldOf("sea_level", DEFAULT.seaLevel).forGetter(o -> o.seaLevel),
+            TerrainHeight.CODEC.optionalFieldOf("terrain", DEFAULT.terrain).forGetter(o -> o.terrain),
             Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
-            Noise.CODEC.optionalFieldOf("noise", DEFAULT.noise).forGetter(o -> o.noise),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
             Codec.list(CarverSetting.CODEC).optionalFieldOf("cave_carver", DEFAULT.carverSettings).forGetter(o -> o.carverSettings)
@@ -52,8 +53,8 @@ public final class MapSettings {
     final int minY;
     final int genHeight;
     final int seaLevel;
+    final TerrainHeight terrain;
     final int transition;
-    final Noise noise;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
@@ -61,7 +62,7 @@ public final class MapSettings {
     private final List<BlockLayer> layers;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, int transition, Noise noise, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.thresholdModifier = thresholdModifier;
@@ -72,8 +73,8 @@ public final class MapSettings {
         this.minY = minY;
         this.genHeight = genHeight;
         this.seaLevel = seaLevel;
+        this.terrain = terrain;
         this.transition = transition;
-        this.noise = noise;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX.map(sX -> {
             if (pixelsAreChunks) {
@@ -125,16 +126,12 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double perlin = getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, Zone::perlinMultiplier);
+        double perlin = terrain.getHeight(this, noise, pX, pY, getValueWithTransition(pX, pY, Zone::terrainModifier));
         double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
         return genHeight + perlin;
     }
 
-    public double getPerlin(SimplexNoise noise, int x, int z) {
-        return this.noise.getPerlin(noise, x, z);
-    }
-
-    double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
+    public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;

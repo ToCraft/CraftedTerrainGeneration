@@ -19,6 +19,9 @@
     ],
     "client": [
       "dev.tocraft.crafted.ctgen.fabric.CTGFabricClient::initialize"
+    ],
+    "fabric-datagen": [
+      "dev.tocraft.crafted.ctgen.fabric.CTGDataGen"
     ]
   },
   "mixins": [

@@ -1,9 +1,9 @@
-package dev.tocraft.crafted.ctgen.layer;
+package dev.tocraft.crafted.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
+import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;

@@ -1,4 +1,4 @@
-package dev.tocraft.crafted.ctgen.blockplacer;
+package dev.tocraft.crafted.ctgen.xtend.placer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

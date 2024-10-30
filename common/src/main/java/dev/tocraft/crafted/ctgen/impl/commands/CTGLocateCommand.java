@@ -4,10 +4,10 @@ import com.google.common.base.Stopwatch;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.logging.LogUtils;
-import dev.tocraft.crafted.ctgen.CTerrainGeneration;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.crafted.ctgen.worldgen.MapSettings;
+import dev.tocraft.crafted.ctgen.xtend.CTRegistries;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -40,7 +40,7 @@ public class CTGLocateCommand {
                         .then(
                                 Commands.literal("zone")
                                         .then(
-                                                Commands.argument("dest", new ResourceLocationArgument()).suggests((context1, builder) -> SharedSuggestionProvider.suggest(context.holderLookup(CTerrainGeneration.MAP_ZONES_REGISTRY).listElements().map(h -> h.key().location().toString()), builder))
+                                                Commands.argument("dest", new ResourceLocationArgument()).suggests((context1, builder) -> SharedSuggestionProvider.suggest(context.holderLookup(CTRegistries.ZONES_KEY).listElements().map(h -> h.key().location().toString()), builder))
                                                         .executes(
                                                                 commandContext -> locate(
                                                                         commandContext.getSource(),
@@ -58,7 +58,7 @@ public class CTGLocateCommand {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             Stopwatch stopwatch = Stopwatch.createStarted(Util.TICKER);
 
-            Zone zone = level.registryAccess().registryOrThrow(CTerrainGeneration.MAP_ZONES_REGISTRY).getOptional(zoneId).orElseThrow();
+            Zone zone = level.registryAccess().registryOrThrow(CTRegistries.ZONES_KEY).getOptional(zoneId).orElseThrow();
 
             MapSettings settings = generator.getSettings();
             BufferedImage image = generator.getSettings().getMapImage();

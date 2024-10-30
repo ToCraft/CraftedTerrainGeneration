@@ -1,7 +1,7 @@
 package dev.tocraft.crafted.ctgen.zone;
 
-import dev.tocraft.crafted.ctgen.blockplacer.BasicPlacer;
-import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
+import dev.tocraft.crafted.ctgen.xtend.placer.BasicPlacer;
+import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -16,7 +16,7 @@ public class ZoneBuilder {
     private Holder<Biome> biome;
     private int color;
     private int height = Zone.DEFAULT_HEIGHT;
-    private double perlinMultiplier = Zone.DEFAULT_PERLIN_MULTIPLIER;
+    private double terrainModifier = Zone.DEFAULT_TERRAIN_MODIFIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
     private Map<String, BlockPlacer> layers = new HashMap<>();
     private Optional<Integer> thresholdModifier = Optional.empty();
@@ -41,8 +41,8 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setPerlinMultiplier(double perlinMultiplier) {
-        this.perlinMultiplier = perlinMultiplier;
+    public ZoneBuilder setTerrainModifier(double terrainModifier) {
+        this.terrainModifier = terrainModifier;
         return this;
     }
 
@@ -87,6 +87,6 @@ public class ZoneBuilder {
     }
 
     public Zone build() {
-        return new Zone(biome, color, layers, height, perlinMultiplier, pixelWeight, thresholdModifier);
+        return new Zone(biome, color, layers, height, terrainModifier, pixelWeight, thresholdModifier);
     }
 }

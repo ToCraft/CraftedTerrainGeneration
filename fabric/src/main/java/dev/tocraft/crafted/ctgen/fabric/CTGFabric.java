@@ -1,12 +1,13 @@
 package dev.tocraft.crafted.ctgen.fabric;
 
 import dev.tocraft.crafted.ctgen.CTerrainGeneration;
-import dev.tocraft.crafted.ctgen.blockplacer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.data.MapImageRegistry;
 import dev.tocraft.crafted.ctgen.impl.CTGCommand;
-import dev.tocraft.crafted.ctgen.layer.BlockLayer;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.crafted.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.crafted.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
+import dev.tocraft.crafted.ctgen.xtend.terrain.TerrainHeight;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -56,5 +57,6 @@ public class CTGFabric implements ModInitializer {
         // register built-in registry entries
         BlockPlacer.register();
         BlockLayer.register();
+        TerrainHeight.register();
     }
 }

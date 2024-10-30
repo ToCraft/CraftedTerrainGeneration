@@ -1,6 +1,6 @@
 package dev.tocraft.crafted.ctgen.mixin;
 
-import dev.tocraft.crafted.ctgen.CTerrainGeneration;
+import dev.tocraft.crafted.ctgen.xtend.CTRegistries;
 import dev.tocraft.crafted.ctgen.zone.Zones;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.registries.VanillaRegistries;
@@ -19,6 +19,6 @@ public class VanillaRegistriesMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void onInit(CallbackInfo ci) {
-        BUILDER.add(CTerrainGeneration.MAP_ZONES_REGISTRY, Zones::bootstrap);
+        BUILDER.add(CTRegistries.ZONES_KEY, Zones::bootstrap);
     }
 }
