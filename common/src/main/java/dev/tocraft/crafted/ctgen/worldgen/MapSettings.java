@@ -62,7 +62,7 @@ public final class MapSettings {
     private final List<BlockLayer> layers;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, Optional<Integer> spawnX, Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
         this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.thresholdModifier = thresholdModifier;

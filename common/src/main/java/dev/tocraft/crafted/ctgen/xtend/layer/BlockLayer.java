@@ -7,6 +7,9 @@ import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.crafted.ctgen.zone.Zone;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -29,28 +32,34 @@ public abstract class BlockLayer {
         Registry.register(CTRegistries.BLOCK_LAYER, WeightLayer.ID, WeightLayer.CODEC);
     }
 
-    public static BlockLayer deepslate(int minY) {
+    @Contract("_ -> new")
+    public static @NotNull BlockLayer deepslate(int minY) {
         return new HeightLayer(minY, 0, true, "deepslate", BasicPlacer.DEEPSLATE_BLOCK);
     }
 
-    public static BlockLayer stone() {
+    @Contract(" -> new")
+    public static @NotNull BlockLayer stone() {
         return new WeightLayer(0, 0.96, "stone", BasicPlacer.STONE_BLOCK);
     }
 
-    public static BlockLayer dirt() {
+    @Contract(" -> new")
+    public static @NotNull BlockLayer dirt() {
         // max is 200% to ensure there's no gap caused by "shifted" blocks
         return new WeightLayer(0.96, 2, "dirt", BasicPlacer.DIRT_BLOCK);
     }
 
-    public static BlockLayer surface() {
+    @Contract(" -> new")
+    public static @NotNull BlockLayer surface() {
         return new SurfaceLayer("surface", BasicPlacer.GRASS_BLOCK);
     }
 
-    public static BlockLayer sea() {
+    @Contract(" -> new")
+    public static @NotNull BlockLayer sea() {
         return new SeaLayer("sea", BasicPlacer.WATER_BLOCK);
     }
 
-    public static List<BlockLayer> defaultLayers(int minY) {
+    @Contract("_ -> new")
+    public static @Unmodifiable List<BlockLayer> defaultLayers(int minY) {
         return List.of(surface(), deepslate(minY), sea(), stone(), dirt());
     }
 

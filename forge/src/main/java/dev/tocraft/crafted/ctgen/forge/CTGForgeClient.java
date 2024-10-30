@@ -9,6 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @ApiStatus.Internal
@@ -19,12 +20,12 @@ public class CTGForgeClient {
     }
 
     @SubscribeEvent
-    public void event(RegisterKeyMappingsEvent event) {
+    public void event(@NotNull RegisterKeyMappingsEvent event) {
         event.register(CTGClient.OPEN_MAP_KEY);
     }
 
     @SubscribeEvent
-    public void event(TickEvent.ClientTickEvent event) {
+    public void event(TickEvent.@NotNull ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             CTGClient.tick(Minecraft.getInstance());
         }

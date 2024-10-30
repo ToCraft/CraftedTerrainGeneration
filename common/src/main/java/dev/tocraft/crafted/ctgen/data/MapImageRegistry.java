@@ -59,7 +59,12 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
             } else {
                 BufferedImage original = MAPS.get(id);
                 if (original != null) {
-                    return UPSCALED_MAPS.put(id, MapUtils.generateDetailedMap(original, zones.get()));
+                    LogUtils.getLogger().info("Upscaling map {}", id);
+                    long start = System.currentTimeMillis();
+                    BufferedImage detailed = MapUtils.generateDetailedMap(original, zones.get());
+                    long elapsed = System.currentTimeMillis() - start;
+                    LogUtils.getLogger().info("Finished map upscaling for {} within {}s", id, String.format("%.2f", elapsed / 1000.0));
+                    return UPSCALED_MAPS.put(id, detailed);
                 } else {
                     return null;
                 }

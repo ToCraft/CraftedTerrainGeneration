@@ -1,11 +1,13 @@
 package dev.tocraft.crafted.ctgen.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ColorUtils {
-    public static int compareColors(Color c1, Color c2) {
+    public static int compareColors(@NotNull Color c1, @NotNull Color c2) {
         int a = Math.abs(c1.getAlpha() - c2.getAlpha());
         int r = Math.abs(c1.getRed() - c2.getRed());
         int g = Math.abs(c1.getGreen() - c2.getGreen());
@@ -13,7 +15,7 @@ public class ColorUtils {
         return a + r + g + b;
     }
 
-    public static Color getNearestColor(Color color, Iterable<Color> colorList) {
+    public static Color getNearestColor(Color color, @NotNull Iterable<Color> colorList) {
         Map<Integer, Color> differences = new HashMap<>();
         for (Color color1 : colorList) {
             int i = compareColors(color, color1);

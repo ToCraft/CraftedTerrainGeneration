@@ -7,6 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,8 +62,9 @@ public class SyncMapPacket {
         }
     }
 
+    @Contract(value = " -> new", pure = true)
     @ApiStatus.Internal
-    public static SyncMapPacket empty() {
+    public static @NotNull SyncMapPacket empty() {
         return new SyncMapPacket(null, false, -1, -1, -1, -1);
     }
 

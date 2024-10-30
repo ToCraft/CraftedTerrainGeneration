@@ -17,6 +17,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.RegisterEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,7 +38,7 @@ public class CTGForgeEventListener {
     }
 
     @SubscribeEvent
-    public void registerCommands(RegisterCommandsEvent event) {
+    public void registerCommands(@NotNull RegisterCommandsEvent event) {
         CTGCommand.register(event.getDispatcher(), event.getBuildContext());
     }
 

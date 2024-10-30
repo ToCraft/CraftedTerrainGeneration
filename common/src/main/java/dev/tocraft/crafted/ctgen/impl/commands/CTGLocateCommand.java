@@ -23,6 +23,8 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -33,7 +35,7 @@ import java.util.Queue;
 import java.util.Set;
 
 public class CTGLocateCommand {
-    public static void register(LiteralCommandNode<CommandSourceStack> rootNode, CommandBuildContext context) {
+    public static void register(@NotNull LiteralCommandNode<CommandSourceStack> rootNode, CommandBuildContext context) {
         LiteralCommandNode<CommandSourceStack> locateNode =
                 Commands.literal("locate")
                         .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
@@ -54,7 +56,7 @@ public class CTGLocateCommand {
         rootNode.addChild(locateNode);
     }
 
-    private static int locate(CommandSourceStack source, ServerLevel level, ResourceLocation zoneId) throws CommandSyntaxException {
+    private static int locate(CommandSourceStack source, @NotNull ServerLevel level, ResourceLocation zoneId) throws CommandSyntaxException {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             Stopwatch stopwatch = Stopwatch.createStarted(Util.TICKER);
 
@@ -93,7 +95,7 @@ public class CTGLocateCommand {
             new Point(0, -4)   // Up
     };
 
-    public static Point locateColor(BufferedImage image, Point startPoint, int targetColor) {
+    public static @Nullable Point locateColor(@NotNull BufferedImage image, Point startPoint, int targetColor) {
         int width = image.getWidth();
         int height = image.getHeight();
 
@@ -129,10 +131,10 @@ public class CTGLocateCommand {
     }
 
     private static void showResult(
-            CommandSourceStack source,
-            Point pixelPos,
+            @NotNull CommandSourceStack source,
+            @NotNull Point pixelPos,
             String elementName,
-            Duration duration
+            @NotNull Duration duration
     ) {
         Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("ctgen.coordinates", pixelPos.x, pixelPos.y))
                 .withStyle(

@@ -10,11 +10,12 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
 public class CTGCommand {
     public static final SimpleCommandExceptionType INVALID_CHUNK_GENERATOR = new SimpleCommandExceptionType(Component.translatable("ctgen.commands.invalidChunkGenerator"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
+    public static void register(@NotNull CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         LiteralCommandNode<CommandSourceStack> rootNode = Commands.literal(CTerrainGeneration.MODID).requires(source -> source.hasPermission(2)).build();
         CTGLocateCommand.register(rootNode, context);
         CTGTeleportCommand.register(rootNode);

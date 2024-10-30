@@ -46,7 +46,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         this.biomeSource = biomeSource;
     }
 
-    public static MapBasedChunkGenerator of(MapSettings settings) {
+    public static @NotNull MapBasedChunkGenerator of(MapSettings settings) {
         MapBasedBiomeSource biomeSource = new MapBasedBiomeSource(settings);
         return new MapBasedChunkGenerator(biomeSource);
     }
@@ -114,7 +114,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         }
     }
 
-    private boolean canSetBlock(BlockPos pos, double surfaceHeight, int minHeight, int thresholdModifier) {
+    private boolean canSetBlock(@NotNull BlockPos pos, double surfaceHeight, int minHeight, int thresholdModifier) {
         double height = (double) (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
         double addThreshold = height * height * height * height * thresholdModifier;
 

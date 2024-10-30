@@ -18,7 +18,7 @@ public class MapScreen extends Screen {
     @Nullable
     private final MapWidget mapWidget;
 
-    public MapScreen(Minecraft minecraft, SyncMapPacket packet) {
+    public MapScreen(Minecraft minecraft, @NotNull SyncMapPacket packet) {
         super(Component.literal("Map Menu"));
         super.init(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
 
@@ -29,6 +29,10 @@ public class MapScreen extends Screen {
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         this.mapWidget = MapWidget.ofPacket(minecraft, x, y, width, height, packet);
+        if (this.mapWidget != null) {
+            this.mapWidget.setMinZoom(-1);
+            this.mapWidget.resetTextureOffsets();
+        }
     }
 
     /**

@@ -19,6 +19,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec2;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +28,7 @@ import java.util.HashSet;
 public class CTGTeleportCommand {
     private static final SimpleCommandExceptionType INVALID_POSITION = new SimpleCommandExceptionType(Component.translatable("commands.teleport.invalidPosition"));
 
-    public static void register(LiteralCommandNode<CommandSourceStack> rootNode) {
+    public static void register(@NotNull LiteralCommandNode<CommandSourceStack> rootNode) {
         LiteralCommandNode<CommandSourceStack> teleportNode =
                 Commands.literal("teleport")
                         .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
@@ -60,7 +61,7 @@ public class CTGTeleportCommand {
         rootNode.addChild(teleportNode);
     }
 
-    private static int teleportToPos(CommandSourceStack source, Collection<? extends Entity> targets, ServerLevel level, Vec2 dest) throws CommandSyntaxException {
+    private static int teleportToPos(CommandSourceStack source, Collection<? extends Entity> targets, @NotNull ServerLevel level, Vec2 dest) throws CommandSyntaxException {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             MapSettings settings = generator.getSettings();
 

@@ -5,6 +5,7 @@ import dev.tocraft.crafted.ctgen.xtend.placer.BlockPlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setColor(Color color) {
+    public ZoneBuilder setColor(@NotNull Color color) {
         this.color = color.getRGB();
         return this;
     }

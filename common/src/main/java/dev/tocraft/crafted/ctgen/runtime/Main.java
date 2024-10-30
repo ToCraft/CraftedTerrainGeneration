@@ -8,6 +8,8 @@ import dev.tocraft.crafted.cli.json.JsonParser;
 import dev.tocraft.crafted.cli.json.elements.JsonDouble;
 import dev.tocraft.crafted.cli.json.elements.JsonElement;
 import dev.tocraft.crafted.ctgen.util.MapUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -87,7 +89,8 @@ public class Main {
         }
 
         // read input files and parse as something readable
-        public Runner run() throws IOException {
+        @Contract(" -> new")
+        public @NotNull Runner run() throws IOException {
             BufferedImage inImage = ImageIO.read(input);
 
             List<JsonZone> zones = new ArrayList<>();

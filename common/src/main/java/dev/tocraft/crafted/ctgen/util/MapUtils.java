@@ -1,6 +1,7 @@
 package dev.tocraft.crafted.ctgen.util;
 
 import dev.tocraft.crafted.ctgen.zone.Zone;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,7 +12,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class MapUtils {
-    public static int approachColors(final BufferedImage inImage, final BufferedImage outImage, final Iterable<Color> colors) {
+    public static int approachColors(final BufferedImage inImage, final @NotNull BufferedImage outImage, final Iterable<Color> colors) {
         int changed = 0;
 
         for (int x = 0; x < outImage.getWidth(); x++) {
@@ -34,7 +35,7 @@ public class MapUtils {
     private static final int[][] diagonal = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
     private static final int[][] orthogonal = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
-    public static BufferedImage generateDetailedMap(final BufferedImage original, Iterable<Zone> zones) {
+    public static @NotNull BufferedImage generateDetailedMap(final BufferedImage original, Iterable<Zone> zones) {
         return generateDetailedMap(original, color -> {
             for (Zone zone : zones) {
                 if (zone.color() == color) {
@@ -46,7 +47,7 @@ public class MapUtils {
         });
     }
 
-    public static BufferedImage generateDetailedMap(final BufferedImage original, Function<Integer, Double> getWeightByColor) {
+    public static @NotNull BufferedImage generateDetailedMap(final @NotNull BufferedImage original, Function<Integer, Double> getWeightByColor) {
         final BufferedImage greatMap = new BufferedImage(original.getWidth() * 2, original.getHeight() * 2, BufferedImage.TYPE_INT_RGB);
         // seed is 0 so the map is always the same
         final Random random = new Random(0);
@@ -100,7 +101,7 @@ public class MapUtils {
         return x >= 0 && y >= 0 && x < width && y < height;
     }
 
-    private static int getMostWeightColor(Function<Integer, Double> getWeightByColor, List<Integer> list, Random random) {
+    private static int getMostWeightColor(Function<Integer, Double> getWeightByColor, @NotNull List<Integer> list, Random random) {
         double totalWeight = 0;
         for (int color : list) {
             totalWeight += getWeightByColor.apply(color);
