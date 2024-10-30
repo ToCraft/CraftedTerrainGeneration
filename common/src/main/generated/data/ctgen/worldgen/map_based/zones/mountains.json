@@ -5,10 +5,10 @@
     "g": 130,
     "r": 130
   },
-  "height": 50,
+  "height": 40,
   "layers": {
     "dirt": "minecraft:stone",
     "surface": "minecraft:stone"
   },
-  "terrain_modifier": 28.0
+  "terrain_modifier": 50.0
 }

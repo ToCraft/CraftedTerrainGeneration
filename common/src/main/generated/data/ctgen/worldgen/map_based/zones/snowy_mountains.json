@@ -5,9 +5,9 @@
     "g": 168,
     "r": 168
   },
-  "height": 60,
+  "height": 40,
   "layers": {
     "surface": "minecraft:snow_block"
   },
-  "terrain_modifier": 28.0
+  "terrain_modifier": 50.0
 }

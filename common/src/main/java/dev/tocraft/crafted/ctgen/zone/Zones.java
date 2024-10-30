@@ -43,16 +43,16 @@ public class Zones {
     public static void bootstrap(BootstapContext<Zone> context) {
         // Northern Continent
         context.register(STONY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(12).build());
-        context.register(SNOWY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(11).build());
-        context.register(SNOWY_SLOPES, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setDirtBlock(Blocks.SNOW_BLOCK).setSurfaceBlock(Blocks.SNOW_BLOCK).setHeight(24).setTerrainModifier(20).setPixelWeight(1.5).build());
-        context.register(SNOWY_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setHeight(60).setTerrainModifier(28).setSurfaceBlock(Blocks.SNOW_BLOCK).build());
+        context.register(SNOWY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(5).build());
+        context.register(SNOWY_SLOPES, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setDirtBlock(Blocks.SNOW_BLOCK).setSurfaceBlock(Blocks.SNOW_BLOCK).setHeight(18).setTerrainModifier(20).setPixelWeight(1.5).build());
+        context.register(SNOWY_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setHeight(40).setTerrainModifier(50).setSurfaceBlock(Blocks.SNOW_BLOCK).build());
         context.register(FROZEN_RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setThresholdModifier(26).build());
         context.register(FROZEN_LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setThresholdModifier(26).build());
         // Eastern Continent
-        context.register(PLAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57)).setHeight(6).setTerrainModifier(4).build());
-        context.register(FOREST, new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setHeight(8).setTerrainModifier(6).build());
-        context.register(HILLS, new ZoneBuilder().setBiome(getBiome(context, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setHeight(25).setTerrainModifier(18).build());
-        context.register(MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(50).setTerrainModifier(28).build());
+        context.register(PLAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57)).setHeight(5).build());
+        context.register(FOREST, new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setHeight(12).setTerrainModifier(10).build());
+        context.register(HILLS, new ZoneBuilder().setBiome(getBiome(context, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setHeight(18).setTerrainModifier(18).build());
+        context.register(MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(40).setTerrainModifier(50).build());
         context.register(LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.LUKEWARM_OCEAN)).setColor(new Color(0, 83, 217)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).build());
         // Western Continent
         context.register(DESERT, new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setDirtBlock(Blocks.SANDSTONE).setSurfaceBlock(Blocks.SAND).setHeight(5).setTerrainModifier(4).build());
