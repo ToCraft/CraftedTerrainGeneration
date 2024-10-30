@@ -6,9 +6,9 @@
     "r": 84
   },
   "height": 18,
-  "perlin_multiplier": 12.0,
   "layers": {
     "dirt": "minecraft:red_concrete",
-    "surface": "minecraft:red_sand"
-  }
+    "surface": "minecraft:brown_concrete"
+  },
+  "terrain_modifier": 12.0
 }

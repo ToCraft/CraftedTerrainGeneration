@@ -6,7 +6,6 @@
     "r": 70
   },
   "height": 28,
-  "perlin_multiplier": 24.0,
   "layers": {
     "dirt": "minecraft:red_concrete",
     "surface": {
@@ -14,14 +13,16 @@
       "default": "minecraft:brown_concrete",
       "noise": {
         "octaves": [
-          1
-        ]
+          1.0
+        ],
+        "persistence": 1.0,
+        "stretch": 1
       },
       "values": {
         "-0.5": "minecraft:orange_concrete",
-        "0": "minecraft:red_concrete",
-        "0.5": "minecraft:gray_concrete"
+        "0.0": "minecraft:red_concrete"
       }
     }
-  }
+  },
+  "terrain_modifier": 24.0
 }

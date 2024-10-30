@@ -6,9 +6,9 @@
     "r": 165
   },
   "height": 5,
-  "perlin_multiplier": 4.0,
   "layers": {
     "dirt": "minecraft:sandstone",
     "surface": "minecraft:sand"
-  }
+  },
+  "terrain_modifier": 4.0
 }

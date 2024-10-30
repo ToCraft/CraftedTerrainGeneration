@@ -1,15 +1,13 @@
 {
   "biome": "minecraft:jagged_peaks",
-  "cave_threshold": 0.7,
   "color": {
     "b": 168,
     "g": 168,
     "r": 168
   },
-  "dirt_block": "minecraft:stone",
   "height": 60,
-  "perlin_multiplier": 28.0,
   "layers": {
     "surface": "minecraft:snow_block"
-  }
+  },
+  "terrain_modifier": 28.0
 }

@@ -1,15 +1,14 @@
 {
   "biome": "minecraft:stony_peaks",
-  "cave_threshold": 0.7,
   "color": {
     "b": 130,
     "g": 130,
     "r": 130
   },
-  "dirt_block": "minecraft:stone",
   "height": 50,
-  "perlin_multiplier": 28.0,
   "layers": {
+    "dirt": "minecraft:stone",
     "surface": "minecraft:stone"
-  }
+  },
+  "terrain_modifier": 28.0
 }

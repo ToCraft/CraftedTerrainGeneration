@@ -1,3 +1,11 @@
+sourceSets {
+    main {
+        resources {
+            srcDir(rootDir.resolve("common/src/main/generated"))
+        }
+    }
+}
+
 plugins {
     id("dev.tocraft.modmaster.common")
 }
