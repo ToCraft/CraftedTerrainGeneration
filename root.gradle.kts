@@ -3,5 +3,5 @@ plugins {
 }
 
 allprojects {
-    group = "dev.tocraft.crafted"
+    group = "dev.tocraft"
 }

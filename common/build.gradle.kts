@@ -11,5 +11,5 @@ plugins {
 }
 
 dependencies {
-    implementation("dev.tocraft.crafted:cli:${rootProject.properties["cli_version"]}")
+    implementation("dev.tocraft:cli:${rootProject.properties["cli_version"]}")
 }

@@ -15,13 +15,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.tocraft.crafted.ctgen.fabric.CTGFabric"
+      "dev.tocraft.ctgen.fabric.CTGFabric"
     ],
     "client": [
-      "dev.tocraft.crafted.ctgen.fabric.CTGFabricClient::initialize"
+      "dev.tocraft.ctgen.fabric.CTGFabricClient::initialize"
     ],
     "fabric-datagen": [
-      "dev.tocraft.crafted.ctgen.fabric.CTGDataGen"
+      "dev.tocraft.ctgen.fabric.CTGDataGen"
     ]
   },
   "mixins": [

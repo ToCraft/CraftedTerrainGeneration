@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    shadowCommon(implementation("dev.tocraft.crafted:cli:${rootProject.properties["cli_version"]}")!!)
+    shadowCommon(implementation("dev.tocraft:cli:${rootProject.properties["cli_version"]}")!!)
 }
 
 tasks.withType<ProcessResources> {
