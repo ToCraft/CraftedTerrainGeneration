@@ -407,11 +407,9 @@ public class MapWidget extends AbstractWidget {
         if (zoom != oZoom) {
             double newZ = zoom / oZoom;
 
-            if (isHovered) {
-                // Apply zoom, and adjust the texture offset to ensure zoom focuses on the mouse cursor
-                textureOffsetX = (textureOffsetX + relX) * newZ - relX;
-                textureOffsetY = (textureOffsetY + relY) * newZ - relY;
-            }
+            // Apply zoom, and adjust the texture offset to ensure zoom focuses on the mouse cursor
+            textureOffsetX = (textureOffsetX + relX) * newZ - relX;
+            textureOffsetY = (textureOffsetY + relY) * newZ - relY;
 
             updateZoomedHeight();
             updateZoomedWidth();
