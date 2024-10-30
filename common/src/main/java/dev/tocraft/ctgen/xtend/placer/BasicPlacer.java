@@ -3,7 +3,7 @@ package dev.tocraft.ctgen.xtend.placer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
-import dev.tocraft.ctgen.zone.Codecs;
+import dev.tocraft.ctgen.util.Codecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -45,7 +45,7 @@ public class BasicPlacer extends BlockPlacer {
     public static final ResourceLocation ID = CTerrainGeneration.id("basic");
 
     @Override
-    public Codec<BasicPlacer> codec() {
+    protected Codec<BasicPlacer> codec() {
         return CODEC;
     }
 }

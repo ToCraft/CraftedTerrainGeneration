@@ -2,6 +2,7 @@ package dev.tocraft.ctgen.zone;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.tocraft.ctgen.util.Codecs;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import net.minecraft.core.Holder;

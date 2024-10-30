@@ -1,4 +1,4 @@
-package dev.tocraft.ctgen.zone;
+package dev.tocraft.ctgen.util;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;

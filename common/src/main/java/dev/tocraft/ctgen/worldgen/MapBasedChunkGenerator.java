@@ -6,7 +6,6 @@ import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BasicPlacer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.zone.CarverSetting;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

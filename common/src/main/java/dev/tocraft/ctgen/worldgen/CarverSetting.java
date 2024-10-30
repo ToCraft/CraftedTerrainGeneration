@@ -1,4 +1,4 @@
-package dev.tocraft.ctgen.zone;
+package dev.tocraft.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

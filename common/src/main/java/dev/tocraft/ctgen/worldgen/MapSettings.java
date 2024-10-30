@@ -6,7 +6,6 @@ import dev.tocraft.ctgen.data.MapImageRegistry;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.terrain.BasicSurface;
 import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
-import dev.tocraft.ctgen.zone.CarverSetting;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

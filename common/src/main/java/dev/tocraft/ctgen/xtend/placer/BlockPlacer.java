@@ -2,9 +2,8 @@ package dev.tocraft.ctgen.xtend.placer;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import dev.tocraft.ctgen.util.Codecs;
 import dev.tocraft.ctgen.xtend.CTRegistries;
-import dev.tocraft.ctgen.zone.Codecs;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +29,8 @@ public abstract class BlockPlacer {
     });
 
     public static void register() {
-        Registry.register(CTRegistries.BLOCK_PLACER, BasicPlacer.ID, BasicPlacer.CODEC);
-        Registry.register(CTRegistries.BLOCK_PLACER, NoisePlacer.ID, NoisePlacer.CODEC);
+        CTRegistries.BLOCK_PLACER.register(BasicPlacer.ID, BasicPlacer.CODEC);
+        CTRegistries.BLOCK_PLACER.register(NoisePlacer.ID, NoisePlacer.CODEC);
     }
 
     @NotNull

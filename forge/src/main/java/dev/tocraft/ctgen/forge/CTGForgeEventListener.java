@@ -5,13 +5,11 @@ import dev.tocraft.ctgen.data.MapImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
-import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -42,17 +40,11 @@ public class CTGForgeEventListener {
         CTGCommand.register(event.getDispatcher(), event.getBuildContext());
     }
 
-    @SuppressWarnings("unchecked")
     @SubscribeEvent
     public void register(RegisterEvent event) {
         // generic stuff
         Registry.register(BuiltInRegistries.BIOME_SOURCE, CTerrainGeneration.id("map_based_biome_source"), MapBasedBiomeSource.CODEC);
         Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedChunkGenerator.CODEC);
-
-        // custom built-in registries
-        Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.BLOCK_PLAYER_KEY, CTRegistries.BLOCK_PLACER);
-        Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.BLOCK_LAYER_KEY, CTRegistries.BLOCK_LAYER);
-        Registry.register((Registry<Registry<?>>) BuiltInRegistries.REGISTRY, (ResourceKey<Registry<?>>) (ResourceKey<?>) CTRegistries.TERRAIN_KEY, CTRegistries.TERRAIN);
 
         // values for the built-in registries
         BlockPlacer.register();

@@ -5,7 +5,6 @@ import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.placer.BasicPlacer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.ctgen.zone.Zone;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -27,9 +26,9 @@ public abstract class BlockLayer {
     }
 
     public static void register() {
-        Registry.register(CTRegistries.BLOCK_LAYER, SeaLayer.ID, SeaLayer.CODEC);
-        Registry.register(CTRegistries.BLOCK_LAYER, HeightLayer.ID, HeightLayer.CODEC);
-        Registry.register(CTRegistries.BLOCK_LAYER, WeightLayer.ID, WeightLayer.CODEC);
+        CTRegistries.BLOCK_LAYER.register(SeaLayer.ID, SeaLayer.CODEC);
+        CTRegistries.BLOCK_LAYER.register(HeightLayer.ID, HeightLayer.CODEC);
+        CTRegistries.BLOCK_LAYER.register(WeightLayer.ID, WeightLayer.CODEC);
     }
 
     @Contract("_ -> new")

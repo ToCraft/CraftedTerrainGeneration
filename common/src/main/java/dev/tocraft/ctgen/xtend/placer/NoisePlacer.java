@@ -3,8 +3,8 @@ package dev.tocraft.ctgen.xtend.placer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
+import dev.tocraft.ctgen.util.Codecs;
 import dev.tocraft.ctgen.util.Noise;
-import dev.tocraft.ctgen.zone.Codecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -107,7 +107,7 @@ public class NoisePlacer extends BlockPlacer {
     public static final ResourceLocation ID = CTerrainGeneration.id("noise");
 
     @Override
-    public Codec<NoisePlacer> codec() {
+    protected Codec<NoisePlacer> codec() {
         return CODEC;
     }
 }

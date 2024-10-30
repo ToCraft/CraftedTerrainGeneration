@@ -3,7 +3,6 @@ package dev.tocraft.ctgen.xtend.terrain;
 import com.mojang.serialization.Codec;
 import dev.tocraft.ctgen.worldgen.MapSettings;
 import dev.tocraft.ctgen.xtend.CTRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 import java.util.function.Function;
@@ -12,7 +11,7 @@ public abstract class TerrainHeight {
     public static final Codec<TerrainHeight> CODEC = CTRegistries.TERRAIN.byNameCodec().dispatchStable(TerrainHeight::codec, Function.identity());
 
     public static void register() {
-        Registry.register(CTRegistries.TERRAIN, BasicSurface.ID, BasicSurface.CODEC);
+        CTRegistries.TERRAIN.register(BasicSurface.ID, BasicSurface.CODEC);
     }
 
     /**
