@@ -26,32 +26,33 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("unused")
 @ApiStatus.Internal
-public class CTGFabric implements ModInitializer {
+public final class CTGFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        Registry.register(BuiltInRegistries.BIOME_SOURCE, CTerrainGeneration.id("map_based_biome_source"), MapBasedBiomeSource.CODEC);
-        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, CTerrainGeneration.id("map_based_chunk_generator"), MapBasedChunkGenerator.CODEC);
+        // register chunk generator
+        Registry.register(BuiltInRegistries.BIOME_SOURCE, MapBasedBiomeSource.ID, MapBasedBiomeSource.CODEC);
+        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, MapBasedChunkGenerator.ID, MapBasedChunkGenerator.CODEC);
 
-        {
-            MapImageRegistry reloadListener = new MapImageRegistry();
-            ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
-                @Override
-                public ResourceLocation getFabricId() {
-                    return CTerrainGeneration.id("map_image_listener");
-                }
+        // register reload listener
+        MapImageRegistry reloadListener = new MapImageRegistry();
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
+            @Override
+            public ResourceLocation getFabricId() {
+                return CTerrainGeneration.id("map_image_listener");
+            }
 
-                @Override
-                public @NotNull String getName() {
-                    return reloadListener.getName();
-                }
+            @Override
+            public @NotNull String getName() {
+                return reloadListener.getName();
+            }
 
-                @Override
-                public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
-                    return reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
-                }
-            });
-        }
+            @Override
+            public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+                return reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+            }
+        });
 
+        // register commands
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> CTGCommand.register(dispatcher, context));
 
         // register built-in registry entries

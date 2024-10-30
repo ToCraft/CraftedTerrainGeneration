@@ -7,25 +7,24 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 @ApiStatus.Internal
 @OnlyIn(Dist.CLIENT)
-public class CTGForgeClient {
-    public CTGForgeClient() {
-        MinecraftForge.EVENT_BUS.register(this);
+public final class CTGForgeClientEventListener {
+    public static void initialize(IEventBus modEventBus) {
+        modEventBus.addListener(CTGForgeClientEventListener::registerKeys);
+        MinecraftForge.EVENT_BUS.addListener(CTGForgeClientEventListener::tick);
     }
 
-    @SubscribeEvent
-    public void event(@NotNull RegisterKeyMappingsEvent event) {
+    private static void registerKeys(@NotNull RegisterKeyMappingsEvent event) {
         event.register(CTGClient.OPEN_MAP_KEY);
     }
 
-    @SubscribeEvent
-    public void event(TickEvent.@NotNull ClientTickEvent event) {
+    private static void tick(TickEvent.@NotNull ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             CTGClient.tick(Minecraft.getInstance());
         }

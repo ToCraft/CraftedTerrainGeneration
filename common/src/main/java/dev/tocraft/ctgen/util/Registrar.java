@@ -15,6 +15,11 @@ public class Registrar<T> {
     private final Map<ResourceLocation, T> VALUE_BY_ID = new HashMap<>();
     private final Map<T, ResourceLocation> ID_BY_VALUE = new IdentityHashMap<>();
 
+    public void clear() {
+        VALUE_BY_ID.clear();
+        ID_BY_VALUE.clear();
+    }
+
     public <V> void register(ResourceLocation id, T obj) {
         VALUE_BY_ID.put(id, obj);
         ID_BY_VALUE.put(obj, id);

@@ -108,6 +108,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, 31, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carverSettings);
     }
 }

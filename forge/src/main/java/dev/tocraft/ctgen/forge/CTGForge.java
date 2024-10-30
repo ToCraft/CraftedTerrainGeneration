@@ -2,7 +2,10 @@ package dev.tocraft.ctgen.forge;
 
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
-import net.minecraftforge.common.MinecraftForge;
+import dev.tocraft.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
+import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -14,13 +17,19 @@ import org.jetbrains.annotations.ApiStatus;
 @SuppressWarnings("unused")
 @ApiStatus.Internal
 @Mod(CTerrainGeneration.MODID)
-public class CTGForge {
+public final class CTGForge {
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel SYNC_MAP_CHANNEL = NetworkRegistry.newSimpleChannel(SyncMapPacket.PACKET_ID, () -> PROTOCOL_VERSION, ver -> true, ver -> true);
 
     public CTGForge() {
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        MinecraftForge.EVENT_BUS.register(new CTGForgeEventListener());
+
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        CTGForgeEventListener.initialize(modEventBus);
+
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            CTGForgeClientEventListener.initialize(modEventBus);
+        }
 
         SYNC_MAP_CHANNEL.messageBuilder(SyncMapPacket.class, 0)
                 .decoder(SyncMapPacket::decode)
@@ -30,8 +39,9 @@ public class CTGForge {
                 })
                 .add();
 
-        if (FMLEnvironment.dist.isClient()) {
-            new CTGForgeClient();
-        }
+        // values for the built-in registries
+        BlockPlacer.register();
+        BlockLayer.register();
+        TerrainHeight.register();
     }
 }

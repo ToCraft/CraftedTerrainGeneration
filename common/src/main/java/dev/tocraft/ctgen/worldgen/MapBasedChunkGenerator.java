@@ -9,6 +9,7 @@ import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.*;
@@ -31,6 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class MapBasedChunkGenerator extends ChunkGenerator {
+    public static final ResourceLocation ID = CTerrainGeneration.id("map_based_chunk_generator");
     public static final Codec<MapBasedChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));

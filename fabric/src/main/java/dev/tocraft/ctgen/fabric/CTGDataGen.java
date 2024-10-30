@@ -13,12 +13,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public class CTGDataGen implements DataGeneratorEntrypoint {
+public final class CTGDataGen implements DataGeneratorEntrypoint {
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder().add(CTRegistries.ZONES_KEY, Zones::bootstrap);
 
     @Override
     public void onInitializeDataGenerator(@NotNull FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
+        // generate zones
         pack.addProvider((FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider>) (output, registriesFuture) ->
                 new RegistriesDatapackGenerator(output, CompletableFuture.supplyAsync(() -> {
                     RegistryAccess.Frozen frozen = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);

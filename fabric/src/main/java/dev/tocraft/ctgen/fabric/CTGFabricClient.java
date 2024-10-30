@@ -11,7 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 @Environment(EnvType.CLIENT)
-public class CTGFabricClient {
+public final class CTGFabricClient {
     public static void initialize() {
         KeyBindingHelper.registerKeyBinding(CTGClient.OPEN_MAP_KEY);
         ClientTickEvents.START_CLIENT_TICK.register(CTGClient::tick);
