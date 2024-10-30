@@ -172,20 +172,24 @@ public class MapWidget extends AbstractWidget {
 
     public void resetTextureOffsets() {
         // calculate pixel pos for the player
-        double pixelX;
-        double pixelY;
+        int playerX;
+        int playerY;
         if (minecraft.player != null) {
+            // calculate pixel pos for the player
             BlockPos blockPos = minecraft.player.blockPosition();
-            pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
-            pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
+            int i = pixelsAreChunks ? 4 : 2;
+            int pixelX = (blockPos.getX() >> i) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> i) + pixelOffsetY;
+            playerX = (int) ((double) pixelX / mapWidth * zoomedWidth);
+            playerY = (int) ((double) pixelY / mapHeight * zoomedHeight);
         } else {
-            pixelX = pixelOffsetX;
-            pixelY = pixelOffsetY;
+            playerX = zoomedWidth / 2;
+            playerY = zoomedHeight / 2;
         }
 
-        // calculate offset for pixel pos
-        int tX = (int) (pixelX / mapWidth * zoomedWidth + getTextureX());
-        int tY = (int) (pixelY / mapHeight * zoomedHeight + getTextureY());
+        // calculate offset for player pos on texture
+        int tX = playerX - width / 2;
+        int tY = playerY - height / 2;
 
         setTextureOffsetX(tX);
         setTextureOffsetY(tY);
