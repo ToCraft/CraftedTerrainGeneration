@@ -6,7 +6,9 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public final class FabricServerPlatform implements ServerPlatform {
     @Override
     public void send(SyncMapPacket packet, ServerPlayer to) {

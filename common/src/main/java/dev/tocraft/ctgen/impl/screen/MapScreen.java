@@ -29,10 +29,6 @@ public class MapScreen extends Screen {
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         this.mapWidget = MapWidget.ofPacket(minecraft, x, y, width, height, packet);
-        if (this.mapWidget != null) {
-            this.mapWidget.setMinZoom(-1);
-            this.mapWidget.resetTextureOffsets();
-        }
     }
 
     /**
@@ -53,6 +49,14 @@ public class MapScreen extends Screen {
     }
 
     @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        super.resize(minecraft, width, height);
+        if (mapWidget != null) {
+            setSpecs(mapWidget);
+        }
+    }
+
+    @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         assert minecraft != null && minecraft.player != null;
 
@@ -66,8 +70,6 @@ public class MapScreen extends Screen {
                 onClose();
                 return;
             }
-
-            setSpecs(mapWidget);
 
             // render map
             mapWidget.render(context, mouseX, mouseY, delta);

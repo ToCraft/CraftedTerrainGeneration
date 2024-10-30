@@ -121,6 +121,9 @@ public class MapWidget extends AbstractWidget {
 
     public void setMinZoom(float minZoom) {
         this.minZoom = minZoom;
+        if (zoom < minZoom) {
+            zoom = minZoom;
+        }
     }
 
     /**
@@ -275,7 +278,7 @@ public class MapWidget extends AbstractWidget {
         RenderSystem.enableScissor((int) (getX() * scaleFactor), (int) (getY() * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
 
         // render actual map
-        context.blit(mapId, getX(), getY(), (float) textureOffsetX, (float) textureOffsetY, width, height, zoomedWidth, zoomedHeight);
+        context.blit(mapId, getTextureX(), getTextureY(), 0, 0, zoomedWidth, zoomedHeight, zoomedWidth, zoomedHeight);
 
         if (showPlayer) {
             // calculate pixel pos for the player

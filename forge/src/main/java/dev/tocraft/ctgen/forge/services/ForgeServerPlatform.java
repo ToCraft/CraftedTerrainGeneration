@@ -5,8 +5,10 @@ import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.impl.services.ServerPlatform;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Internal
 public final class ForgeServerPlatform implements ServerPlatform {
     @Override
     public void send(SyncMapPacket packet, @NotNull ServerPlayer to) {
