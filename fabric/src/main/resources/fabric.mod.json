@@ -11,7 +11,7 @@
     "issues": "https://github.com/ToCraft/CraftedTerrainGeneration/issues",
     "sources": "https://github.com/ToCraft/CraftedTerrainGeneration"
   },
-  "icon": "icon.png",
+  "icon": "pack.png",
   "license": "Crafted License 1.0",
   "environment": "*",
   "entrypoints": {
