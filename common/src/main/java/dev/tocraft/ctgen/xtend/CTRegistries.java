@@ -2,6 +2,7 @@ package dev.tocraft.ctgen.xtend;
 
 import com.mojang.serialization.Codec;
 import dev.tocraft.ctgen.util.Registrar;
+import dev.tocraft.ctgen.xtend.carver.Carver;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -16,4 +17,5 @@ public final class CTRegistries {
     public static final Registrar<Codec<? extends BlockPlacer>> BLOCK_PLACER = new Registrar<>();
     public static final Registrar<Codec<? extends BlockLayer>> BLOCK_LAYER = new Registrar<>();
     public static final Registrar<Codec<? extends TerrainHeight>> TERRAIN = new Registrar<>();
+    public static final Registrar<Codec<? extends Carver>> CARVER = new Registrar<>();
 }

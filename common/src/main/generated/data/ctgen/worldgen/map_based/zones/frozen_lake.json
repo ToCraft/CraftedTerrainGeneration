@@ -1,5 +1,6 @@
 {
   "biome": "minecraft:frozen_ocean",
+  "carver_modifier": 26.0,
   "color": {
     "b": 204,
     "g": 126,
@@ -9,6 +10,5 @@
   "layers": {
     "surface": "minecraft:sand"
   },
-  "pixel_weight": 3.0,
-  "threshold_modifier": 26
+  "pixel_weight": 3.0
 }

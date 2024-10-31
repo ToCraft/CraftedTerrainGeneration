@@ -1,5 +1,6 @@
 {
   "biome": "minecraft:frozen_river",
+  "carver_modifier": 26.0,
   "color": {
     "b": 240,
     "g": 145,
@@ -10,6 +11,5 @@
     "dirt": "minecraft:sand",
     "surface": "minecraft:sand"
   },
-  "pixel_weight": 2.0,
-  "threshold_modifier": 26
+  "pixel_weight": 2.0
 }

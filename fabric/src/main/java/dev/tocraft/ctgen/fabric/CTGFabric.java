@@ -5,9 +5,10 @@ import dev.tocraft.ctgen.data.MapImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.ctgen.xtend.carver.Carver;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -59,5 +60,6 @@ public final class CTGFabric implements ModInitializer {
         BlockPlacer.register();
         BlockLayer.register();
         TerrainHeight.register();
+        Carver.register();
     }
 }

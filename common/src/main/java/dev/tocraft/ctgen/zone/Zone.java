@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public record Zone(Holder<Biome> biome, int color, Map<String, BlockPlacer> layers, int height, double terrainModifier,
                    double pixelWeight,
-                   Optional<Integer> thresholdModifier) {
+                   Optional<Double> carverModifier) {
 
     public static final int DEFAULT_HEIGHT = 0;
     public static final double DEFAULT_TERRAIN_MODIFIER = 8;
@@ -28,7 +28,7 @@ public record Zone(Holder<Biome> biome, int color, Map<String, BlockPlacer> laye
             Codec.INT.optionalFieldOf("height", DEFAULT_HEIGHT).forGetter(Zone::height),
             Codec.DOUBLE.optionalFieldOf("terrain_modifier", DEFAULT_TERRAIN_MODIFIER).forGetter(Zone::terrainModifier),
             Codec.DOUBLE.optionalFieldOf("pixel_weight", DEFAULT_PIXEL_WEIGHT).forGetter(Zone::pixelWeight),
-            Codec.INT.optionalFieldOf("threshold_modifier").forGetter(Zone::thresholdModifier)
+            Codec.DOUBLE.optionalFieldOf("carver_modifier").forGetter(Zone::carverModifier)
     ).apply(instance, instance.stable(Zone::new)));
 
     public static RegistryFileCodec<Zone> CODEC = RegistryFileCodec.create(CTRegistries.ZONES_KEY, DIRECT_CODEC);

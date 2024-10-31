@@ -1,5 +1,6 @@
 {
   "biome": "minecraft:ocean",
+  "carver_modifier": 26.0,
   "color": {
     "b": 103,
     "g": 42,
@@ -9,6 +10,5 @@
   "layers": {
     "surface": "minecraft:sand"
   },
-  "terrain_modifier": 16.0,
-  "threshold_modifier": 26
+  "terrain_modifier": 16.0
 }

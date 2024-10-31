@@ -3,6 +3,8 @@ package dev.tocraft.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.data.MapImageRegistry;
+import dev.tocraft.ctgen.xtend.carver.Carver;
+import dev.tocraft.ctgen.xtend.carver.NoiseCarver;
 import dev.tocraft.ctgen.xtend.height.NoiseHeight;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
@@ -23,12 +25,11 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, false, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, false, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), NoiseCarver.DEFAULT, 1);
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
             Codec.BOOL.optionalFieldOf("pixels_are_chunks", DEFAULT.pixelsAreChunks).forGetter(o -> o.pixelsAreChunks),
-            Codec.INT.optionalFieldOf("default_threshold_modifier", DEFAULT.thresholdModifier).forGetter(o -> o.thresholdModifier),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.list(BlockLayer.CODEC).optionalFieldOf("layers", DEFAULT.layers).forGetter(o -> o.layers),
@@ -40,12 +41,12 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
-            Codec.list(CarverSetting.CODEC).optionalFieldOf("cave_carver", DEFAULT.carverSettings).forGetter(o -> o.carverSettings)
+            Carver.CODEC.optionalFieldOf("carver", DEFAULT.carver).forGetter(o -> o.carver),
+            Codec.DOUBLE.optionalFieldOf("default_carver_modifier", DEFAULT.carverModifier).forGetter(o -> o.carverModifier)
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation mapId;
     final boolean pixelsAreChunks;
-    final int thresholdModifier;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     final int surfaceLevel;
@@ -57,14 +58,15 @@ public final class MapSettings {
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
-    final List<CarverSetting> carverSettings;
+    final Carver carver;
+    final double carverModifier;
     private final List<BlockLayer> layers;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, int thresholdModifier, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, List<CarverSetting> carverSettings) {
+    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Carver carver, double carverModifier) {
         this.mapId = mapId;
         this.pixelsAreChunks = pixelsAreChunks;
-        this.thresholdModifier = thresholdModifier;
+        this.carverModifier = carverModifier;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
         this.layers = layers;
@@ -89,7 +91,7 @@ public final class MapSettings {
                 return sX;
             }
         });
-        this.carverSettings = carverSettings;
+        this.carver = carver;
     }
 
     public List<BlockLayer> getLayers() {

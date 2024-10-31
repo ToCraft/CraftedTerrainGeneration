@@ -20,7 +20,7 @@ public class ZoneBuilder {
     private double terrainModifier = Zone.DEFAULT_TERRAIN_MODIFIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
     private Map<String, BlockPlacer> layers = new HashMap<>();
-    private Optional<Integer> thresholdModifier = Optional.empty();
+    private Optional<Double> carverModifier = Optional.empty();
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
         this.biome = biome;
@@ -82,12 +82,12 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setThresholdModifier(int thresholdModifier) {
-        this.thresholdModifier = Optional.of(thresholdModifier);
+    public ZoneBuilder setCarverModifier(double carverModifier) {
+        this.carverModifier = Optional.of(carverModifier);
         return this;
     }
 
     public Zone build() {
-        return new Zone(biome, color, layers, height, terrainModifier, pixelWeight, thresholdModifier);
+        return new Zone(biome, color, layers, height, terrainModifier, pixelWeight, carverModifier);
     }
 }

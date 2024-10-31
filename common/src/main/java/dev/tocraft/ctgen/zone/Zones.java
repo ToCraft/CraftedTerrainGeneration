@@ -47,8 +47,8 @@ public final class Zones {
         context.register(SNOWY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(5).build());
         context.register(SNOWY_SLOPES, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setDirtBlock(Blocks.SNOW_BLOCK).setSurfaceBlock(Blocks.SNOW_BLOCK).setHeight(18).setTerrainModifier(20).setPixelWeight(1.5).build());
         context.register(SNOWY_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setHeight(40).setTerrainModifier(50).setSurfaceBlock(Blocks.SNOW_BLOCK).build());
-        context.register(FROZEN_RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setThresholdModifier(26).build());
-        context.register(FROZEN_LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setThresholdModifier(26).build());
+        context.register(FROZEN_RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26).build());
+        context.register(FROZEN_LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setCarverModifier(26).build());
         // Eastern Continent
         context.register(PLAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57)).setHeight(5).build());
         context.register(FOREST, new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setHeight(12).setTerrainModifier(10).build());
@@ -65,9 +65,9 @@ public final class Zones {
             }
         }, Blocks.BROWN_CONCRETE)).setHeight(28).setTerrainModifier(24).build());
         // General Water Biomes
-        context.register(RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setThresholdModifier(26).build());
-        context.register(OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setSurfaceBlock(Blocks.SAND).setHeight(-35).setTerrainModifier(16).setThresholdModifier(26).build());
-        context.register(DEEP_OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33).setThresholdModifier(26).build());
+        context.register(RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26).build());
+        context.register(OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setSurfaceBlock(Blocks.SAND).setHeight(-35).setTerrainModifier(16).setCarverModifier(26).build());
+        context.register(DEEP_OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33).setCarverModifier(26).build());
     }
 
     private static @NotNull Holder<Biome> getBiome(@NotNull BootstapContext<?> context, ResourceKey<Biome> biome) {

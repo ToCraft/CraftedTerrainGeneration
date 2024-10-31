@@ -1,5 +1,6 @@
 package dev.tocraft.ctgen.worldgen;
 
+import dev.tocraft.ctgen.xtend.carver.Carver;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.zone.Zone;
@@ -13,7 +14,6 @@ import java.util.Optional;
 public class MapSettingsBuilder {
     private ResourceLocation biomeMapId;
     private boolean pixelsAreChunks = MapSettings.DEFAULT.pixelsAreChunks;
-    private int thresholdModifier = MapSettings.DEFAULT.thresholdModifier;
     private List<Holder<Zone>> zones = MapSettings.DEFAULT.zones;
     private Holder<Zone> defaultBiome;
     private List<BlockLayer> layers = MapSettings.DEFAULT.getLayers();
@@ -25,7 +25,8 @@ public class MapSettingsBuilder {
     private int transition = MapSettings.DEFAULT.transition;
     private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
     private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
-    private List<CarverSetting> carverSettings = MapSettings.DEFAULT.carverSettings;
+    private Carver carver = MapSettings.DEFAULT.carver;
+    private double carverModifier = MapSettings.DEFAULT.carverModifier;
 
     public MapSettingsBuilder setBiomeMapId(ResourceLocation biomeMapId) {
         this.biomeMapId = biomeMapId;
@@ -37,10 +38,6 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setThresholdModifier(int thresholdModifier) {
-        this.thresholdModifier = thresholdModifier;
-        return this;
-    }
 
     public MapSettingsBuilder setZones(List<Holder<Zone>> zones) {
         this.zones = zones;
@@ -102,12 +99,17 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setCarverSettings(List<CarverSetting> carverSetting) {
-        this.carverSettings = carverSetting;
+    public MapSettingsBuilder setCarver(Carver carver) {
+        this.carver = carver;
+        return this;
+    }
+
+    public MapSettingsBuilder setCarverModifier(double carverModifier) {
+        this.carverModifier = carverModifier;
         return this;
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, thresholdModifier, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carverSettings);
+        return new MapSettings(biomeMapId, pixelsAreChunks, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carver, carverModifier);
     }
 }

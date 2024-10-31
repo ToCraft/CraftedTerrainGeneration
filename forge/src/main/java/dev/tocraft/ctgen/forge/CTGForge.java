@@ -2,9 +2,10 @@ package dev.tocraft.ctgen.forge;
 
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
+import dev.tocraft.ctgen.xtend.carver.Carver;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -43,5 +44,6 @@ public final class CTGForge {
         BlockPlacer.register();
         BlockLayer.register();
         TerrainHeight.register();
+        Carver.register();
     }
 }

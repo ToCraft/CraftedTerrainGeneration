@@ -74,7 +74,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
                 Zone zone = getSettings().getZone(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
-                int thresholdModifier = (int) getSettings().getValueWithTransition(xOff, zOff, zo -> (double) zo.thresholdModifier().orElse(getSettings().thresholdModifier));
+                double carverModifier = getSettings().getValueWithTransition(xOff, zOff, zo -> zo.carverModifier().orElse(getSettings().carverModifier));
 
                 int shift = (int) (noise.getValue(xOff, zOff) * 3);
                 int bedrockLevel = minHeight + shift;
@@ -96,7 +96,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         BlockPlacer placer = layer != null ? zone.layers().getOrDefault(layer.getName(), layer.getFallback()) : BasicPlacer.AIR;
                         Block block = placer.get(this.noise, x, y, z, layer != null ? layer.getName() : "fill");
 
-                        if (layer != null && !layer.hasCaves() || canSetBlock(pos, surfaceHeight, minHeight, thresholdModifier)) {
+                        if (layer != null && !layer.hasCaves() || canSetBlock(pos, surfaceHeight, minHeight, carverModifier)) {
                             // no grass underwater
                             if (surfaceHeight < getSeaLevel() && block == Blocks.GRASS_BLOCK) {
                                 block = Blocks.DIRT;
@@ -115,20 +115,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         }
     }
 
-    private boolean canSetBlock(@NotNull BlockPos pos, double surfaceHeight, int minHeight, int thresholdModifier) {
-        double height = (double) (pos.getY() - minHeight) / (surfaceHeight - minHeight) - 0.5;
-        double addThreshold = height * height * height * height * thresholdModifier;
-
-        for (CarverSetting carver : getSettings().carverSettings) {
-            double perlin = carver.noise().getPerlin(this.noise, pos.getX(), pos.getY(), pos.getZ());
-
-            double threshold = carver.threshold() + addThreshold;
-            if (perlin > threshold) {
-                return false;
-            }
-        }
-
-        return true;
+    private boolean canSetBlock(@NotNull BlockPos pos, double surfaceHeight, int minHeight, double carverModifier) {
+        return getSettings().carver.canSetBlock(this.noise, pos, surfaceHeight, minHeight, carverModifier);
     }
 
     @Override

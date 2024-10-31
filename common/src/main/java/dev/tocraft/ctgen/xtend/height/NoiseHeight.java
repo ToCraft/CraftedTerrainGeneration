@@ -12,7 +12,7 @@ public class NoiseHeight extends TerrainHeight {
     public static final NoiseHeight DEFAULT = new NoiseHeight(Noise.DEFAULT);
 
     public static final Codec<NoiseHeight> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise)
+            Noise.CODEC.optionalFieldOf("noise", DEFAULT.noise).forGetter(o -> o.noise)
     ).apply(instance, NoiseHeight::new));
     public static final ResourceLocation ID = CTerrainGeneration.id("noise_height");
 

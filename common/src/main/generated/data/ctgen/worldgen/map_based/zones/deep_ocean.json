@@ -1,11 +1,11 @@
 {
   "biome": "minecraft:deep_ocean",
+  "carver_modifier": 26.0,
   "color": {
     "b": 85,
     "g": 35,
     "r": 0
   },
   "height": -60,
-  "terrain_modifier": 33.0,
-  "threshold_modifier": 26
+  "terrain_modifier": 33.0
 }
