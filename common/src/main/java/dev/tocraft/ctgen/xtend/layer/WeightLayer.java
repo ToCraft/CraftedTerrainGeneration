@@ -56,7 +56,7 @@ public class WeightLayer extends BlockLayer {
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(WeightLayer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("weight");
+    public static final ResourceLocation ID = CTerrainGeneration.id("weight_layer");
 
     @Override
     protected Codec<WeightLayer> codec() {

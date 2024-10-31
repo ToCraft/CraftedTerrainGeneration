@@ -9,7 +9,7 @@
   "layers": {
     "dirt": "minecraft:red_concrete",
     "surface": {
-      "type": "ctgen:noise",
+      "type": "ctgen:noise_placer",
       "default": "minecraft:brown_concrete",
       "noise": {
         "octaves": [

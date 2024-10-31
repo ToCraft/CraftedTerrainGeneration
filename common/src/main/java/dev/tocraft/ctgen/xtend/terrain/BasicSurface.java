@@ -14,7 +14,7 @@ public class BasicSurface extends TerrainHeight {
     public static final Codec<BasicSurface> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise)
     ).apply(instance, BasicSurface::new));
-    public static final ResourceLocation ID = CTerrainGeneration.id("basic");
+    public static final ResourceLocation ID = CTerrainGeneration.id("basic_surface");
 
     private final Noise noise;
 

@@ -28,7 +28,7 @@ public class SurfaceLayer extends BlockLayer {
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(SurfaceLayer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("surface");
+    public static final ResourceLocation ID = CTerrainGeneration.id("surface_layer");
 
     @Override
     protected Codec<SurfaceLayer> codec() {

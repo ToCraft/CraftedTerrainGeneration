@@ -67,7 +67,7 @@ public class HeightLayer extends BlockLayer {
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(HeightLayer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("height");
+    public static final ResourceLocation ID = CTerrainGeneration.id("height_layer");
 
     @Override
     protected Codec<HeightLayer> codec() {

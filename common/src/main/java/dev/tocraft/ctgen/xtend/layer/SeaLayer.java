@@ -23,7 +23,7 @@ public class SeaLayer extends BlockLayer {
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(SeaLayer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("sea");
+    public static final ResourceLocation ID = CTerrainGeneration.id("sea_layer");
 
     @Override
     protected Codec<SeaLayer> codec() {

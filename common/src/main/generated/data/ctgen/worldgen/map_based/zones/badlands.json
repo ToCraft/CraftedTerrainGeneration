@@ -8,7 +8,7 @@
   "height": 18,
   "layers": {
     "dirt": "minecraft:red_concrete",
-    "surface": "minecraft:brown_concrete"
+    "surface": "minecraft:red_sand"
   },
   "terrain_modifier": 12.0
 }

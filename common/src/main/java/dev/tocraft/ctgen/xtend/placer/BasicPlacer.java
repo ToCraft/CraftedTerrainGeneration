@@ -42,7 +42,7 @@ public class BasicPlacer extends BlockPlacer {
             Codecs.BLOCK.fieldOf("value").forGetter(o -> o.value)
     ).apply(instance, instance.stable(BasicPlacer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("basic");
+    public static final ResourceLocation ID = CTerrainGeneration.id("basic_placer");
 
     @Override
     protected Codec<BasicPlacer> codec() {

@@ -104,7 +104,7 @@ public class NoisePlacer extends BlockPlacer {
             Codecs.BLOCK.fieldOf("default").forGetter(o -> o.defaultValue)
     ).apply(instance, instance.stable(NoisePlacer::new)));
 
-    public static final ResourceLocation ID = CTerrainGeneration.id("noise");
+    public static final ResourceLocation ID = CTerrainGeneration.id("noise_placer");
 
     @Override
     protected Codec<NoisePlacer> codec() {
