@@ -2,10 +2,8 @@ package dev.tocraft.ctgen.util;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 import java.awt.*;
@@ -27,5 +25,5 @@ public final class Codecs {
                 }
             });
 
-    public static final Codec<Block> BLOCK = ResourceLocation.CODEC.comapFlatMap(id -> BuiltInRegistries.BLOCK.containsKey(id) ? DataResult.success(BuiltInRegistries.BLOCK.get(id)) : DataResult.error(() -> String.format("Block %s not found!", id)), BuiltInRegistries.BLOCK::getKey).stable();
+    public static final Codec<Block> BLOCK = BuiltInRegistries.BLOCK.byNameCodec().stable();
 }

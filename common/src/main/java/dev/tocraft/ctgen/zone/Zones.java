@@ -17,7 +17,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 
-public class Zones {
+public final class Zones {
     // Northern Continent
     public static final ResourceKey<Zone> STONY_FLATS = getKey("stony_flats");
     public static final ResourceKey<Zone> SNOWY_FLATS = getKey("snowy_flats");

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public class CTerrainGeneration {
+public final class CTerrainGeneration {
     public static final String MODID = "ctgen";
 
     @Contract("_ -> new")

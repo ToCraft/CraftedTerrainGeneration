@@ -21,9 +21,9 @@ public final class CTGDataGen implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = generator.createPack();
         // generate zones
         pack.addProvider((FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider>) (output, registriesFuture) ->
-                new RegistriesDatapackGenerator(output, CompletableFuture.supplyAsync(() -> {
+                new RegistriesDatapackGenerator(output, registriesFuture.thenComposeAsync(registries -> CompletableFuture.supplyAsync(() -> {
                     RegistryAccess.Frozen frozen = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
-                    return BUILDER.buildPatch(frozen, registriesFuture.join());
-                })));
+                    return BUILDER.buildPatch(frozen, registries);
+                }))));
     }
 }
