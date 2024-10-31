@@ -94,7 +94,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         }
 
                         BlockPlacer placer = layer != null ? zone.layers().getOrDefault(layer.getName(), layer.getFallback()) : BasicPlacer.AIR;
-                        Block block = placer.get(this.noise, x, y, z, layer != null ? layer.getName() : "fill");
+                        Block block = placer.get(this.noise, pos.getX(), pos.getY(), pos.getZ(), surfaceHeight, layer != null ? layer.getName() : "fill");
 
                         if (layer != null && !layer.hasCaves() || canSetBlock(pos, surfaceHeight, minHeight, carverModifier)) {
                             // no grass underwater

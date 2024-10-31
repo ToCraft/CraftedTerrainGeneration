@@ -34,10 +34,7 @@ public abstract class BlockPlacer {
     }
 
     @NotNull
-    public abstract Block get(SimplexNoise noise, double x, double y, double z, String layer);
-
-    @NotNull
-    public abstract Block get(SimplexNoise noise, double x, double z, String layer);
+    public abstract Block get(SimplexNoise noise, double x, double y, double z, double surfaceHeight, String layer);
 
     protected abstract Codec<? extends BlockPlacer> codec();
 }

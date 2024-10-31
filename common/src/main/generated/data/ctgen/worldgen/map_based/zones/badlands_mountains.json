@@ -16,7 +16,7 @@
           1.0
         ],
         "persistence": 1.0,
-        "stretch": 1
+        "stretch": 50
       },
       "values": {
         "-0.5": "minecraft:orange_concrete",

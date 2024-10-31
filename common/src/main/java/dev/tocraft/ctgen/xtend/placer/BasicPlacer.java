@@ -25,12 +25,8 @@ public class BasicPlacer extends BlockPlacer {
         this.value = value;
     }
 
-    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, String layer) {
-        return value;
-    }
-
     @Override
-    public @NotNull Block get(SimplexNoise noise, double x, double z, String layer) {
+    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, double surfaceHeight, String layer) {
         return value;
     }
 

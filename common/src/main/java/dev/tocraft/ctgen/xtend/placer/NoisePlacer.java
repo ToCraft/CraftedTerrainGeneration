@@ -22,23 +22,30 @@ public class NoisePlacer extends BlockPlacer {
     private final Map<Double, Block> thresholdMap;
     @NotNull
     private final Block defaultValue;
+    private final boolean is2D;
 
-    private NoisePlacer(@Nullable Noise noise, @NotNull Map<Double, Block> thresholdMap, @NotNull Block defaultValue) {
+    private NoisePlacer(@Nullable Noise noise, @NotNull Map<Double, Block> thresholdMap, @NotNull Block defaultValue, boolean is2D) {
         this.noise = noise;
         this.thresholdMap = thresholdMap;
         this.defaultValue = defaultValue;
+        this.is2D = is2D;
     }
 
-    @Contract(value = "_, _, _ -> new", pure = true)
-    public static @NotNull NoisePlacer of(Noise noise, Map<Double, Block> thresholdMap, Block value) {
-        return new NoisePlacer(noise, thresholdMap, value);
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static @NotNull NoisePlacer of(Noise noise, Map<Double, Block> thresholdMap, Block value, boolean is2D) {
+        return new NoisePlacer(noise, thresholdMap, value, is2D);
     }
 
     public boolean hasNoise() {
         return noise != null && !thresholdMap.isEmpty();
     }
 
-    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, String layer) {
+    @Override
+    public @NotNull Block get(SimplexNoise noise, double x, double y, double z, double surfaceHeight, String layer) {
+        return is2D ? get2(noise, x, z) : get3(noise, x, y, z);
+    }
+
+    private @NotNull Block get3(SimplexNoise noise, double x, double y, double z) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {
@@ -59,8 +66,7 @@ public class NoisePlacer extends BlockPlacer {
         return value;
     }
 
-    @Override
-    public @NotNull Block get(SimplexNoise noise, double x, double z, String layer) {
+    private @NotNull Block get2(SimplexNoise noise, double x, double z) {
         double perlin;
 
         if (this.noise != null && hasNoise()) {
@@ -101,7 +107,8 @@ public class NoisePlacer extends BlockPlacer {
     public static final Codec<NoisePlacer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise),
             VALUE_MAP_CODEC.fieldOf("values").forGetter(o -> o.thresholdMap),
-            Codecs.BLOCK.fieldOf("default").forGetter(o -> o.defaultValue)
+            Codecs.BLOCK.fieldOf("default").forGetter(o -> o.defaultValue),
+            Codec.BOOL.optionalFieldOf("is_2d", false).forGetter(o -> o.is2D)
     ).apply(instance, instance.stable(NoisePlacer::new)));
 
     public static final ResourceLocation ID = CTerrainGeneration.id("noise_placer");
