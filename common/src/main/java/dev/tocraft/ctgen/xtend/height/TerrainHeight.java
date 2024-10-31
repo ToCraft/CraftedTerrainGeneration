@@ -1,4 +1,4 @@
-package dev.tocraft.ctgen.xtend.terrain;
+package dev.tocraft.ctgen.xtend.height;
 
 import com.mojang.serialization.Codec;
 import dev.tocraft.ctgen.worldgen.MapSettings;
@@ -11,7 +11,8 @@ public abstract class TerrainHeight {
     public static final Codec<TerrainHeight> CODEC = CTRegistries.TERRAIN.byNameCodec().dispatchStable(TerrainHeight::codec, Function.identity());
 
     public static void register() {
-        CTRegistries.TERRAIN.register(BasicSurface.ID, BasicSurface.CODEC);
+        CTRegistries.TERRAIN.register(BasicHeight.ID, BasicHeight.CODEC);
+        CTRegistries.TERRAIN.register(NoiseHeight.ID, NoiseHeight.CODEC);
     }
 
     /**

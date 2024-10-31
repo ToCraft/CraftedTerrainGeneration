@@ -4,7 +4,7 @@ import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;

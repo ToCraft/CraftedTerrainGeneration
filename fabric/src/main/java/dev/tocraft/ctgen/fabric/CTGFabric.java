@@ -7,7 +7,7 @@ import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;

@@ -1,7 +1,7 @@
 package dev.tocraft.ctgen.worldgen;
 
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
-import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

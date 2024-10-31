@@ -1,8 +1,8 @@
-// 1.20.1	2024-10-31T11:57:02.662182745	CTGen/Registries
+// 1.20.1	2024-10-31T12:11:48.172926144	CTGen/Registries
 09917112f8476aaef3e39f5780a478b955edc3e7 data/ctgen/worldgen/map_based/zones/plains.json
 3ca73f0225adf1fd168bfc73558fbf63bcf54aec data/ctgen/worldgen/map_based/zones/badlands_mountains.json
-4e10b1b02ad79d86538524c470d56dedf8c779f1 data/ctgen/worldgen/map_based/zones/desert.json
 ea8abee99ec67bf274bec024eff481325863952a data/ctgen/worldgen/map_based/zones/stony_flats.json
+4e10b1b02ad79d86538524c470d56dedf8c779f1 data/ctgen/worldgen/map_based/zones/desert.json
 b24dcc94b75a2092b2386357c78a1f93808fd7f8 data/ctgen/worldgen/map_based/zones/river.json
 166eb560b75b90c63217a66b4eac9cf59dcb8f9e data/ctgen/worldgen/map_based/zones/lake.json
 786353e42c828bf1348fb727db3e60adec29c18d data/ctgen/worldgen/map_based/zones/forest.json

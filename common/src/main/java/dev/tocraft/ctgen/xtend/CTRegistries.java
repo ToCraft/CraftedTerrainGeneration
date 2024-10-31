@@ -2,9 +2,9 @@ package dev.tocraft.ctgen.xtend;
 
 import com.mojang.serialization.Codec;
 import dev.tocraft.ctgen.util.Registrar;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

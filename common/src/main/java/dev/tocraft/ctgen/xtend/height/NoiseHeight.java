@@ -1,4 +1,4 @@
-package dev.tocraft.ctgen.xtend.terrain;
+package dev.tocraft.ctgen.xtend.height;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -8,17 +8,17 @@ import dev.tocraft.ctgen.worldgen.MapSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
-public class BasicSurface extends TerrainHeight {
-    public static final BasicSurface DEFAULT = new BasicSurface(Noise.DEFAULT);
+public class NoiseHeight extends TerrainHeight {
+    public static final NoiseHeight DEFAULT = new NoiseHeight(Noise.DEFAULT);
 
-    public static final Codec<BasicSurface> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<NoiseHeight> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise)
-    ).apply(instance, BasicSurface::new));
-    public static final ResourceLocation ID = CTerrainGeneration.id("basic_surface");
+    ).apply(instance, NoiseHeight::new));
+    public static final ResourceLocation ID = CTerrainGeneration.id("noise_height");
 
     private final Noise noise;
 
-    public BasicSurface(Noise noise) {
+    public NoiseHeight(Noise noise) {
         this.noise = noise;
     }
 
@@ -29,7 +29,7 @@ public class BasicSurface extends TerrainHeight {
     }
 
     @Override
-    protected Codec<BasicSurface> codec() {
+    protected Codec<NoiseHeight> codec() {
         return CODEC;
     }
 }

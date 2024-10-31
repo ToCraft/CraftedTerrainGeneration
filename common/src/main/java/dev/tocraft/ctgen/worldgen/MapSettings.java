@@ -3,9 +3,9 @@ package dev.tocraft.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.data.MapImageRegistry;
+import dev.tocraft.ctgen.xtend.height.NoiseHeight;
+import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
-import dev.tocraft.ctgen.xtend.terrain.BasicSurface;
-import dev.tocraft.ctgen.xtend.terrain.TerrainHeight;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, false, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, BasicSurface.DEFAULT, 31, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
+    static final MapSettings DEFAULT = new MapSettings(null, false, 1, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), List.of(CarverSetting.DEFAULT));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
@@ -125,9 +125,9 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double perlin = terrain.getHeight(this, noise, pX, pY, getValueWithTransition(pX, pY, Zone::terrainModifier));
+        double addHeight = terrain.getHeight(this, noise, pX, pY, getValueWithTransition(pX, pY, Zone::terrainModifier));
         double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
-        return genHeight + perlin;
+        return genHeight + addHeight;
     }
 
     public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
