@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.placer.BasicPlacer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -76,5 +77,5 @@ public abstract class BlockLayer {
         return fallback;
     }
 
-    protected abstract Codec<? extends BlockLayer> codec();
+    protected abstract MapCodec<? extends BlockLayer> codec();
 }

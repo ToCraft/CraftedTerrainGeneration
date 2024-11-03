@@ -42,7 +42,7 @@ public class CTGLocateCommand {
                         .then(
                                 Commands.literal("zone")
                                         .then(
-                                                Commands.argument("dest", new ResourceLocationArgument()).suggests((context1, builder) -> SharedSuggestionProvider.suggest(context.holderLookup(CTRegistries.ZONES_KEY).listElements().map(h -> h.key().location().toString()), builder))
+                                                Commands.argument("dest", new ResourceLocationArgument()).suggests((context1, builder) -> SharedSuggestionProvider.suggest(context.lookupOrThrow(CTRegistries.ZONES_KEY).listElements().map(h -> h.key().location().toString()), builder))
                                                         .executes(
                                                                 commandContext -> locate(
                                                                         commandContext.getSource(),
@@ -60,7 +60,7 @@ public class CTGLocateCommand {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             Stopwatch stopwatch = Stopwatch.createStarted(Util.TICKER);
 
-            Zone zone = level.registryAccess().registryOrThrow(CTRegistries.ZONES_KEY).getOptional(zoneId).orElseThrow();
+            Zone zone = level.registryAccess().lookupOrThrow(CTRegistries.ZONES_KEY).getOptional(zoneId).orElseThrow();
 
             MapSettings settings = generator.getSettings();
             BufferedImage image = generator.getSettings().getMapImage();

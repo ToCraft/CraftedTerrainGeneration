@@ -1,6 +1,6 @@
 package dev.tocraft.ctgen.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
@@ -29,11 +29,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class MapBasedChunkGenerator extends ChunkGenerator {
     public static final ResourceLocation ID = CTerrainGeneration.id("map_based_chunk_generator");
-    public static final Codec<MapBasedChunkGenerator> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+    public static final MapCodec<MapBasedChunkGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
@@ -53,12 +52,13 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    protected @NotNull Codec<MapBasedChunkGenerator> codec() {
+    protected @NotNull MapCodec<MapBasedChunkGenerator> codec() {
         return CODEC;
     }
 
     @Override
-    public void applyCarvers(@NotNull WorldGenRegion level, long pSeed, @NotNull RandomState random, @NotNull BiomeManager pBiomeManager, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess chunk, GenerationStep.@NotNull Carving step) {
+    public void applyCarvers(WorldGenRegion level, long seed, RandomState random, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunk) {
+
     }
 
     @Override
@@ -122,7 +122,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     @Override
     public void spawnOriginalMobs(@NotNull WorldGenRegion pLevel) {
         ChunkPos chunkpos = pLevel.getCenter();
-        Holder<Biome> holder = pLevel.getBiome(chunkpos.getWorldPosition().atY(pLevel.getMaxBuildHeight() - 1));
+        Holder<Biome> holder = pLevel.getBiome(chunkpos.getWorldPosition().atY(pLevel.getMaxY() - 1));
         WorldgenRandom worldgenrandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
         worldgenrandom.setDecorationSeed(pLevel.getSeed(), chunkpos.getMinBlockX(), chunkpos.getMinBlockZ());
         NaturalSpawner.spawnMobsForChunkGeneration(pLevel, holder, chunkpos, worldgenrandom);
@@ -134,8 +134,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public @NotNull CompletableFuture<ChunkAccess> fillFromNoise(@NotNull Executor pExecutor, @NotNull Blender pBlender, @NotNull RandomState pRandom, @NotNull StructureManager pStructureManager, @NotNull ChunkAccess pChunk) {
-        return CompletableFuture.completedFuture(pChunk);
+    public @NotNull CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunkAccess) {
+        return CompletableFuture.completedFuture(chunkAccess);
     }
 
     @Override

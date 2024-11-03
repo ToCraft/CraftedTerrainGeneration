@@ -12,6 +12,6 @@ public final class CTerrainGeneration {
     @Contract("_ -> new")
     @ApiStatus.Internal
     public static @NotNull ResourceLocation id(String path) {
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

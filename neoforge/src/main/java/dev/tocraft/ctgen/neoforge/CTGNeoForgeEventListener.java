@@ -1,16 +1,18 @@
-package dev.tocraft.ctgen.forge;
+package dev.tocraft.ctgen.neoforge;
 
 import dev.tocraft.ctgen.data.MapImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
+import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.RegisterEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,11 +20,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @ApiStatus.Internal
-public final class CTGForgeEventListener {
-    public static void initialize(IEventBus modEventBus) {
-        MinecraftForge.EVENT_BUS.addListener(CTGForgeEventListener::addReloadListenerEvent);
-        MinecraftForge.EVENT_BUS.addListener(CTGForgeEventListener::registerCommands);
-        modEventBus.addListener(CTGForgeEventListener::register);
+public final class CTGNeoForgeEventListener {
+    private static final String PROTOCOL_VERSION = "1";
+
+    public static void initialize(@NotNull IEventBus modEventBus) {
+        NeoForge.EVENT_BUS.addListener(CTGNeoForgeEventListener::addReloadListenerEvent);
+        NeoForge.EVENT_BUS.addListener(CTGNeoForgeEventListener::registerCommands);
+        modEventBus.addListener(CTGNeoForgeEventListener::register);
+        modEventBus.addListener(CTGNeoForgeEventListener::registerPayload);
     }
 
     private static final List<PreparableReloadListener> RELOAD_LISTENERS = new CopyOnWriteArrayList<>() {
@@ -41,9 +46,13 @@ public final class CTGForgeEventListener {
         CTGCommand.register(event.getDispatcher(), event.getBuildContext());
     }
 
-    private static void register(RegisterEvent event) {
+    private static void register(@NotNull RegisterEvent event) {
         // generic stuff
         event.register(Registries.BIOME_SOURCE, helper -> helper.register(MapBasedBiomeSource.ID, MapBasedBiomeSource.CODEC));
         event.register(Registries.CHUNK_GENERATOR, helper -> helper.register(MapBasedChunkGenerator.ID, MapBasedChunkGenerator.CODEC));
+    }
+
+    private static void registerPayload(@NotNull RegisterPayloadHandlersEvent event) {
+        event.registrar(PROTOCOL_VERSION).playToClient(SyncMapPacket.TYPE, SyncMapPacket.streamCodec(), (packet, context) -> packet.handle());
     }
 }

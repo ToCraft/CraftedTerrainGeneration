@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.height;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import dev.tocraft.ctgen.worldgen.MapSettings;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -24,5 +25,5 @@ public abstract class TerrainHeight {
      */
     public abstract double getHeight(MapSettings settings, SimplexNoise noise, int x, int z, double terrainModifier);
 
-    protected abstract Codec<? extends TerrainHeight> codec();
+    protected abstract MapCodec<? extends TerrainHeight> codec();
 }

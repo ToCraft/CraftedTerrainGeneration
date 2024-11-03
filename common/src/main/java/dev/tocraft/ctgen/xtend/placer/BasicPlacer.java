@@ -1,6 +1,6 @@
 package dev.tocraft.ctgen.xtend.placer;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.util.Codecs;
@@ -34,14 +34,14 @@ public class BasicPlacer extends BlockPlacer {
         return value;
     }
 
-    public static final Codec<BasicPlacer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<BasicPlacer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codecs.BLOCK.fieldOf("value").forGetter(o -> o.value)
     ).apply(instance, instance.stable(BasicPlacer::new)));
 
     public static final ResourceLocation ID = CTerrainGeneration.id("basic_placer");
 
     @Override
-    protected Codec<BasicPlacer> codec() {
+    protected MapCodec<BasicPlacer> codec() {
         return CODEC;
     }
 }

@@ -112,7 +112,7 @@ public class CTGTeleportCommand {
         if (!Level.isInSpawnableBounds(pos)) {
             throw INVALID_POSITION.create();
         } else {
-            if (entity.teleportTo(level, pos.getX(), pos.getY(), pos.getZ(), new HashSet<>(), entity.getYRot(), entity.getXRot())) {
+            if (entity.teleportTo(level, pos.getX(), pos.getY(), pos.getZ(), new HashSet<>(), entity.getYRot(), entity.getXRot(), true)) {
                 if (!(entity instanceof LivingEntity livingEntity) || !livingEntity.isFallFlying()) {
                     entity.setDeltaMovement(entity.getDeltaMovement().multiply(1.0, 0.0, 1.0));
                     entity.setOnGround(true);

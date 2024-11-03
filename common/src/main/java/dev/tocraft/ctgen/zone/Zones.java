@@ -6,7 +6,7 @@ import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.placer.NoisePlacer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -41,7 +41,7 @@ public final class Zones {
     public static final ResourceKey<Zone> DEEP_OCEAN = getKey("deep_ocean");
 
 
-    public static void bootstrap(@NotNull BootstapContext<Zone> context) {
+    public static void bootstrap(@NotNull BootstrapContext<Zone> context) {
         // Northern Continent
         context.register(STONY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(12).build());
         context.register(SNOWY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(5).build());
@@ -70,7 +70,7 @@ public final class Zones {
         context.register(DEEP_OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33).setCarverModifier(26).build());
     }
 
-    private static @NotNull Holder<Biome> getBiome(@NotNull BootstapContext<?> context, ResourceKey<Biome> biome) {
+    private static @NotNull Holder<Biome> getBiome(@NotNull BootstrapContext<?> context, ResourceKey<Biome> biome) {
         return context.lookup(Registries.BIOME).getOrThrow(biome);
     }
 

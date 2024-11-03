@@ -1,6 +1,6 @@
 package dev.tocraft.ctgen.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import net.minecraft.core.Holder;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public class MapBasedBiomeSource extends BiomeSource {
     public static final ResourceLocation ID = CTerrainGeneration.id("map_based_biome_source");
-    public static final Codec<MapBasedBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+    public static final MapCodec<MapBasedBiomeSource> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             MapSettings.CODEC.fieldOf("settings").forGetter(o -> o.settings)
     ).apply(instance, instance.stable(MapBasedBiomeSource::new)));
 
@@ -25,7 +25,7 @@ public class MapBasedBiomeSource extends BiomeSource {
     }
 
     @Override
-    protected @NotNull Codec<? extends BiomeSource> codec() {
+    protected @NotNull MapCodec<MapBasedBiomeSource> codec() {
         return CODEC;
     }
 

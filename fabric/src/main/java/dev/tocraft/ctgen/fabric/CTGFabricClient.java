@@ -17,11 +17,8 @@ public final class CTGFabricClient {
         ClientTickEvents.START_CLIENT_TICK.register(CTGClient::tick);
 
         ClientPlayNetworking.registerGlobalReceiver(
-                SyncMapPacket.PACKET_ID,
-                (client, handler, buf, sender) -> {
-                    SyncMapPacket packet = SyncMapPacket.decode(buf);
-                    packet.handle();
-                }
+                SyncMapPacket.TYPE,
+                (payload, context) -> payload.handle()
         );
     }
 }

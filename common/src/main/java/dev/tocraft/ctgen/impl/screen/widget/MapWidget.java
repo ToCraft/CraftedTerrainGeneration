@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +62,7 @@ public class MapWidget extends AbstractWidget {
         int mapWidth = packet.getMapWidth();
         int mapHeight = packet.getMapHeight();
         if (mapId != null) {
-            return new MapWidget(minecraft, x, y, width, height, new ResourceLocation(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
+            return new MapWidget(minecraft, x, y, width, height, ResourceLocation.fromNamespaceAndPath(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
         }
         return null;
     }
@@ -278,7 +279,7 @@ public class MapWidget extends AbstractWidget {
         RenderSystem.enableScissor((int) (getX() * scaleFactor), (int) (getY() * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
 
         // render actual map
-        context.blit(mapId, getTextureX(), getTextureY(), 0, 0, zoomedWidth, zoomedHeight, zoomedWidth, zoomedHeight);
+        context.blit(RenderType::guiTextured, mapId, getTextureX(), getTextureY(), 0, 0, zoomedWidth, zoomedHeight, zoomedWidth, zoomedHeight);
 
         if (showPlayer) {
             // calculate pixel pos for the player
@@ -296,9 +297,9 @@ public class MapWidget extends AbstractWidget {
             if (playerY > getTextureY() - 4 + zoomedHeight) playerY = getTextureY() - 4 + zoomedHeight;
 
             // render player head
-            ResourceLocation skin = minecraft.player.getSkinTextureLocation();
-            context.blit(skin, playerX - 4, playerY - 4, 8, 8, 8.0f, 8, 8, 8, 64, 64);
-            context.blit(skin, playerX - 4, playerY - 4, 8, 8, 40.0f, 8, 8, 8, 64, 64);
+            ResourceLocation skin = minecraft.player.getSkin().texture();
+            context.blit(RenderType::guiTextured, skin, playerX - 4, playerY - 4, 8.0f, 8, 8, 8, 8, 8, 64, 64);
+            context.blit(RenderType::guiTextured, skin, playerX - 4, playerY - 4, 40.0f, 8, 8, 8, 8, 8, 64, 64);
         }
 
         // render cursor position
@@ -379,13 +380,13 @@ public class MapWidget extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
         double value;
 
         // Zoom in/out with scrolling
-        if (amount > 0) {
+        if (deltaY > 0) {
             value = ZOOM_FACTOR;
-        } else if (amount < 0) {
+        } else if (deltaY < 0) {
             value = 1 / ZOOM_FACTOR;
         } else {
             value = 1;

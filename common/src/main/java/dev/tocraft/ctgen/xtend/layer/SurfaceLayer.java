@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -22,7 +23,7 @@ public class SurfaceLayer extends BlockLayer {
         return y == (int) surfaceHeight;
     }
 
-    public static final Codec<SurfaceLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<SurfaceLayer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.STRING.optionalFieldOf("name", "surface").forGetter(BlockLayer::getName),
             Codec.BOOL.optionalFieldOf("has_caves", true).forGetter(BlockLayer::hasCaves),
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
@@ -31,7 +32,7 @@ public class SurfaceLayer extends BlockLayer {
     public static final ResourceLocation ID = CTerrainGeneration.id("surface_layer");
 
     @Override
-    protected Codec<SurfaceLayer> codec() {
+    protected MapCodec<SurfaceLayer> codec() {
         return CODEC;
     }
 }

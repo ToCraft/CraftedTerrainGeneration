@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -18,7 +19,7 @@ public class SeaLayer extends BlockLayer {
         return y > surfaceHeight && surfaceHeight < seaLevel;
     }
 
-    public static final Codec<SeaLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<SeaLayer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(BlockLayer::getName),
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(SeaLayer::new)));
@@ -26,7 +27,7 @@ public class SeaLayer extends BlockLayer {
     public static final ResourceLocation ID = CTerrainGeneration.id("sea_layer");
 
     @Override
-    protected Codec<SeaLayer> codec() {
+    protected MapCodec<SeaLayer> codec() {
         return CODEC;
     }
 }

@@ -2,6 +2,7 @@ package dev.tocraft.ctgen.xtend.placer;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import dev.tocraft.ctgen.util.Codecs;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import net.minecraft.world.level.block.Block;
@@ -36,5 +37,5 @@ public abstract class BlockPlacer {
     @NotNull
     public abstract Block get(SimplexNoise noise, double x, double y, double z, double surfaceHeight, String layer);
 
-    protected abstract Codec<? extends BlockPlacer> codec();
+    protected abstract MapCodec<? extends BlockPlacer> codec();
 }

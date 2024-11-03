@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.carver;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.util.Noise;
@@ -14,7 +15,7 @@ import java.util.List;
 public class NoiseCarver extends Carver {
     public static final NoiseCarver DEFAULT = new NoiseCarver(new Noise(List.of(1F, 0.5F), 2, 63, 47), 0.55F);
 
-    public static final Codec<NoiseCarver> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<NoiseCarver> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", DEFAULT.noise).forGetter(o -> o.noise),
             Codec.DOUBLE.optionalFieldOf("threshold", DEFAULT.threshold).forGetter(o -> o.threshold)
     ).apply(instance, NoiseCarver::new));
@@ -41,7 +42,7 @@ public class NoiseCarver extends Carver {
     }
 
     @Override
-    protected Codec<NoiseCarver> codec() {
+    protected MapCodec<NoiseCarver> codec() {
         return CODEC;
     }
 }

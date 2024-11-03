@@ -4,6 +4,9 @@ issueTrackerURL = "https://github.com/ToCraft/CraftedTerrainGeneration/issues"
 displayURL = "https://github.com/ToCraft/CraftedTerrainGeneration"
 license = "Crafted License 1.0"
 
+[[mixins]]
+config = "ctgen.mixins.json"
+
 [[mods]]
 modId = "ctgen"
 version = "${version}"
@@ -16,7 +19,7 @@ logoFile = "pack.png"
 
 [[dependencies.ctgen]]
 modId = "minecraft"
-mandatory = true
+type="required"
 versionRange = "[${minecraft},)"
 ordering = "NONE"
 side = "BOTH"

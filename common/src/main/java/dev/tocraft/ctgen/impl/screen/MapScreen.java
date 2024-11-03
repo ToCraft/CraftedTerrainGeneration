@@ -61,7 +61,7 @@ public class MapScreen extends Screen {
         assert minecraft != null && minecraft.player != null;
 
         // transparent background
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
 
         // check if texture with was found
         if (mapWidget != null && mapWidget.getMapId() != null && minecraft.getResourceManager().getResource(mapWidget.getMapId()).isPresent()) {
@@ -84,11 +84,11 @@ public class MapScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
         if (mapWidget != null) {
-            return mapWidget.mouseScrolled(mouseX, mouseY, delta);
+            return mapWidget.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
         } else {
-            return super.mouseScrolled(mouseX, mouseY, delta);
+            return super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
         }
     }
 

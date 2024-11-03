@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.placer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.util.Codecs;
@@ -104,7 +105,7 @@ public class NoisePlacer extends BlockPlacer {
             }
     );
 
-    public static final Codec<NoisePlacer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<NoisePlacer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", Noise.DEFAULT).forGetter(o -> o.noise),
             VALUE_MAP_CODEC.fieldOf("values").forGetter(o -> o.thresholdMap),
             Codecs.BLOCK.fieldOf("default").forGetter(o -> o.defaultValue),
@@ -114,7 +115,7 @@ public class NoisePlacer extends BlockPlacer {
     public static final ResourceLocation ID = CTerrainGeneration.id("noise_placer");
 
     @Override
-    protected Codec<NoisePlacer> codec() {
+    protected MapCodec<NoisePlacer> codec() {
         return CODEC;
     }
 }

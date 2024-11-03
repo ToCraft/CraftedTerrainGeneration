@@ -3,6 +3,7 @@ package dev.tocraft.ctgen.fabric;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.data.MapImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
+import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.ctgen.xtend.carver.Carver;
@@ -11,6 +12,7 @@ import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Registry;
@@ -18,7 +20,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,13 +44,13 @@ public final class CTGFabric implements ModInitializer {
             }
 
             @Override
-            public @NotNull String getName() {
-                return reloadListener.getName();
+            public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
+                return reloadListener.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
             }
 
             @Override
-            public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
-                return reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+            public @NotNull String getName() {
+                return reloadListener.getName();
             }
         });
 
@@ -61,5 +62,8 @@ public final class CTGFabric implements ModInitializer {
         BlockLayer.register();
         TerrainHeight.register();
         Carver.register();
+
+        // register network packet type
+        PayloadTypeRegistry.playS2C().register(SyncMapPacket.TYPE, SyncMapPacket.streamCodec());
     }
 }

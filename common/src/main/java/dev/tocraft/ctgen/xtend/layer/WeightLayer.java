@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -47,7 +48,7 @@ public class WeightLayer extends BlockLayer {
         return this.min <= percentage && percentage <= this.max;
     }
 
-    public static final Codec<WeightLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<WeightLayer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.fieldOf("min_percentage").forGetter(WeightLayer::getMinPercentage),
             Codec.DOUBLE.fieldOf("max_percentage").forGetter(WeightLayer::getMaxPercentage),
             Codec.BOOL.optionalFieldOf("shift", true).forGetter(WeightLayer::hasShift),
@@ -59,7 +60,7 @@ public class WeightLayer extends BlockLayer {
     public static final ResourceLocation ID = CTerrainGeneration.id("weight_layer");
 
     @Override
-    protected Codec<WeightLayer> codec() {
+    protected MapCodec<WeightLayer> codec() {
         return CODEC;
     }
 }

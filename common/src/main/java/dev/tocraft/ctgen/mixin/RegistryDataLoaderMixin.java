@@ -34,9 +34,9 @@ public class RegistryDataLoaderMixin {
             }
         }
         if (biomeIndex != -1) {
-            RegistryDataLoader.RegistryData<?> zoneRegistryData = new RegistryDataLoader.RegistryData<>(CTRegistries.ZONES_KEY, Zone.DIRECT_CODEC);
+            RegistryDataLoader.RegistryData<?> zoneRegistryData = new RegistryDataLoader.RegistryData<>(CTRegistries.ZONES_KEY, Zone.DIRECT_CODEC, false);
             worldGenRegistries.add(biomeIndex + 1, zoneRegistryData);
-            WORLDGEN_REGISTRIES = worldGenRegistries;
+            WORLDGEN_REGISTRIES = List.copyOf(worldGenRegistries);
         }
     }
 }

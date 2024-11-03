@@ -4,11 +4,10 @@ import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.zone.Zones;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
+import net.minecraft.data.registries.RegistryPatchGenerator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,10 +19,10 @@ public final class CTGDataGen implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(@NotNull FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
         // generate zones
-        pack.addProvider((FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider>) (output, registriesFuture) ->
-                new RegistriesDatapackGenerator(output, registriesFuture.thenComposeAsync(registries -> CompletableFuture.supplyAsync(() -> {
-                    RegistryAccess.Frozen frozen = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
-                    return BUILDER.buildPatch(frozen, registries);
-                }))));
+        pack.addProvider((FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider>) (output, registries) ->
+                new RegistriesDatapackGenerator(output,
+                        RegistryPatchGenerator.createLookup(registries, BUILDER).thenComposeAsync(patchedRegistries ->
+                                CompletableFuture.completedFuture(patchedRegistries.patches()))
+                ));
     }
 }

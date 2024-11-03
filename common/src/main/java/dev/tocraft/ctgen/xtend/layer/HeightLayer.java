@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.xtend.layer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -57,7 +58,7 @@ public class HeightLayer extends BlockLayer {
         return y2 >= min - 1 && y2 <= max && (!limitedToSurface || y < surfaceHeight);
     }
 
-    public static final Codec<HeightLayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<HeightLayer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("min").forGetter(HeightLayer::getMinY),
             Codec.INT.fieldOf("max").forGetter(HeightLayer::getMaxY),
             Codec.BOOL.optionalFieldOf("limit_to_surface", true).forGetter(HeightLayer::isLimitedToSurface),
@@ -70,7 +71,7 @@ public class HeightLayer extends BlockLayer {
     public static final ResourceLocation ID = CTerrainGeneration.id("height_layer");
 
     @Override
-    protected Codec<HeightLayer> codec() {
+    protected MapCodec<HeightLayer> codec() {
         return CODEC;
     }
 }
