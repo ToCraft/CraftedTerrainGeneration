@@ -1,11 +1,7 @@
 {
   "biome": "minecraft:frozen_ocean",
   "carver_modifier": 26.0,
-  "color": {
-    "b": 204,
-    "g": 126,
-    "r": 78
-  },
+  "color": "#4e7ecc",
   "height": -20,
   "layers": {
     "surface": "minecraft:sand"

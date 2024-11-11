@@ -1,10 +1,6 @@
 {
   "biome": "minecraft:stony_shore",
-  "color": {
-    "b": 130,
-    "g": 140,
-    "r": 130
-  },
+  "color": "#828c82",
   "height": 12,
   "layers": {
     "dirt": "minecraft:stone",

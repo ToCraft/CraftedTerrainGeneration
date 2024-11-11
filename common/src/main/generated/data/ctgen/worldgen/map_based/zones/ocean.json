@@ -1,11 +1,7 @@
 {
   "biome": "minecraft:ocean",
   "carver_modifier": 26.0,
-  "color": {
-    "b": 103,
-    "g": 42,
-    "r": 0
-  },
+  "color": "#002a67",
   "height": -35,
   "layers": {
     "surface": "minecraft:sand"

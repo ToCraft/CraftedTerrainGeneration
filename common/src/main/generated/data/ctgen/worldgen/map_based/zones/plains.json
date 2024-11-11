@@ -1,9 +1,5 @@
 {
   "biome": "minecraft:plains",
-  "color": {
-    "b": 57,
-    "g": 95,
-    "r": 57
-  },
+  "color": "#395f39",
   "height": 5
 }

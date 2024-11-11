@@ -1,10 +1,6 @@
 {
   "biome": "minecraft:windswept_gravelly_hills",
-  "color": {
-    "b": 151,
-    "g": 151,
-    "r": 151
-  },
+  "color": "#979797",
   "height": 18,
   "terrain_modifier": 18.0
 }

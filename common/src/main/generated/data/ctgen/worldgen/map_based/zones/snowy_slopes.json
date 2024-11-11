@@ -1,10 +1,6 @@
 {
   "biome": "minecraft:snowy_slopes",
-  "color": {
-    "b": 192,
-    "g": 192,
-    "r": 192
-  },
+  "color": "#c0c0c0",
   "height": 18,
   "layers": {
     "dirt": "minecraft:snow_block",

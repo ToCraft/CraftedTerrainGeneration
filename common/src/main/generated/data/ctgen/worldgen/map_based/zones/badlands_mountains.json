@@ -1,10 +1,6 @@
 {
   "biome": "minecraft:badlands",
-  "color": {
-    "b": 53,
-    "g": 71,
-    "r": 70
-  },
+  "color": "#464735",
   "height": 28,
   "layers": {
     "dirt": "minecraft:red_concrete",

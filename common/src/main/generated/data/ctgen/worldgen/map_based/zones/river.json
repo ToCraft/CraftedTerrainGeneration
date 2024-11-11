@@ -1,11 +1,7 @@
 {
   "biome": "minecraft:river",
   "carver_modifier": 26.0,
-  "color": {
-    "b": 255,
-    "g": 98,
-    "r": 1
-  },
+  "color": "#0162ff",
   "height": -15,
   "layers": {
     "dirt": "minecraft:sand",

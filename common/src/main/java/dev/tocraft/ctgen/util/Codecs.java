@@ -6,24 +6,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
-import java.awt.*;
-
 public final class Codecs {
-    public static final Codec<Color> COLOR_DIRECT = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("r").forGetter(Color::getRed),
-            Codec.INT.fieldOf("g").forGetter(Color::getGreen),
-            Codec.INT.fieldOf("b").forGetter(Color::getBlue)
-    ).apply(instance, instance.stable(Color::new)));
+    public static final Codec<Integer> COLOR_RGB = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("r").forGetter(i -> (i >> 16) & 0xFF),
+            Codec.INT.fieldOf("g").forGetter(i -> (i >> 8) & 0xFF),
+            Codec.INT.fieldOf("b").forGetter(i -> i & 0xFF)
+    ).apply(instance, instance.stable((r, g, b) -> (0xFF << 24) |
+            ((r & 0xFF) << 16) |
+            ((g & 0xFF) << 8)  |
+            ((b & 0xFF)))));
 
-    public static final Codec<Integer> COLOR = Codec.either(COLOR_DIRECT, Codec.INT)
-            .xmap(either -> either.right().orElseGet(() -> either.left().orElseThrow().getRGB()), rgb -> {
-                Color color = new Color(rgb);
-                if (color.getAlpha() < 255) {
-                    return Either.right(rgb);
-                } else {
-                    return Either.left(color);
-                }
-            });
+    public static final Codec<Integer> COLOR_HEX = Codec.STRING.xmap(Integer::decode, i -> String.format("#%02x%02x%02x", (i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF));
+
+    public static final Codec<Integer> COLOR = Codec.either(COLOR_HEX, COLOR_RGB)
+            .xmap(either -> either.left().orElseGet(() -> either.right().orElseThrow()), Either::left);
 
     public static final Codec<Block> BLOCK = BuiltInRegistries.BLOCK.byNameCodec().stable();
 }
