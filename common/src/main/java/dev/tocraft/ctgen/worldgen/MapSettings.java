@@ -1,5 +1,6 @@
 package dev.tocraft.ctgen.worldgen;
 
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.data.MapImageRegistry;
@@ -9,6 +10,7 @@ import dev.tocraft.ctgen.xtend.height.NoiseHeight;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.zone.Zone;
+import dev.tocraft.ctgen.zone.Zones;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -16,6 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +95,13 @@ public final class MapSettings {
             }
         });
         this.carver = carver;
+
+        for (Holder<Zone> zone : this.zones) {
+            if (zone.is(Zones.RIVER)) {
+                Color c = new Color(1, 98, 255);
+                LogUtils.getLogger().warn("Color: " + zone.value().color() + " should be: " + c.getRGB());
+            }
+        }
     }
 
     public List<BlockLayer> getLayers() {

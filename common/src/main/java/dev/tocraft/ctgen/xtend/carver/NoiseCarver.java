@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class NoiseCarver extends Carver {
-    public static final NoiseCarver DEFAULT = new NoiseCarver(new Noise(List.of(1F, 0.5F), 2, 63, 47), 0.55F);
+    public static final NoiseCarver DEFAULT = new NoiseCarver(new Noise(List.of(new Noise.Octave(1, 1), new Noise.Octave(0.5f, 2)), 63, 47), 0.55F);
 
     public static final MapCodec<NoiseCarver> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Noise.CODEC.optionalFieldOf("noise", DEFAULT.noise).forGetter(o -> o.noise),

@@ -1,8 +1,8 @@
-// 1.21.3	2024-11-11T14:50:47.678304767	CTGen/Registries
+// 1.21.3	2024-11-13T16:30:12.837407206	CTGen/Registries
 1c5db5f4593f5fe97dbaf73bdbd63fe354a1185d data/ctgen/worldgen/map_based/zones/plains.json
-6558d921786e5388da9f7f0366456041995fe2ff data/ctgen/worldgen/map_based/zones/badlands_mountains.json
-3b20f0ae96f94e9a6aed34a730107acbf62fb269 data/ctgen/worldgen/map_based/zones/desert.json
+cabb67dcfcfd601de0edcbb9a954770e0d9e5831 data/ctgen/worldgen/map_based/zones/badlands_mountains.json
 97ccec666213300c0d55e330c49fad22e57e67f3 data/ctgen/worldgen/map_based/zones/stony_flats.json
+3b20f0ae96f94e9a6aed34a730107acbf62fb269 data/ctgen/worldgen/map_based/zones/desert.json
 a0432f3114eaaeca727c52f71e231dc7abbc6852 data/ctgen/worldgen/map_based/zones/river.json
 3f241a73909060b3e47b9c13ae766d4c59568f77 data/ctgen/worldgen/map_based/zones/lake.json
 754af079c6a28d87c26f7c9eae41f7a8f35f8261 data/ctgen/worldgen/map_based/zones/forest.json
@@ -11,8 +11,8 @@ a0432f3114eaaeca727c52f71e231dc7abbc6852 data/ctgen/worldgen/map_based/zones/riv
 201b650496b9dddf4a2282c26e363e0b53718cc2 data/ctgen/worldgen/map_based/zones/ocean.json
 a7977c1dada7eba7b8061d96da7d062e5807b621 data/ctgen/worldgen/map_based/zones/badlands.json
 d27c95e66c317aba9c83e1f928dc572cc66e4aa8 data/ctgen/worldgen/map_based/zones/mountains.json
-e6faad7f254549d65c1b04bcd3f2bdf8f4690e22 data/ctgen/worldgen/map_based/zones/hills.json
 c8b6815ea720a5bb4312e5805143598c40b31648 data/ctgen/worldgen/map_based/zones/frozen_river.json
+e6faad7f254549d65c1b04bcd3f2bdf8f4690e22 data/ctgen/worldgen/map_based/zones/hills.json
 c43ae3888694ab66b65eef8cf94a5a041c974a98 data/ctgen/worldgen/map_based/zones/snowy_flats.json
 bf803d6e35a3e69a5e34361863c82113446e4690 data/ctgen/worldgen/map_based/zones/deep_ocean.json
 7e4477583efb49a9ee6fcb344282ed1cefbc6c43 data/ctgen/worldgen/map_based/zones/frozen_lake.json

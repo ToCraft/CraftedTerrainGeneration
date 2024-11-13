@@ -6,16 +6,22 @@ import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 import java.util.List;
 
-public record Noise(List<Float> octaves, double persistence, int stretchXZ, int stretchY) {
-    public static final Noise DEFAULT = new Noise(List.of(1f, 2f, 4f), 0.5f, 250);
+public record Noise(List<Octave> octaves, int stretchXZ, int stretchY) {
+    public record Octave(float frequency, float amplitude) {
+        public static final Codec<Octave> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+                Codec.FLOAT.fieldOf("frequency").forGetter(Octave::frequency),
+                Codec.FLOAT.fieldOf("amplitude").forGetter(Octave::amplitude)
+        ).apply(instance, instance.stable(Octave::new)));
+    }
 
-    public Noise(List<Float> octaves, double persistence, int stretch) {
-        this(octaves, persistence, stretch, -1);
+    public static final Noise DEFAULT = new Noise(List.of(new Octave(1, 1), new Octave(2, 0.5f), new Octave(4, 0.25f)), 250);
+
+    public Noise(List<Octave> octaves, int stretch) {
+        this(octaves, stretch, -1);
     }
 
     public static final Codec<Noise> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-            Codec.list(Codec.FLOAT).optionalFieldOf("octaves", DEFAULT.octaves).forGetter(Noise::octaves),
-            Codec.DOUBLE.optionalFieldOf("persistence", DEFAULT.persistence).forGetter(Noise::persistence),
+            Codec.list(Octave.CODEC).optionalFieldOf("octaves", DEFAULT.octaves).forGetter(Noise::octaves),
             Codec.INT.optionalFieldOf("stretch", DEFAULT.stretchXZ).forGetter(Noise::stretchXZ),
             Codec.INT.optionalFieldOf("stretch_y", DEFAULT.stretchY).forGetter(Noise::stretchY)
     ).apply(instance, instance.stable(Noise::new)));
@@ -26,12 +32,10 @@ public record Noise(List<Float> octaves, double persistence, int stretchXZ, int 
         double z2 = z / stretchXZ;
 
         double total = 0;
-        double amplitude = 1;
         double totalAmplitude = 0;
-        for (float frequency : octaves) {
-            total += noise.getValue(x2 * frequency, y2 * frequency, z2 * frequency) * amplitude;
-            totalAmplitude += amplitude;
-            amplitude *= persistence;
+        for (Octave octave : octaves) {
+            total += noise.getValue(x2 * octave.frequency, y2 * octave.frequency, z2 * octave.frequency) * octave.amplitude;
+            totalAmplitude += octave.amplitude;
         }
 
         return total / totalAmplitude;
@@ -42,13 +46,10 @@ public record Noise(List<Float> octaves, double persistence, int stretchXZ, int 
         double z2 = z / stretchXZ;
 
         double total = 0;
-        double amplitude = 1;
         double totalAmplitude = 0;
-
-        for (float frequency : octaves) {
-            total += noise.getValue(x2 * frequency, z2 * frequency) * amplitude;
-            totalAmplitude += amplitude;
-            amplitude *= persistence;
+        for (Octave octave : octaves) {
+            total += noise.getValue(x2 * octave.frequency, z2 * octave.frequency) * octave.amplitude;
+            totalAmplitude += octave.amplitude;
         }
 
         total /= totalAmplitude;

@@ -9,9 +9,11 @@
       "default": "minecraft:brown_concrete",
       "noise": {
         "octaves": [
-          1.0
+          {
+            "amplitude": 1.0,
+            "frequency": 1.0
+          }
         ],
-        "persistence": 1.0,
         "stretch": 50
       },
       "values": {
