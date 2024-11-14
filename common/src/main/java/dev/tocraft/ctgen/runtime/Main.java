@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class Main {
+public final class Main {
     private static final String JAR_FILE_NAME = Path.of(Main.class
             .getProtectionDomain()
             .getCodeSource()

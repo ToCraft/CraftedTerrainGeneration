@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
+@ApiStatus.Internal
 public final class CTerrainGeneration {
     public static final String MODID = "ctgen";
 

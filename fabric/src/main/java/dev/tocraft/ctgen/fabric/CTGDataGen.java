@@ -8,10 +8,12 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.registries.RegistryPatchGenerator;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+@ApiStatus.Internal
 public final class CTGDataGen implements DataGeneratorEntrypoint {
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder().add(CTRegistries.ZONES_KEY, Zones::bootstrap);
 
