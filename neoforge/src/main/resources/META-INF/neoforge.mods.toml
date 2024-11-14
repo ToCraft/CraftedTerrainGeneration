@@ -19,7 +19,7 @@ logoFile = "pack.png"
 
 [[dependencies.ctgen]]
 modId = "minecraft"
-type="required"
+type = "required"
 versionRange = "[${minecraft},)"
 ordering = "NONE"
 side = "BOTH"

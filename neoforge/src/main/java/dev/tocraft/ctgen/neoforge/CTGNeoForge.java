@@ -1,10 +1,6 @@
 package dev.tocraft.ctgen.neoforge;
 
 import dev.tocraft.ctgen.CTerrainGeneration;
-import dev.tocraft.ctgen.xtend.carver.Carver;
-import dev.tocraft.ctgen.xtend.height.TerrainHeight;
-import dev.tocraft.ctgen.xtend.layer.BlockLayer;
-import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
@@ -26,11 +22,5 @@ public final class CTGNeoForge {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             CTGNeoForgeClientEventListener.initialize(modEventBus);
         }
-
-        // values for the built-in registries
-        BlockPlacer.register();
-        BlockLayer.register();
-        TerrainHeight.register();
-        Carver.register();
     }
 }

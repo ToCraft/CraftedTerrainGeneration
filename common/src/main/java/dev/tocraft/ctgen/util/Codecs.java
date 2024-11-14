@@ -13,7 +13,7 @@ public final class Codecs {
             Codec.INT.fieldOf("blue").forGetter(i -> i & 0xFF)
     ).apply(instance, instance.stable((r, g, b) -> (0xFF << 24) |
             ((r & 0xFF) << 16) |
-            ((g & 0xFF) << 8)  |
+            ((g & 0xFF) << 8) |
             ((b & 0xFF)))));
 
     public static final Codec<Integer> COLOR_HEX = Codec.STRING.xmap(s -> ((0xFF) << 24) |

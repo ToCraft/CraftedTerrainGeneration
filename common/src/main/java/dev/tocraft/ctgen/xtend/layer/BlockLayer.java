@@ -6,12 +6,15 @@ import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.placer.BasicPlacer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
 import dev.tocraft.ctgen.zone.Zone;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class BlockLayer {
@@ -26,10 +29,11 @@ public abstract class BlockLayer {
         this.fallback = fallback;
     }
 
-    public static void register() {
-        CTRegistries.BLOCK_LAYER.register(SeaLayer.ID, SeaLayer.CODEC);
-        CTRegistries.BLOCK_LAYER.register(HeightLayer.ID, HeightLayer.CODEC);
-        CTRegistries.BLOCK_LAYER.register(WeightLayer.ID, WeightLayer.CODEC);
+    @ApiStatus.Internal
+    public static void register(@NotNull BiConsumer<ResourceLocation, MapCodec<? extends BlockLayer>> registerFunc) {
+        registerFunc.accept(SeaLayer.ID, SeaLayer.CODEC);
+        registerFunc.accept(HeightLayer.ID, HeightLayer.CODEC);
+        registerFunc.accept(WeightLayer.ID, WeightLayer.CODEC);
     }
 
     @Contract("_ -> new")

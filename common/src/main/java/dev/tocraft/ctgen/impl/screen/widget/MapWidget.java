@@ -275,6 +275,7 @@ public class MapWidget extends AbstractWidget {
         updateZoomedHeight();
 
         // cut widget
+        context.flush();
         final double scaleFactor = minecraft.getWindow().getGuiScale();
         RenderSystem.enableScissor((int) (getX() * scaleFactor), (int) (getY() * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
 

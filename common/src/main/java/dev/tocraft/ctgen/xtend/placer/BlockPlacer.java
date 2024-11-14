@@ -5,11 +5,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import dev.tocraft.ctgen.util.Codecs;
 import dev.tocraft.ctgen.xtend.CTRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class BlockPlacer {
@@ -29,9 +32,10 @@ public abstract class BlockPlacer {
         }
     });
 
-    public static void register() {
-        CTRegistries.BLOCK_PLACER.register(BasicPlacer.ID, BasicPlacer.CODEC);
-        CTRegistries.BLOCK_PLACER.register(NoisePlacer.ID, NoisePlacer.CODEC);
+    @ApiStatus.Internal
+    public static void register(@NotNull BiConsumer<ResourceLocation, MapCodec<? extends BlockPlacer>> registerFunc) {
+        registerFunc.accept(BasicPlacer.ID, BasicPlacer.CODEC);
+        registerFunc.accept(NoisePlacer.ID, NoisePlacer.CODEC);
     }
 
     @NotNull
