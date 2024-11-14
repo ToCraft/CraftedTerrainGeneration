@@ -5,7 +5,7 @@
 
 # Crafted Terrain Generation
 
-<img alt="Banner" height="125" src="assets/branding/PNG/Banners/CTGen_Header_BG_Logomark.png"></img>
+<img alt="Banner" height="125" src="assets/branding/PNG/Banners/CTGen_Header_BG_Logomark.png"/>
 
 *Crafted Terrain Generation* (CTGen) allows you to generate entire Minecraft worlds with just one map image!
 It's fully data-driven, so you can configure it entirely via data packs - no need for java code!
@@ -16,15 +16,16 @@ No matter if you want to play in a fantastic world like the world in [Game of Th
 There's already an amazing mod using CTGen for the world of [Game of Thrones] - the [A Storm of Swords] mod.
 
 ---
-
-<img alt="BiSect Banner - Code: 'woodwalkers'" height="125" src="assets/branding/PNG/Banners/CTGen_BH_AffiliateBanner.png"></img>
+<a href="https://www.bisecthosting.com/woodwalkers">
+    <img alt="BiSect Banner - Code: 'woodwalkers'" height="125" src="assets/branding/PNG/Banners/CTGen_BH_AffiliateBanner.png"/>
+</a>
 
 If you want to use CTGen on a server so you can enjoy your custom generated minecraft worlds with friends, I suggest trying out BisectHosting.
 You can use the code "woodwalkers" to receive a 25% discount on your first month, and you'll also support the development of CTGen.
 
 ---
 
-<img alt="Horizontal Wordmark Logo" height="125" src="assets/branding/PNG/Horizontal/CTGen_Horizontal_Wordmark_Mono_Dark.png"></img>
+<img alt="Horizontal Wordmark Logo" height="125" src="assets/branding/PNG/Horizontal/CTGen_Horizontal_Wordmark_Mono_Dark.png"/>
 
 ---
 
