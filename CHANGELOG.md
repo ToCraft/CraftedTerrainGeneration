@@ -1,21 +1,8 @@
-SkinShifter 1.2
-================
-
-- Config option to configure OP Level for commands
-- different command level to modify own skin
-
-SkinShifter 1.1
-================
-
-- run different tasks asynchronous to fix stuck when running commands with bad internet connection
-- change player chat name
-- performance improvements
-- merge caching to CraftedCore
-
-SkinShifter 1.0
+Crafted Terrain Generation
 ================
 
 Initial Release!
 
-*SkinShifter* lets you change your Player Skin in game!
-(Don't worry- you won't change you're actual skin, it just renders differently.)
+*Crafted Terrain Generation* (CTGen) allows you to generate entire Minecraft worlds with just one map image!
+It's fully data-driven, so you can configure it entirely via data packs - no need for java code!
+If you're a java coder, don't worry - CTGen also features a Java API, where you can configure everything of the mod!
