@@ -5,8 +5,8 @@ import dev.tocraft.cli.CommandLine;
 import dev.tocraft.cli.Option;
 import dev.tocraft.cli.OptionBuilder;
 import dev.tocraft.cli.json.JsonParser;
-import dev.tocraft.cli.json.elements.JsonDouble;
 import dev.tocraft.cli.json.elements.JsonElement;
+import dev.tocraft.cli.json.elements.JsonString;
 import dev.tocraft.ctgen.util.MapUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,8 +39,7 @@ public final class Main {
     private static final Option OUTPUT = new OptionBuilder().setAbbreviation("-o").addAlias("--output").setDescription("Output map image").create();
     private static final Option CORRECTED = new OptionBuilder().setAbbreviation("-c").addAlias("--corrected").setDescription("Optional file to save an image with only the corrected colors").setRequired(false).create();
     private static final Option ONLY_CHANGED = new OptionBuilder().setAbbreviation("-oc").addAlias("--only-changed").setDescription("Works only in addition to --corrected, the corrected image will only show the changed pixel.").setTakesInput(false).setRequired(false).create();
-    private static final Option WEIGHT = new OptionBuilder().setAbbreviation("-w").addAlias("--weight").setDescription("Default pixel weight, will default to 1").setRequired(false).create();
-    private static final CommandLine CMDLINE = new CmdLineBuilder().setCmdBase(CMD_BASE).setHeader(DESCRIPTION).setFooter(COPYRIGHT).addOptions(INPUT, ZONES, OUTPUT, CORRECTED, ONLY_CHANGED, WEIGHT).create();
+    private static final CommandLine CMDLINE = new CmdLineBuilder().setCmdBase(CMD_BASE).setHeader(DESCRIPTION).setFooter(COPYRIGHT).addOptions(INPUT, ZONES, OUTPUT, CORRECTED, ONLY_CHANGED).create();
 
     public static void main(String[] args) {
         Map<Option, String> input = CMDLINE.parseArgs(args);
@@ -52,7 +51,7 @@ public final class Main {
 
             long startTime = System.currentTimeMillis();
 
-            Preparer preparer = new Preparer(input.get(INPUT), input.get(ZONES), input.get(OUTPUT), input.get(WEIGHT), input.get(CORRECTED), input.containsKey(ONLY_CHANGED));
+            Preparer preparer = new Preparer(input.get(INPUT), input.get(ZONES), input.get(OUTPUT), input.get(CORRECTED), input.containsKey(ONLY_CHANGED));
             Runner runner = preparer.run();
             System.out.println("Successfully read all input files. Continuing with processing.");
             runner.run();
@@ -75,15 +74,13 @@ public final class Main {
         private final File input;
         private final Path zones;
         private final File output;
-        private final double weight;
         private final File corrected;
         private final boolean onlyChanged;
 
-        public Preparer(String input, String zones, String output, String weight, String corrected, boolean onlyChanged) {
+        public Preparer(String input, String zones, String output, String corrected, boolean onlyChanged) {
             this.input = new File(input);
             this.zones = Path.of(zones);
             this.output = new File(output);
-            this.weight = weight == null ? 1.0d : Double.parseDouble(weight);
             this.corrected = corrected == null ? null : new File(corrected);
             this.onlyChanged = onlyChanged;
         }
@@ -104,18 +101,19 @@ public final class Main {
                     String json = Files.readString(zoneFile);
                     Color color;
                     {
-                        Map<String, JsonElement> colorMap = JsonParser.parseJson(json).asObject().get("color").asObject();
-                        int r = colorMap.get("r").asInt().get();
-                        int g = colorMap.get("g").asInt().get();
-                        int b = colorMap.get("b").asInt().get();
-                        color = new Color(r, g, b);
+                        JsonElement colorElement = JsonParser.parseJson(json).asObject().get("color");
+                        if (colorElement instanceof JsonString s) {
+                            color = new Color(((0xFF) << 24) | Integer.decode(s.get()));
+                        } else {
+                            Map<String, JsonElement> colorMap = colorElement.asObject();
+                            int r = colorMap.get("red").asInt().get();
+                            int g = colorMap.get("green").asInt().get();
+                            int b = colorMap.get("blue").asInt().get();
+                            color = new Color(r, g, b);
+                        }
                     }
                     JsonElement pixelWeight = JsonParser.parseJson(json).asObject().get("pixel_weight");
-                    if (pixelWeight == null) {
-                        pixelWeight = new JsonDouble(weight);
-                    }
-
-                    JsonZone zone = new JsonZone(color.getRGB(), pixelWeight.asDouble().get());
+                    JsonZone zone = new JsonZone(color.getRGB(), pixelWeight != null ? pixelWeight.asDouble().get() : 1.0);
                     zones.add(zone);
                 }
             }
