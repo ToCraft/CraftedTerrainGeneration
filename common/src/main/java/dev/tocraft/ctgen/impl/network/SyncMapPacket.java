@@ -13,9 +13,15 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 public class SyncMapPacket implements CustomPacketPayload {
     public static final ResourceLocation PACKET_ID = CTerrainGeneration.id("sync_map_id");
     public static final Type<SyncMapPacket> TYPE = new Type<>(PACKET_ID);
+
+    private static final List<Consumer<SyncMapPacket>> handlers = new CopyOnWriteArrayList<>();
 
     @Nullable
     private final ResourceLocation mapId;
@@ -44,10 +50,17 @@ public class SyncMapPacket implements CustomPacketPayload {
     @ApiStatus.Internal
     public void handle() {
         CTGClient.LAST_SYNC_MAP_PACKET.set(this);
+        for (Consumer<SyncMapPacket> handler : handlers) {
+            handler.accept(this);
+        }
+    }
+
+    public static void registerHandler(Consumer<SyncMapPacket> handler) {
+        handlers.add(handler);
     }
 
     @ApiStatus.Internal
-    public void send(ServerPlayer to) {
+    public void send(@NotNull ServerPlayer to) {
         ClientboundCustomPayloadPacket payload = new ClientboundCustomPayloadPacket(this);
         to.connection.send(payload);
     }
