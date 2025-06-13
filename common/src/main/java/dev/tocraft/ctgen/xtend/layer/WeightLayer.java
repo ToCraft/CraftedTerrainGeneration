@@ -19,11 +19,7 @@ public class WeightLayer extends BlockLayer {
     }
 
     public WeightLayer(double minPercentage, double maxPercentage, boolean hasShift, String name, BlockPlacer fallback) {
-        this(minPercentage, maxPercentage, hasShift, name, true, fallback);
-    }
-
-    public WeightLayer(double minPercentage, double maxPercentage, boolean hasShift, String name, boolean hasCaves, BlockPlacer fallback) {
-        super(name, hasCaves, fallback);
+        super(name, fallback);
         this.min = minPercentage;
         this.max = maxPercentage;
         this.hasShift = hasShift;
@@ -53,7 +49,6 @@ public class WeightLayer extends BlockLayer {
             Codec.DOUBLE.fieldOf("max_percentage").forGetter(WeightLayer::getMaxPercentage),
             Codec.BOOL.optionalFieldOf("shift", true).forGetter(WeightLayer::hasShift),
             Codec.STRING.fieldOf("name").forGetter(BlockLayer::getName),
-            Codec.BOOL.optionalFieldOf("has_caves", true).forGetter(BlockLayer::hasCaves),
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(WeightLayer::new)));
 

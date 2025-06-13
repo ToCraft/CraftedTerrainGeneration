@@ -11,11 +11,7 @@ import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 public class SurfaceLayer extends BlockLayer {
     public SurfaceLayer(String name, BlockPlacer fallback) {
-        this(name, true, fallback);
-    }
-
-    public SurfaceLayer(String name, boolean hasCaves, BlockPlacer fallback) {
-        super(name, hasCaves, fallback);
+        super(name, fallback);
     }
 
     @Override
@@ -25,7 +21,6 @@ public class SurfaceLayer extends BlockLayer {
 
     public static final MapCodec<SurfaceLayer> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.STRING.optionalFieldOf("name", "surface").forGetter(BlockLayer::getName),
-            Codec.BOOL.optionalFieldOf("has_caves", true).forGetter(BlockLayer::hasCaves),
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(SurfaceLayer::new)));
 

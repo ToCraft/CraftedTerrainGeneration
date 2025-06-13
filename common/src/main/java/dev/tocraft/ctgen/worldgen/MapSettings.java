@@ -1,24 +1,23 @@
 package dev.tocraft.ctgen.worldgen;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.data.MapImageRegistry;
-import dev.tocraft.ctgen.xtend.carver.Carver;
-import dev.tocraft.ctgen.xtend.carver.NoiseCarver;
 import dev.tocraft.ctgen.xtend.height.NoiseHeight;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.zone.Zone;
-import dev.tocraft.ctgen.zone.Zones;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), NoiseCarver.DEFAULT, 1);
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), Holder.direct(null));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
@@ -38,13 +37,11 @@ public final class MapSettings {
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
             Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
             Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
-            Codec.INT.optionalFieldOf("sea_level", DEFAULT.seaLevel).forGetter(o -> o.seaLevel),
             TerrainHeight.CODEC.optionalFieldOf("terrain", DEFAULT.terrain).forGetter(o -> o.terrain),
             Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
-            Carver.CODEC.optionalFieldOf("carver", DEFAULT.carver).forGetter(o -> o.carver),
-            Codec.DOUBLE.optionalFieldOf("default_carver_modifier", DEFAULT.carverModifier).forGetter(o -> o.carverModifier)
+            NoiseGeneratorSettings.CODEC.fieldOf("noise_gen_settings").forGetter(o -> o.noiseGenSettings)
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation mapId;
@@ -53,40 +50,29 @@ public final class MapSettings {
     final int surfaceLevel;
     final int minY;
     final int genHeight;
-    final int seaLevel;
     final TerrainHeight terrain;
     final int transition;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
-    final Carver carver;
-    final double carverModifier;
     private final List<BlockLayer> layers;
+    public final Holder<NoiseGeneratorSettings> noiseGenSettings;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Carver carver, double carverModifier) {
+    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
         this.mapId = mapId;
-        this.carverModifier = carverModifier;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
         this.layers = layers;
         this.surfaceLevel = surfaceLevel;
         this.minY = minY;
         this.genHeight = genHeight;
-        this.seaLevel = seaLevel;
         this.terrain = terrain;
         this.transition = transition;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX;
         this.spawnY = spawnY;
-        this.carver = carver;
-
-        for (Holder<Zone> zone : this.zones) {
-            if (zone.is(Zones.RIVER)) {
-                Color c = new Color(1, 98, 255);
-                LogUtils.getLogger().warn("Color: " + zone.value().color() + " should be: " + c.getRGB());
-            }
-        }
+        this.noiseGenSettings = noiseGenSettings;
     }
 
     public List<BlockLayer> getLayers() {

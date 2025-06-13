@@ -21,15 +21,11 @@ public class HeightLayer extends BlockLayer {
     }
 
     public HeightLayer(int minY, int maxY, boolean hasShift, String name, BlockPlacer fallback) {
-        this(minY, maxY, hasShift, name, true, fallback);
+        this(minY, maxY, true, hasShift, name, fallback);
     }
 
-    public HeightLayer(int minY, int maxY, boolean hasShift, String name, boolean hasCaves, BlockPlacer fallback) {
-        this(minY, maxY, true, hasShift, name, hasCaves, fallback);
-    }
-
-    public HeightLayer(int minY, int maxY, boolean limitedToSurface, boolean hasShift, String name, boolean hasCaves, BlockPlacer fallback) {
-        super(name, hasCaves, fallback);
+    public HeightLayer(int minY, int maxY, boolean limitedToSurface, boolean hasShift, String name, BlockPlacer fallback) {
+        super(name, fallback);
         this.min = minY;
         this.max = maxY;
         this.hasShift = hasShift;
@@ -64,7 +60,6 @@ public class HeightLayer extends BlockLayer {
             Codec.BOOL.optionalFieldOf("limit_to_surface", true).forGetter(HeightLayer::isLimitedToSurface),
             Codec.BOOL.optionalFieldOf("shift", true).forGetter(HeightLayer::hasShift),
             Codec.STRING.fieldOf("name").forGetter(BlockLayer::getName),
-            Codec.BOOL.optionalFieldOf("has_caves", true).forGetter(BlockLayer::hasCaves),
             BlockPlacer.CODEC.fieldOf("fallback").forGetter(BlockLayer::getFallback)
     ).apply(instance, instance.stable(HeightLayer::new)));
 

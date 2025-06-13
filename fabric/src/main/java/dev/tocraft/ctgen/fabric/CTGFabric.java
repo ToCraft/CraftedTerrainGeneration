@@ -7,7 +7,6 @@ import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.ctgen.xtend.CTRegistries;
-import dev.tocraft.ctgen.xtend.carver.Carver;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
@@ -62,7 +61,6 @@ public final class CTGFabric implements ModInitializer {
         BlockPlacer.register((id, codec) -> Registry.register(CTRegistries.BLOCK_PLACER, id, codec));
         BlockLayer.register((id, codec) -> Registry.register(CTRegistries.BLOCK_LAYER, id, codec));
         TerrainHeight.register((id, codec) -> Registry.register(CTRegistries.TERRAIN, id, codec));
-        Carver.register((id, codec) -> Registry.register(CTRegistries.CARVER, id, codec));
 
         // register network packet type
         PayloadTypeRegistry.playS2C().register(SyncMapPacket.TYPE, SyncMapPacket.streamCodec());

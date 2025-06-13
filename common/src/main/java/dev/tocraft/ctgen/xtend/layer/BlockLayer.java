@@ -20,12 +20,10 @@ import java.util.function.Function;
 public abstract class BlockLayer {
     public static final Codec<BlockLayer> CODEC = CTRegistries.BLOCK_LAYER.byNameCodec().dispatchStable(BlockLayer::codec, Function.identity());
     private final String name;
-    private final boolean hasCaves;
     private final BlockPlacer fallback;
 
-    public BlockLayer(String name, boolean hasCaves, BlockPlacer fallback) {
+    public BlockLayer(String name, BlockPlacer fallback) {
         this.name = name;
-        this.hasCaves = hasCaves;
         this.fallback = fallback;
     }
 
@@ -71,10 +69,6 @@ public abstract class BlockLayer {
 
     public String getName() {
         return this.name;
-    }
-
-    public boolean hasCaves() {
-        return hasCaves;
     }
 
     public BlockPlacer getFallback() {

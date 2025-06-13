@@ -1,6 +1,5 @@
 package dev.tocraft.ctgen.worldgen;
 
-import dev.tocraft.ctgen.xtend.carver.Carver;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
 import dev.tocraft.ctgen.zone.Zone;
@@ -19,13 +18,10 @@ public class MapSettingsBuilder {
     private int surfaceLevel = MapSettings.DEFAULT.surfaceLevel;
     private int minY = MapSettings.DEFAULT.minY;
     private int genHeight = MapSettings.DEFAULT.genHeight;
-    private int seaLevel = MapSettings.DEFAULT.seaLevel;
     private TerrainHeight terrain = MapSettings.DEFAULT.terrain;
     private int transition = MapSettings.DEFAULT.transition;
     private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
     private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
-    private Carver carver = MapSettings.DEFAULT.carver;
-    private double carverModifier = MapSettings.DEFAULT.carverModifier;
 
     public MapSettingsBuilder setBiomeMapId(ResourceLocation biomeMapId) {
         this.biomeMapId = biomeMapId;
@@ -67,11 +63,6 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setSeaLevel(int seaLevel) {
-        this.seaLevel = seaLevel;
-        return this;
-    }
-
     public MapSettingsBuilder setTerrainHeight(TerrainHeight terrain) {
         this.terrain = terrain;
         return this;
@@ -92,17 +83,7 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettingsBuilder setCarver(Carver carver) {
-        this.carver = carver;
-        return this;
-    }
-
-    public MapSettingsBuilder setCarverModifier(double carverModifier) {
-        this.carverModifier = carverModifier;
-        return this;
-    }
-
     public MapSettings build() {
-        return new MapSettings(biomeMapId, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carver, carverModifier);
+        return new MapSettings(biomeMapId, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, terrain, transition, spawnX, spawnY, MapSettings.DEFAULT.noiseGenSettings);
     }
 }

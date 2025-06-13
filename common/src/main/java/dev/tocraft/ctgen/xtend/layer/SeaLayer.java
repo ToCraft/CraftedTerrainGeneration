@@ -11,7 +11,7 @@ import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 public class SeaLayer extends BlockLayer {
     public SeaLayer(String name, BlockPlacer fallback) {
-        super(name, false, fallback);
+        super(name, fallback);
     }
 
     @Override

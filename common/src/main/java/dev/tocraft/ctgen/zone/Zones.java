@@ -60,9 +60,21 @@ public final class Zones {
         context.register(BADLANDS, badlands(context).build());
         context.register(BADLANDS_MOUNTAINS, badlandMountains(context).build());
         // General Water Biomes
-        context.register(RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26).build());
-        context.register(OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setSurfaceBlock(Blocks.SAND).setHeight(-35).setTerrainModifier(16).setCarverModifier(26).build());
-        context.register(DEEP_OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33).setCarverModifier(26).build());
+        context.register(RIVER, river(context).build());
+        context.register(OCEAN, ocean(context).build());
+        context.register(DEEP_OCEAN, deepOcean(context).build());
+    }
+
+    private static ZoneBuilder deepOcean(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33);
+    }
+
+    private static ZoneBuilder ocean(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setSurfaceBlock(Blocks.SAND).setHeight(-35).setTerrainModifier(16);
+    }
+
+    private static ZoneBuilder river(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2);
     }
 
     public static ZoneBuilder badlandMountains(@NotNull BootstrapContext<Zone> context) {
@@ -103,11 +115,11 @@ public final class Zones {
     }
 
     public static ZoneBuilder frozenLake(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setCarverModifier(26);
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3);
     }
 
     public static ZoneBuilder frozenRiver(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26);
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2);
     }
 
     public static ZoneBuilder snowyMountains(@NotNull BootstrapContext<Zone> context) {

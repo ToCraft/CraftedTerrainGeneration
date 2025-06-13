@@ -10,9 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-@SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
+@SuppressWarnings({"unused"})
 public class ZoneBuilder {
     private Holder<Biome> biome;
     private int color;
@@ -20,7 +19,6 @@ public class ZoneBuilder {
     private double terrainModifier = Zone.DEFAULT_TERRAIN_MODIFIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
     private Map<String, BlockPlacer> layers = new HashMap<>();
-    private Optional<Double> carverModifier = Optional.empty();
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
         this.biome = biome;
@@ -82,12 +80,7 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setCarverModifier(double carverModifier) {
-        this.carverModifier = Optional.of(carverModifier);
-        return this;
-    }
-
     public Zone build() {
-        return new Zone(biome, color, layers, height, terrainModifier, pixelWeight, carverModifier);
+        return new Zone(biome, color, layers, height, terrainModifier, pixelWeight);
     }
 }

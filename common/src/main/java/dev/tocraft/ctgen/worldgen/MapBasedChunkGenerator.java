@@ -36,6 +36,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
+    private final NoiseBasedChunkGenerator delegate;
+
     private static final int BEDROCK_SIZE = 3;
 
     protected final MapBasedBiomeSource biomeSource;
@@ -44,6 +46,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     private MapBasedChunkGenerator(MapBasedBiomeSource biomeSource) {
         super(biomeSource);
         this.biomeSource = biomeSource;
+        this.delegate = new NoiseBasedChunkGenerator(biomeSource, biomeSource.settings.noiseGenSettings);
     }
 
     public static @NotNull MapBasedChunkGenerator of(MapSettings settings) {
@@ -57,8 +60,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void applyCarvers(WorldGenRegion level, long seed, RandomState random, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunk) {
-
+    public void applyCarvers(WorldGenRegion chunkRegion, long seed, RandomState noiseConfig, BiomeManager biomeAccess, StructureManager structureAccessor, ChunkAccess chunk2) {
+        delegate.applyCarvers(chunkRegion, seed, noiseConfig, biomeAccess, structureAccessor, chunk2);
     }
 
     @Override
@@ -74,7 +77,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
                 Zone zone = getSettings().getZone(xOff >> 2, zOff >> 2).value();
                 double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
-                double carverModifier = getSettings().getValueWithTransition(xOff, zOff, zo -> zo.carverModifier().orElse(getSettings().carverModifier));
 
                 int shift = (int) (noise.getValue(xOff, zOff) * 3);
                 int bedrockLevel = minHeight + shift;
@@ -96,7 +98,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                         BlockPlacer placer = layer != null ? zone.layers().getOrDefault(layer.getName(), layer.getFallback()) : BasicPlacer.AIR;
                         Block block = placer.get(this.noise, pos.getX(), pos.getY(), pos.getZ(), surfaceHeight, layer != null ? layer.getName() : "fill");
 
-                        if (layer != null && !layer.hasCaves() || canSetBlock(pos, surfaceHeight, minHeight, carverModifier)) {
+                        if (layer != null) {
                             // no grass underwater
                             if (surfaceHeight < getSeaLevel() && block == Blocks.GRASS_BLOCK) {
                                 block = Blocks.DIRT;
@@ -113,10 +115,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 }
             }
         }
-    }
-
-    private boolean canSetBlock(@NotNull BlockPos pos, double surfaceHeight, int minHeight, double carverModifier) {
-        return getSettings().carver.canSetBlock(this.noise, pos, surfaceHeight, minHeight, carverModifier);
     }
 
     @Override
@@ -140,7 +138,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getSeaLevel() {
-        return getSettings().seaLevel;
+        return getSettings().noiseGenSettings.value().seaLevel();
     }
 
     @Override
