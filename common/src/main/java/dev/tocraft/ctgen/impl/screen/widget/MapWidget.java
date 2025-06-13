@@ -2,7 +2,10 @@ package dev.tocraft.ctgen.impl.screen.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import dev.tocraft.ctgen.data.MapOverlayTextLoader;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
+import dev.tocraft.ctgen.impl.screen.MapText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -19,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class MapWidget extends AbstractWidget {
@@ -29,7 +35,7 @@ public class MapWidget extends AbstractWidget {
     private final Minecraft minecraft;
 
     // texture to be used as map
-    private final ResourceLocation mapId;
+    private final ResourceLocation mapTexId;
     private final boolean pixelsAreChunks;
 
     // received from the server
@@ -52,6 +58,8 @@ public class MapWidget extends AbstractWidget {
     // misc
     private boolean showCursorPos;
     private boolean showPlayer;
+    private boolean showTexts;
+    private final List<MapText> textOverlays = new ArrayList<>();
 
     @Nullable
     public static MapWidget ofPacket(Minecraft minecraft, int x, int y, int width, int height, @NotNull SyncMapPacket packet) {
@@ -62,7 +70,7 @@ public class MapWidget extends AbstractWidget {
         int mapWidth = packet.getMapWidth();
         int mapHeight = packet.getMapHeight();
         if (mapId != null) {
-            return new MapWidget(minecraft, x, y, width, height, ResourceLocation.fromNamespaceAndPath(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
+            return new MapWidget(minecraft, x, y, width, height, ResourceLocation.fromNamespaceAndPath(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
         }
         return null;
     }
@@ -70,15 +78,15 @@ public class MapWidget extends AbstractWidget {
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight) {
-        this(minecraft, x, y, width, height, mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true);
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight) {
+        this(minecraft, x, y, width, height, mapTexId, mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true, true);
     }
 
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     @ApiStatus.Internal
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer) {
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer, boolean showTexts) {
         super(x, y, width, height, Component.literal("Map Widget"));
         this.minecraft = minecraft;
         this.pixelOffsetX = xOffset;
@@ -86,12 +94,14 @@ public class MapWidget extends AbstractWidget {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.ratio = (double) mapWidth / mapHeight;
-        this.mapId = mapId;
+        this.mapTexId = mapTexId;
         this.pixelsAreChunks = pixelsAreChunks;
         this.minZoom = minZoom;
         this.zoom = minZoom;
         this.showCursorPos = showCursorPos;
         this.showPlayer = showPlayer;
+        this.showTexts = showTexts;
+        this.textOverlays.addAll(MapOverlayTextLoader.ENTRIES.getOrDefault(mapId, List.of()));
 
         updateZoomedWidth();
         updateZoomedHeight();
@@ -161,10 +171,18 @@ public class MapWidget extends AbstractWidget {
     }
 
     /**
+     * Sets the text overlays
+     */
+    public void setTexts(List<MapText> texts) {
+        this.textOverlays.clear();
+        this.textOverlays.addAll(texts);
+    }
+
+    /**
      * @return the texture to be used as map
      */
-    public ResourceLocation getMapId() {
-        return mapId;
+    public ResourceLocation getMapTexId() {
+        return mapTexId;
     }
 
     /**
@@ -267,6 +285,10 @@ public class MapWidget extends AbstractWidget {
         this.showPlayer = showPlayer;
     }
 
+    public void setShowTexts(boolean showTexts) {
+        this.showTexts = showTexts;
+    }
+
     @Override
     public void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         assert minecraft != null && minecraft.player != null;
@@ -280,7 +302,7 @@ public class MapWidget extends AbstractWidget {
         RenderSystem.enableScissor((int) (getX() * scaleFactor), (int) (getY() * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
 
         // render actual map
-        context.blit(RenderType::guiTextured, mapId, getTextureX(), getTextureY(), 0, 0, zoomedWidth, zoomedHeight, zoomedWidth, zoomedHeight);
+        context.blit(RenderType::guiTextured, mapTexId, getTextureX(), getTextureY(), 0, 0, zoomedWidth, zoomedHeight, zoomedWidth, zoomedHeight);
 
         if (showPlayer) {
             // calculate pixel pos for the player
@@ -319,7 +341,30 @@ public class MapWidget extends AbstractWidget {
             pose.popPose();
         }
 
+        // render text overlays
+        if (showTexts) {
+            for (MapText entry : this.textOverlays) {
+                if (this.getZoom() > entry.minZoom() && (this.getZoom() < entry.maxZoom() || entry.maxZoom() == -1)) {
+                    int px = getTextureX() + (int) (entry.x() * zoom);
+                    int py = getTextureY() + (int) (entry.y() * zoom);
+
+                    PoseStack pose = context.pose();
+                    pose.pushPose();
+
+                    pose.translate(px, py, 0);
+                    pose.mulPose(Axis.ZP.rotationDegrees(entry.rotation()));
+                    pose.scale((float) zoom * entry.size(), (float) zoom * entry.size(), 1f);
+
+                    Component text = Component.translatable(entry.text().getString()).withStyle(entry.text().getStyle());
+                    context.drawString(minecraft.font, text, 0, 0, 0xFFFFFF);
+
+                    pose.popPose();
+                }
+            }
+        }
+
         // widget is rendered - no need for the scissors anymore
+        context.flush();
         RenderSystem.disableScissor();
     }
 

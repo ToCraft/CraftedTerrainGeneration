@@ -1,5 +1,6 @@
 package dev.tocraft.ctgen.neoforge;
 
+import dev.tocraft.ctgen.data.MapOverlayTextLoader;
 import dev.tocraft.ctgen.impl.CTGClient;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -8,6 +9,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public final class CTGNeoForgeClientEventListener {
     public static void initialize(IEventBus modEventBus) {
         modEventBus.addListener(CTGNeoForgeClientEventListener::registerKeys);
+        modEventBus.addListener(CTGNeoForgeClientEventListener::registerReloadListeners);
         NeoForge.EVENT_BUS.addListener(CTGNeoForgeClientEventListener::tick);
     }
 
@@ -26,5 +29,9 @@ public final class CTGNeoForgeClientEventListener {
 
     private static void tick(ClientTickEvent.Pre event) {
         CTGClient.tick(Minecraft.getInstance());
+    }
+
+    private static void registerReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new MapOverlayTextLoader());
     }
 }

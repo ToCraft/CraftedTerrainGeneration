@@ -64,7 +64,7 @@ public class MapScreen extends Screen {
         renderBackground(context, mouseX, mouseY, delta);
 
         // check if texture with was found
-        if (mapWidget != null && mapWidget.getMapId() != null && minecraft.getResourceManager().getResource(mapWidget.getMapId()).isPresent()) {
+        if (mapWidget != null && mapWidget.getMapTexId() != null && minecraft.getResourceManager().getResource(mapWidget.getMapTexId()).isPresent()) {
             // widget is disabled -> close screen
             if (!mapWidget.isActive()) {
                 onClose();
@@ -75,7 +75,7 @@ public class MapScreen extends Screen {
             mapWidget.render(context, mouseX, mouseY, delta);
         } else {
             // print info why there is no map
-            Component text = mapWidget != null ? Component.translatable("ctgen.screen.no_texture", mapWidget.getMapId()) : Component.translatable("ctgen.screen.wrong_generation");
+            Component text = mapWidget != null ? Component.translatable("ctgen.screen.no_texture", mapWidget.getMapTexId()) : Component.translatable("ctgen.screen.wrong_generation");
             // get text specs
             int textWidth = minecraft.font.width(text.getVisualOrderText());
             int textHeight = minecraft.font.lineHeight;
