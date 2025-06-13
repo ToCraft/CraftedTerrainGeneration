@@ -1,21 +1,20 @@
 package dev.tocraft.ctgen.worldgen;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
-import dev.tocraft.ctgen.xtend.layer.BlockLayer;
-import dev.tocraft.ctgen.xtend.placer.BasicPlacer;
-import dev.tocraft.ctgen.xtend.placer.BlockPlacer;
-import dev.tocraft.ctgen.zone.Zone;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -25,7 +24,6 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -65,56 +63,50 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void buildSurface(@NotNull WorldGenRegion pLevel, @NotNull StructureManager pStructureManager, @NotNull RandomState pRandom, @NotNull ChunkAccess chunk) {
-        setNoise(pRandom);
+    public void buildSurface(WorldGenRegion region, StructureManager structures, RandomState noiseConfig, ChunkAccess chunk) {
+        if (SharedConstants.debugVoidTerrain(chunk.getPos())) {
+            return;
+        }
+        WorldGenerationContext heightContext = new WorldGenerationContext(this, region);
+        this.buildSurface(chunk, heightContext, noiseConfig, structures, region.getBiomeManager(), region.registryAccess().lookupOrThrow(Registries.BIOME), Blender.of(region));
+    }
 
-        int minHeight = getSettings().minY + BEDROCK_SIZE;
+    @VisibleForTesting
+    public void buildSurface(ChunkAccess chunk, WorldGenerationContext heightContext, RandomState noiseConfig, StructureManager structureAccessor, BiomeManager biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
 
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int xOff = chunk.getPos().getBlockX(x);
-                int zOff = chunk.getPos().getBlockZ(z);
+    }
 
-                Zone zone = getSettings().getZone(xOff >> 2, zOff >> 2).value();
-                double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
+    @Override
+    public @NotNull CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState random, StructureManager structureAccessor, ChunkAccess chunk) {
+        return CompletableFuture.supplyAsync(() -> {
+            setNoise(random);
 
-                int shift = (int) (noise.getValue(xOff, zOff) * 3);
-                int bedrockLevel = minHeight + shift;
+            int minHeight = getSettings().minY + BEDROCK_SIZE;
 
-                for (int y = getSettings().minY; y < surfaceHeight || y <= getSeaLevel(); y++) {
-                    BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
-                    if (y < bedrockLevel) {
-                        // place bedrock
-                        chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
-                    } else {
-                        @Nullable BlockLayer layer = null;
-                        for (BlockLayer blockLayer : getSettings().getLayers()) {
-                            if (blockLayer.is(this.noise, x, y, z, zone, getMinY(), getSeaLevel(), surfaceHeight, getGenDepth(), shift)) {
-                                layer = blockLayer;
-                                break;
-                            }
-                        }
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int xOff = chunk.getPos().getBlockX(x);
+                    int zOff = chunk.getPos().getBlockZ(z);
 
-                        BlockPlacer placer = layer != null ? zone.layers().getOrDefault(layer.getName(), layer.getFallback()) : BasicPlacer.AIR;
-                        Block block = placer.get(this.noise, pos.getX(), pos.getY(), pos.getZ(), surfaceHeight, layer != null ? layer.getName() : "fill");
+                    double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
 
-                        if (layer != null) {
-                            // no grass underwater
-                            if (surfaceHeight < getSeaLevel() && block == Blocks.GRASS_BLOCK) {
-                                block = Blocks.DIRT;
-                            }
+                    int shift = (int) (noise.getValue(xOff, zOff) * 3);
+                    int bedrockLevel = minHeight + shift;
 
-                            BlockState blockState = block.defaultBlockState();
-
-                            // is air by default, no need to place it again
-                            if (!blockState.isAir()) {
-                                chunk.setBlockState(pos, blockState, false);
-                            }
+                    for (int y = getSettings().minY; y < surfaceHeight || y <= getSeaLevel(); y++) {
+                        BlockPos pos = chunk.getPos().getBlockAt(x, y, z);
+                        if (y < bedrockLevel) {
+                            // place bedrock
+                            chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
+                        } else {
+                            chunk.setBlockState(pos, biomeSource.settings.noiseGenSettings.value().defaultBlock(), false);
                         }
                     }
                 }
             }
-        }
+
+            return chunk;
+        });
     }
 
     @Override
@@ -129,11 +121,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     @Override
     public int getGenDepth() {
         return getSettings().genHeight;
-    }
-
-    @Override
-    public @NotNull CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunkAccess) {
-        return CompletableFuture.completedFuture(chunkAccess);
     }
 
     @Override
