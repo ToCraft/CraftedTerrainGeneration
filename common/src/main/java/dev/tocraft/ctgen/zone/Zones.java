@@ -43,34 +43,90 @@ public final class Zones {
 
     public static void bootstrap(@NotNull BootstrapContext<Zone> context) {
         // Northern Continent
-        context.register(STONY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(12).build());
-        context.register(SNOWY_FLATS, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(5).build());
-        context.register(SNOWY_SLOPES, new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setDirtBlock(Blocks.SNOW_BLOCK).setSurfaceBlock(Blocks.SNOW_BLOCK).setHeight(18).setTerrainModifier(20).setPixelWeight(1.5).build());
-        context.register(SNOWY_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setHeight(40).setTerrainModifier(50).setSurfaceBlock(Blocks.SNOW_BLOCK).build());
-        context.register(FROZEN_RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26).build());
-        context.register(FROZEN_LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setCarverModifier(26).build());
+        context.register(STONY_FLATS, stonyFlats(context).build());
+        context.register(SNOWY_FLATS, snowyFlats(context).build());
+        context.register(SNOWY_SLOPES, snowySlopes(context).build());
+        context.register(SNOWY_MOUNTAINS, snowyMountains(context).build());
+        context.register(FROZEN_RIVER, frozenRiver(context).build());
+        context.register(FROZEN_LAKE, frozenLake(context).build());
         // Eastern Continent
-        context.register(PLAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57)).setHeight(5).build());
-        context.register(FOREST, new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setHeight(12).setTerrainModifier(10).build());
-        context.register(HILLS, new ZoneBuilder().setBiome(getBiome(context, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setHeight(18).setTerrainModifier(18).build());
-        context.register(MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(40).setTerrainModifier(50).build());
-        context.register(LAKE, new ZoneBuilder().setBiome(getBiome(context, Biomes.LUKEWARM_OCEAN)).setColor(new Color(0, 83, 217)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).build());
+        context.register(PLAINS, plains(context).build());
+        context.register(FOREST, forest(context).build());
+        context.register(HILLS, hills(context).build());
+        context.register(MOUNTAINS, mountains(context).build());
+        context.register(LAKE, lake(context).build());
         // Western Continent
-        context.register(DESERT, new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setDirtBlock(Blocks.SANDSTONE).setSurfaceBlock(Blocks.SAND).setHeight(5).setTerrainModifier(4).build());
-        context.register(BADLANDS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(Blocks.RED_SAND).setHeight(18).setTerrainModifier(12).build());
-        context.register(BADLANDS_MOUNTAINS, new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).putLayer("surface", NoisePlacer.of(new Noise(List.of(new Noise.Octave(1, 1)), 50), new HashMap<>() {
-            {
-                put(-0.5d, Blocks.ORANGE_CONCRETE);
-                put(0d, Blocks.RED_CONCRETE);
-            }
-        }, Blocks.BROWN_CONCRETE, false)).setHeight(28).setTerrainModifier(24).build());
+        context.register(DESERT, desert(context).build());
+        context.register(BADLANDS, badlands(context).build());
+        context.register(BADLANDS_MOUNTAINS, badlandMountains(context).build());
         // General Water Biomes
         context.register(RIVER, new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26).build());
         context.register(OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setSurfaceBlock(Blocks.SAND).setHeight(-35).setTerrainModifier(16).setCarverModifier(26).build());
         context.register(DEEP_OCEAN, new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setHeight(-60).setTerrainModifier(33).setCarverModifier(26).build());
     }
 
-    private static @NotNull Holder<Biome> getBiome(@NotNull BootstrapContext<?> context, ResourceKey<Biome> biome) {
+    public static ZoneBuilder badlandMountains(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setDirtBlock(Blocks.RED_CONCRETE).putLayer("surface", NoisePlacer.of(new Noise(List.of(new Noise.Octave(1, 1)), 50), new HashMap<>() {
+            {
+                put(-0.5d, Blocks.ORANGE_CONCRETE);
+                put(0d, Blocks.RED_CONCRETE);
+            }
+        }, Blocks.BROWN_CONCRETE, false)).setHeight(28).setTerrainModifier(24);
+    }
+
+    public static ZoneBuilder badlands(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setDirtBlock(Blocks.RED_CONCRETE).setSurfaceBlock(Blocks.RED_SAND).setHeight(18).setTerrainModifier(12);
+    }
+
+    public static ZoneBuilder desert(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setDirtBlock(Blocks.SANDSTONE).setSurfaceBlock(Blocks.SAND).setHeight(5).setTerrainModifier(4);
+    }
+
+    public static ZoneBuilder lake(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.LUKEWARM_OCEAN)).setColor(new Color(0, 83, 217)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3);
+    }
+
+    public static ZoneBuilder mountains(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(40).setTerrainModifier(50);
+    }
+
+    public static ZoneBuilder hills(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setHeight(18).setTerrainModifier(18);
+    }
+
+    public static ZoneBuilder forest(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setHeight(12).setTerrainModifier(10);
+    }
+
+    public static ZoneBuilder plains(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57)).setHeight(5);
+    }
+
+    public static ZoneBuilder frozenLake(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setSurfaceBlock(Blocks.SAND).setHeight(-20).setPixelWeight(3).setCarverModifier(26);
+    }
+
+    public static ZoneBuilder frozenRiver(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setDirtBlock(Blocks.SAND).setSurfaceBlock(Blocks.SAND).setHeight(-15).setPixelWeight(2).setCarverModifier(26);
+    }
+
+    public static ZoneBuilder snowyMountains(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setHeight(40).setTerrainModifier(50).setSurfaceBlock(Blocks.SNOW_BLOCK);
+    }
+
+    public static ZoneBuilder snowySlopes(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setDirtBlock(Blocks.SNOW_BLOCK).setSurfaceBlock(Blocks.SNOW_BLOCK).setHeight(18).setTerrainModifier(20).setPixelWeight(1.5);
+    }
+
+    public static ZoneBuilder snowyFlats(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217)).setHeight(5);
+    }
+
+    public static ZoneBuilder stonyFlats(@NotNull BootstrapContext<Zone> context) {
+        return new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130)).setDirtBlock(Blocks.STONE).setSurfaceBlock(Blocks.STONE).setHeight(12);
+    }
+
+    public static @NotNull Holder<Biome> getBiome(@NotNull BootstrapContext<?> context, ResourceKey<Biome> biome) {
         return context.lookup(Registries.BIOME).getOrThrow(biome);
     }
 

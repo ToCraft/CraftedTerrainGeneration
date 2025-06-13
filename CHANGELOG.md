@@ -5,6 +5,7 @@ CTGen 1.1
 - add handlers to SyncMapPacket
 - add map texts
 - remove "pixelsAreChunks" map setting
+- add Zone builder methods for easily coping prebuild zones
 
 Crafted Terrain Generation
 ================
