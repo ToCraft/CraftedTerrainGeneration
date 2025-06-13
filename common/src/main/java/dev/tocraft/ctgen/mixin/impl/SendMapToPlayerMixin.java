@@ -26,12 +26,11 @@ public abstract class SendMapToPlayerMixin {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             MapSettings settings = generator.getSettings();
             ResourceLocation mapId = settings.getMapId();
-            boolean pixelsAreChunks = settings.isPixelsAreChunks();
             int xOffset = settings.xOffset(0);
             int yOffset = settings.yOffset(0);
             int mapWidth = settings.getMapWidth();
             int mapHeight = settings.getMapHeight();
-            packet = new SyncMapPacket(mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
+            packet = new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
         } else {
             packet = SyncMapPacket.empty();
         }

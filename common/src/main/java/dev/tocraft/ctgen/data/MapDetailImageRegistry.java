@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class MapImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
+public class MapDetailImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
     private static final Map<ResourceLocation, BufferedImage> MAPS = new ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, BufferedImage> UPSCALED_MAPS = new ConcurrentHashMap<>();
     private static final String DIRECTORY = "worldgen/map_based/maps";
 
     @Override
@@ -46,11 +47,30 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
     @Override
     protected void apply(Map<ResourceLocation, BufferedImage> preparedMaps, ResourceManager resourceManager, ProfilerFiller profiler) {
         MAPS.clear();
+        UPSCALED_MAPS.clear();
         MAPS.putAll(preparedMaps);
     }
 
     @Nullable
-    public static BufferedImage getByIdOrUpscale(ResourceLocation id, Supplier<Iterable<Zone>> zones) {
-        return MAPS.get(id);
+    public static BufferedImage getByIdOrUpscale(ResourceLocation id, boolean pixelsAreChunks, Supplier<Iterable<Zone>> zones) {
+        if (pixelsAreChunks) {
+            if (UPSCALED_MAPS.containsKey(id)) {
+                return UPSCALED_MAPS.get(id);
+            } else {
+                BufferedImage original = MAPS.get(id);
+                if (original != null) {
+                    LogUtils.getLogger().info("Upscaling map {}", id);
+                    long start = System.currentTimeMillis();
+                    BufferedImage detailed = MapUtils.generateDetailedMap(original, zones.get());
+                    long elapsed = System.currentTimeMillis() - start;
+                    LogUtils.getLogger().info("Finished map upscaling for {} within {}s", id, String.format("%.2f", elapsed / 1000.0));
+                    return UPSCALED_MAPS.put(id, detailed);
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return MAPS.get(id);
+        }
     }
 }

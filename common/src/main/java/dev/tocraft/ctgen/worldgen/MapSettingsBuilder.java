@@ -13,7 +13,6 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
 public class MapSettingsBuilder {
     private ResourceLocation biomeMapId;
-    private boolean pixelsAreChunks = MapSettings.DEFAULT.pixelsAreChunks;
     private List<Holder<Zone>> zones = MapSettings.DEFAULT.zones;
     private Holder<Zone> defaultBiome;
     private List<BlockLayer> layers = MapSettings.DEFAULT.getLayers();
@@ -32,12 +31,6 @@ public class MapSettingsBuilder {
         this.biomeMapId = biomeMapId;
         return this;
     }
-
-    public MapSettingsBuilder setPixelsAreChunks(boolean pixelsAreChunks) {
-        this.pixelsAreChunks = pixelsAreChunks;
-        return this;
-    }
-
 
     public MapSettingsBuilder setZones(List<Holder<Zone>> zones) {
         this.zones = zones;
@@ -110,6 +103,6 @@ public class MapSettingsBuilder {
     }
 
     public MapSettings build() {
-        return new MapSettings(biomeMapId, pixelsAreChunks, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carver, carverModifier);
+        return new MapSettings(biomeMapId, zones, defaultBiome, layers, surfaceLevel, minY, genHeight, seaLevel, terrain, transition, spawnX, spawnY, carver, carverModifier);
     }
 }

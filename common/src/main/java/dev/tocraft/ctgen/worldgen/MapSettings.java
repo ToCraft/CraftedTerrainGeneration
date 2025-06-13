@@ -28,11 +28,10 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, false, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), NoiseCarver.DEFAULT, 1);
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, 64, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), NoiseCarver.DEFAULT, 1);
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
-            Codec.BOOL.optionalFieldOf("pixels_are_chunks", DEFAULT.pixelsAreChunks).forGetter(o -> o.pixelsAreChunks),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.list(BlockLayer.CODEC).optionalFieldOf("layers", DEFAULT.layers).forGetter(o -> o.layers),
@@ -49,7 +48,6 @@ public final class MapSettings {
     ).apply(instance, instance.stable(MapSettings::new)));
 
     private final ResourceLocation mapId;
-    final boolean pixelsAreChunks;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     final int surfaceLevel;
@@ -66,9 +64,8 @@ public final class MapSettings {
     private final List<BlockLayer> layers;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, boolean pixelsAreChunks, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Carver carver, double carverModifier) {
+    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, int seaLevel, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Carver carver, double carverModifier) {
         this.mapId = mapId;
-        this.pixelsAreChunks = pixelsAreChunks;
         this.carverModifier = carverModifier;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
@@ -79,21 +76,9 @@ public final class MapSettings {
         this.seaLevel = seaLevel;
         this.terrain = terrain;
         this.transition = transition;
-        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, pixelsAreChunks, () -> zones.stream().map(Holder::value).toList());
-        this.spawnX = spawnX.map(sX -> {
-            if (pixelsAreChunks) {
-                return sX >> 2;
-            } else {
-                return sX;
-            }
-        });
-        this.spawnY = spawnY.map(sX -> {
-            if (pixelsAreChunks) {
-                return sX >> 2;
-            } else {
-                return sX;
-            }
-        });
+        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, () -> zones.stream().map(Holder::value).toList());
+        this.spawnX = spawnX;
+        this.spawnY = spawnY;
         this.carver = carver;
 
         for (Holder<Zone> zone : this.zones) {
@@ -209,10 +194,6 @@ public final class MapSettings {
 
     public ResourceLocation getMapId() {
         return mapId;
-    }
-
-    public boolean isPixelsAreChunks() {
-        return pixelsAreChunks;
     }
 
     @ApiStatus.Internal

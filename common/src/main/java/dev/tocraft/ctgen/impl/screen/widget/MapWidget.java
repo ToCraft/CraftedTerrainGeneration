@@ -36,7 +36,6 @@ public class MapWidget extends AbstractWidget {
 
     // texture to be used as map
     private final ResourceLocation mapTexId;
-    private final boolean pixelsAreChunks;
 
     // received from the server
     private final int pixelOffsetX;
@@ -64,13 +63,12 @@ public class MapWidget extends AbstractWidget {
     @Nullable
     public static MapWidget ofPacket(Minecraft minecraft, int x, int y, int width, int height, @NotNull SyncMapPacket packet) {
         ResourceLocation mapId = packet.getMapId();
-        boolean pixelsAreChunks = packet.isPixelsAreChunks();
         int xOffset = packet.getXOffset();
         int yOffset = packet.getYOffset();
         int mapWidth = packet.getMapWidth();
         int mapHeight = packet.getMapHeight();
         if (mapId != null) {
-            return new MapWidget(minecraft, x, y, width, height, ResourceLocation.fromNamespaceAndPath(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
+            return new MapWidget(minecraft, x, y, width, height, ResourceLocation.fromNamespaceAndPath(mapId.getNamespace(), "textures/gui/" + mapId.getPath() + ".png"), mapId, xOffset, yOffset, mapWidth, mapHeight);
         }
         return null;
     }
@@ -78,15 +76,15 @@ public class MapWidget extends AbstractWidget {
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight) {
-        this(minecraft, x, y, width, height, mapTexId, mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true, true);
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
+        this(minecraft, x, y, width, height, mapTexId, mapId, xOffset, yOffset, mapWidth, mapHeight, defaultZoom(width, height, mapWidth, mapHeight), true, true, true);
     }
 
     /**
      * @see #ofPacket(Minecraft, int, int, int, int, SyncMapPacket)
      */
     @ApiStatus.Internal
-    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer, boolean showTexts) {
+    public MapWidget(Minecraft minecraft, int x, int y, int width, int height, ResourceLocation mapTexId, ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight, float minZoom, boolean showCursorPos, boolean showPlayer, boolean showTexts) {
         super(x, y, width, height, Component.literal("Map Widget"));
         this.minecraft = minecraft;
         this.pixelOffsetX = xOffset;
@@ -95,7 +93,6 @@ public class MapWidget extends AbstractWidget {
         this.mapHeight = mapHeight;
         this.ratio = (double) mapWidth / mapHeight;
         this.mapTexId = mapTexId;
-        this.pixelsAreChunks = pixelsAreChunks;
         this.minZoom = minZoom;
         this.zoom = minZoom;
         this.showCursorPos = showCursorPos;
@@ -199,9 +196,8 @@ public class MapWidget extends AbstractWidget {
         if (minecraft.player != null) {
             // calculate pixel pos for the player
             BlockPos blockPos = minecraft.player.blockPosition();
-            int i = pixelsAreChunks ? 4 : 2;
-            int pixelX = (blockPos.getX() >> i) + pixelOffsetX;
-            int pixelY = (blockPos.getZ() >> i) + pixelOffsetY;
+            int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
             playerX = (int) ((double) pixelX / mapWidth * zoomedWidth);
             playerY = (int) ((double) pixelY / mapHeight * zoomedHeight);
         } else {
@@ -307,9 +303,8 @@ public class MapWidget extends AbstractWidget {
         if (showPlayer) {
             // calculate pixel pos for the player
             BlockPos blockPos = minecraft.player.blockPosition();
-            int i = pixelsAreChunks ? 4 : 2;
-            int pixelX = (blockPos.getX() >> i) + pixelOffsetX;
-            int pixelY = (blockPos.getZ() >> i) + pixelOffsetY;
+            int pixelX = (blockPos.getX() >> 2) + pixelOffsetX;
+            int pixelY = (blockPos.getZ() >> 2) + pixelOffsetY;
             int playerX = (int) (getTextureX() + (double) pixelX / mapWidth * zoomedWidth);
             int playerY = (int) (getTextureY() + (double) pixelY / mapHeight * zoomedHeight);
 

@@ -4,6 +4,7 @@ CTGen 1.1
 - port to 1.21.4
 - add handlers to SyncMapPacket
 - add map texts
+- remove "pixelsAreChunks" map setting
 
 Crafted Terrain Generation
 ================

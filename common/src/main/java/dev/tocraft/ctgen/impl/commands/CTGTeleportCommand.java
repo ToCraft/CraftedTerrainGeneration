@@ -65,10 +65,8 @@ public class CTGTeleportCommand {
         if (level.getChunkSource().getGenerator() instanceof MapBasedChunkGenerator generator) {
             MapSettings settings = generator.getSettings();
 
-            int i = settings.isPixelsAreChunks() ? 4 : 2;
-
-            int x = ((int) dest.x) - settings.xOffset(0) << i;
-            int z = ((int) dest.y) - settings.yOffset(0) << i;
+            int x = ((int) dest.x) - settings.xOffset(0) << 2;
+            int z = ((int) dest.y) - settings.yOffset(0) << 2;
             int y = level.getChunk(x >> 4, z >> 4).getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z) + 1;
             BlockPos pos = new BlockPos(x, y, z);
 

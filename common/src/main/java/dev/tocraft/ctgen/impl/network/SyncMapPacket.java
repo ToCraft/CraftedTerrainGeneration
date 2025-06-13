@@ -25,16 +25,14 @@ public class SyncMapPacket implements CustomPacketPayload {
 
     @Nullable
     private final ResourceLocation mapId;
-    private final boolean pixelsAreChunks;
     private final int xOffset;
     private final int yOffset;
     private final int mapWidth;
     private final int mapHeight;
 
     @ApiStatus.Internal
-    public SyncMapPacket(@Nullable ResourceLocation mapId, boolean pixelsAreChunks, int xOffset, int yOffset, int mapWidth, int mapHeight) {
+    public SyncMapPacket(@Nullable ResourceLocation mapId, int xOffset, int yOffset, int mapWidth, int mapHeight) {
         this.mapId = mapId;
-        this.pixelsAreChunks = pixelsAreChunks;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.mapWidth = mapWidth;
@@ -44,7 +42,7 @@ public class SyncMapPacket implements CustomPacketPayload {
     @Contract(value = " -> new", pure = true)
     @ApiStatus.Internal
     public static @NotNull SyncMapPacket empty() {
-        return new SyncMapPacket(null, false, -1, -1, -1, -1);
+        return new SyncMapPacket(null, -1, -1, -1, -1);
     }
 
     @ApiStatus.Internal
@@ -67,10 +65,6 @@ public class SyncMapPacket implements CustomPacketPayload {
 
     public @Nullable ResourceLocation getMapId() {
         return mapId;
-    }
-
-    public boolean isPixelsAreChunks() {
-        return pixelsAreChunks;
     }
 
     public int getXOffset() {
@@ -101,12 +95,11 @@ public class SyncMapPacket implements CustomPacketPayload {
                 boolean bl = buf.readBoolean();
                 if (bl) {
                     ResourceLocation mapId = buf.readResourceLocation();
-                    boolean pixelsAreChunks = buf.readBoolean();
                     int xOffset = buf.readInt();
                     int yOffset = buf.readInt();
                     int mapWidth = buf.readInt();
                     int mapHeight = buf.readInt();
-                    return new SyncMapPacket(mapId, pixelsAreChunks, xOffset, yOffset, mapWidth, mapHeight);
+                    return new SyncMapPacket(mapId, xOffset, yOffset, mapWidth, mapHeight);
                 } else {
                     return empty();
                 }
@@ -118,7 +111,6 @@ public class SyncMapPacket implements CustomPacketPayload {
                 buf.writeBoolean(bl);
                 if (bl) {
                     buf.writeResourceLocation(payload.mapId);
-                    buf.writeBoolean(payload.pixelsAreChunks);
                     buf.writeInt(payload.xOffset);
                     buf.writeInt(payload.yOffset);
                     buf.writeInt(payload.mapWidth);
