@@ -1,5 +1,6 @@
 {
   "biome": "minecraft:forest",
   "color": "#2b462b",
-  "height": 12
+  "height": 12,
+  "terrain_modifier": 10.0
 }

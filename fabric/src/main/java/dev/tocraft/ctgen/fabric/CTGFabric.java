@@ -6,7 +6,6 @@ import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
-import dev.tocraft.ctgen.worldgen.noise.CTGAboveSurfaceCondition;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -53,9 +52,6 @@ public final class CTGFabric implements ModInitializer {
 
         // register commands
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> CTGCommand.register(dispatcher, context));
-
-        // register built-in registry entries
-        CTGAboveSurfaceCondition.register((id, codec) -> Registry.register(BuiltInRegistries.MATERIAL_CONDITION, id, codec));
 
         // register network packet type
         PayloadTypeRegistry.playS2C().register(SyncMapPacket.TYPE, SyncMapPacket.streamCodec());

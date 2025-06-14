@@ -22,13 +22,14 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 100, Optional.empty(), Optional.empty(), Holder.direct(null));
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 66, 8, Optional.empty(), Optional.empty(), Holder.direct(null));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
+            Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
             NoiseGeneratorSettings.CODEC.fieldOf("noise_gen_settings").forGetter(o -> o.noiseGenSettings)
@@ -38,20 +39,20 @@ public final class MapSettings {
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     public final int surfaceLevel;
+    private final int transition;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
     public final Holder<NoiseGeneratorSettings> noiseGenSettings;
 
-    private final int terrainModifier = 4;
-    private final int transition = 4;
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int surfaceLevel, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
+    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int surfaceLevel, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
         this.mapId = mapId;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
         this.surfaceLevel = surfaceLevel;
+        this.transition = transition;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX;
         this.spawnY = spawnY;
@@ -87,13 +88,9 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double addHeight = Noise.DEFAULT.getPerlin(noise, pX, pY) * terrainModifier;
+        double addHeight = Noise.DEFAULT.getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, Zone::terrainModifier);
         double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
         return genHeight + addHeight;
-    }
-
-    public int getElevation(int bX, int bY) {
-        return (int) (surfaceLevel + getValueWithTransition(bX, bY, zone -> (double) zone.height()));
     }
 
     public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {

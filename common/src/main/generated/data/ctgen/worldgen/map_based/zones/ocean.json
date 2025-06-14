@@ -1,5 +1,6 @@
 {
   "biome": "minecraft:ocean",
   "color": "#002a67",
-  "height": -35
+  "height": -35,
+  "terrain_modifier": 16.0
 }

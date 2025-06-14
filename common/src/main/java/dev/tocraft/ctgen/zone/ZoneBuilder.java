@@ -11,6 +11,7 @@ public class ZoneBuilder {
     private Holder<Biome> biome;
     private int color;
     private int height = Zone.DEFAULT_HEIGHT;
+    private double terrainModifier = Zone.DEFAULT_TERRAIN_MODIFIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
 
     public ZoneBuilder setBiome(Holder<Biome> biome) {
@@ -33,12 +34,17 @@ public class ZoneBuilder {
         return this;
     }
 
+    public ZoneBuilder setTerrainModifier(double terrainModifier) {
+        this.terrainModifier = terrainModifier;
+        return this;
+    }
+
     public ZoneBuilder setPixelWeight(double pixelWeight) {
         this.pixelWeight = pixelWeight;
         return this;
     }
 
     public Zone build() {
-        return new Zone(biome, color, height, pixelWeight);
+        return new Zone(biome, color, height, terrainModifier, pixelWeight);
     }
 }
