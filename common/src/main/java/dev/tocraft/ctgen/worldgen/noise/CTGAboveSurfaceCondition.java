@@ -25,23 +25,18 @@ public record CTGAboveSurfaceCondition(int depth) implements SurfaceRules.Condit
     }
 
     @Override
-    public SurfaceRules.Condition apply(final SurfaceRules.Context materialRuleContext) {
-        class AboveSurfacePredicate
-                extends SurfaceRules.LazyYCondition {
-            AboveSurfacePredicate() {
-                super(materialRuleContext);
-            }
-
+    public SurfaceRules.Condition apply(final SurfaceRules.Context surfaceRuleContext) {
+        return new SurfaceRules.LazyYCondition(surfaceRuleContext) {
             @Override
             protected boolean compute() {
-                MapSettings settings = ((MapInfoAccessor)(Object) materialRuleContext).ctgen$getSettings();
-                // should only apply when carvers call this function, which is okay to always have grass
-                if (settings == null) return true;
-                double elevation = settings.getValueWithTransition(this.context.blockX, this.context.blockY, zone -> (double) zone.height());
-                return this.context.blockY > elevation - CTGAboveSurfaceCondition.this.depth;
+                MapSettings settings = ((MapInfoAccessor)(Object) context).ctgen$getSettings();
+                if (settings != null) {
+                    int elevation = settings.surfaceLevel + settings.getZone(this.context.blockX >> 2, this.context.blockZ >> 2).value().height();
+                    return this.context.blockY > elevation - CTGAboveSurfaceCondition.this.depth;
+                }
+                return true;
             }
-        }
-        return new AboveSurfacePredicate();
+        };
     }
 
     public static void register(@NotNull BiConsumer<ResourceLocation, MapCodec<? extends SurfaceRules.ConditionSource>> registerFunc) {

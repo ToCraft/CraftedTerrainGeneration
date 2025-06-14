@@ -2,6 +2,7 @@ accessWidener v2 named
 # NoiseRouterData
 accessible method net/minecraft/world/level/levelgen/NoiseRouterData overworld (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/core/HolderGetter;ZZ)Lnet/minecraft/world/level/levelgen/NoiseRouter;
 # Surface Rules
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$SurfaceRule
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$Condition
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$LazyYCondition
 accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context

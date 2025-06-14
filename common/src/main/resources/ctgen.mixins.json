@@ -6,6 +6,7 @@
   "mixins": [
     "RegistryDataLoaderMixin",
     "SurfaceRulesContextMixin",
+    "SurfaceSystemMixin",
     "VanillaRegistriesMixin",
     "impl.SendMapToPlayerMixin"
   ],

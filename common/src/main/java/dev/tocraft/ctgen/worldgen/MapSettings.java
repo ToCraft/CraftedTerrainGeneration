@@ -44,7 +44,7 @@ public final class MapSettings {
     private final ResourceLocation mapId;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
-    final int surfaceLevel;
+    public final int surfaceLevel;
     final int minY;
     final int genHeight;
     final TerrainHeight terrain;

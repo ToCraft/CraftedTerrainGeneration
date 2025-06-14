@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
+import dev.tocraft.ctgen.data.SurfaceBuilderAccess;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -44,7 +45,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     private MapBasedChunkGenerator(MapBasedBiomeSource biomeSource) {
         super(biomeSource);
         this.biomeSource = biomeSource;
-        this.delegate = new NoiseBasedChunkGenerator(biomeSource, biomeSource.settings.noiseGenSettings);
+        this.delegate = new NoiseBasedChunkGenerator(biomeSource, getSettings().noiseGenSettings);
     }
 
     public static @NotNull MapBasedChunkGenerator of(MapSettings settings) {
@@ -73,7 +74,24 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @VisibleForTesting
     public void buildSurface(ChunkAccess chunk, WorldGenerationContext heightContext, RandomState noiseConfig, StructureManager structureAccessor, BiomeManager biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
+        NoiseGeneratorSettings chunkGeneratorSettings = this.getSettings().noiseGenSettings.value();
+        NoiseChunk chunkNoiseSampler = chunk.getOrCreateNoiseChunk(chunk3 -> this.createChunkNoiseSampler(chunkGeneratorSettings, chunk3, structureAccessor, blender, noiseConfig));
+        ((SurfaceBuilderAccess) noiseConfig.surfaceSystem()).ctgen$buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.useLegacyRandomSource(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule(), () -> this.getSettings());
+    }
 
+    private NoiseChunk createChunkNoiseSampler(NoiseGeneratorSettings settings, ChunkAccess chunk, StructureManager world, Blender blender, RandomState noiseConfig) {
+        return NoiseChunk.forChunk(chunk, noiseConfig, Beardifier.forStructuresInChunk(world, chunk.getPos()), settings, this.createFluidPicker(settings), blender);
+    }
+
+    private Aquifer.FluidPicker createFluidPicker(NoiseGeneratorSettings settings) {
+        Aquifer.FluidStatus fluidLevel = new Aquifer.FluidStatus(-54, Blocks.LAVA.defaultBlockState());
+        int i = settings.seaLevel();
+        return (x, y, z) -> {
+            if (y < Math.min(-54, i)) {
+                return fluidLevel;
+            }
+            return new Aquifer.FluidStatus(settings.seaLevel(), settings.defaultFluid());
+        };
     }
 
     @Override
@@ -88,7 +106,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                     int xOff = chunk.getPos().getBlockX(x);
                     int zOff = chunk.getPos().getBlockZ(z);
 
-                    double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
+                    double surfaceHeight = getSettings().getZone(xOff >> 2, zOff >> 2).value().height() + getSettings().surfaceLevel;
 
                     int shift = (int) (noise.getValue(xOff, zOff) * 3);
                     int bedrockLevel = minHeight + shift;
@@ -99,7 +117,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                             // place bedrock
                             chunk.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
                         } else {
-                            chunk.setBlockState(pos, biomeSource.settings.noiseGenSettings.value().defaultBlock(), false);
+                            chunk.setBlockState(pos, getSettings().noiseGenSettings.value().defaultBlock(), false);
                         }
                     }
                 }
