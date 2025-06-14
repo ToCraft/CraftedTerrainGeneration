@@ -1,10 +1,5 @@
 {
   "biome": "minecraft:stony_peaks",
   "color": "#828282",
-  "height": 40,
-  "layers": {
-    "dirt": "minecraft:stone",
-    "surface": "minecraft:stone"
-  },
-  "terrain_modifier": 50.0
+  "height": 40
 }

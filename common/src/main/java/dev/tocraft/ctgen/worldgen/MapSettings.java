@@ -3,9 +3,7 @@ package dev.tocraft.ctgen.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.data.MapImageRegistry;
-import dev.tocraft.ctgen.xtend.height.NoiseHeight;
-import dev.tocraft.ctgen.xtend.height.TerrainHeight;
-import dev.tocraft.ctgen.xtend.layer.BlockLayer;
+import dev.tocraft.ctgen.util.Noise;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -24,18 +22,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, BlockLayer.defaultLayers(-64), 66, -64, 279, NoiseHeight.DEFAULT, 31, Optional.empty(), Optional.empty(), Holder.direct(null));
+    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 100, Optional.empty(), Optional.empty(), Holder.direct(null));
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
             Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
-            Codec.list(BlockLayer.CODEC).optionalFieldOf("layers", DEFAULT.layers).forGetter(o -> o.layers),
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
-            Codec.INT.optionalFieldOf("min_y", DEFAULT.minY).forGetter(o -> o.minY),
-            Codec.INT.optionalFieldOf("gen_height", DEFAULT.genHeight).forGetter(o -> o.genHeight),
-            TerrainHeight.CODEC.optionalFieldOf("terrain", DEFAULT.terrain).forGetter(o -> o.terrain),
-            Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
             NoiseGeneratorSettings.CODEC.fieldOf("noise_gen_settings").forGetter(o -> o.noiseGenSettings)
@@ -45,35 +38,24 @@ public final class MapSettings {
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     public final int surfaceLevel;
-    final int minY;
-    final int genHeight;
-    final TerrainHeight terrain;
-    final int transition;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
-    private final List<BlockLayer> layers;
     public final Holder<NoiseGeneratorSettings> noiseGenSettings;
 
+    private final int terrainModifier = 4;
+    private final int transition = 4;
+
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, List<BlockLayer> layers, int surfaceLevel, int minY, int genHeight, TerrainHeight terrain, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
+    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int surfaceLevel, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
         this.mapId = mapId;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
-        this.layers = layers;
         this.surfaceLevel = surfaceLevel;
-        this.minY = minY;
-        this.genHeight = genHeight;
-        this.terrain = terrain;
-        this.transition = transition;
         this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, () -> zones.stream().map(Holder::value).toList());
         this.spawnX = spawnX;
         this.spawnY = spawnY;
         this.noiseGenSettings = noiseGenSettings;
-    }
-
-    public List<BlockLayer> getLayers() {
-        return layers;
     }
 
     /**
@@ -105,13 +87,13 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double addHeight = terrain.getHeight(this, noise, pX, pY, getValueWithTransition(pX, pY, Zone::terrainModifier));
+        double addHeight = Noise.DEFAULT.getPerlin(noise, pX, pY) * terrainModifier;
         double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
         return genHeight + addHeight;
     }
 
     public int getElevation(int bX, int bY) {
-        return surfaceLevel + getZone(bX >> 2, bY >> 2).value().height();
+        return (int) (surfaceLevel + getValueWithTransition(bX, bY, zone -> (double) zone.height()));
     }
 
     public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {

@@ -1,10 +1,5 @@
 {
   "biome": "minecraft:desert",
   "color": "#a5ab36",
-  "height": 5,
-  "layers": {
-    "dirt": "minecraft:sandstone",
-    "surface": "minecraft:sand"
-  },
-  "terrain_modifier": 4.0
+  "height": 5
 }

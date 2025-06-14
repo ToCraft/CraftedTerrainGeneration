@@ -2,9 +2,5 @@
   "biome": "minecraft:frozen_river",
   "color": "#5791f0",
   "height": -15,
-  "layers": {
-    "dirt": "minecraft:sand",
-    "surface": "minecraft:sand"
-  },
   "pixel_weight": 2.0
 }

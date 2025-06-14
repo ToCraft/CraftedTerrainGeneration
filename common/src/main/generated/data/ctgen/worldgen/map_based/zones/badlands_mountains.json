@@ -1,26 +1,5 @@
 {
   "biome": "minecraft:badlands",
   "color": "#464735",
-  "height": 28,
-  "layers": {
-    "dirt": "minecraft:red_concrete",
-    "surface": {
-      "type": "ctgen:noise_placer",
-      "default": "minecraft:brown_concrete",
-      "noise": {
-        "octaves": [
-          {
-            "amplitude": 1.0,
-            "frequency": 1.0
-          }
-        ],
-        "stretch": 50
-      },
-      "values": {
-        "-0.5": "minecraft:orange_concrete",
-        "0.0": "minecraft:red_concrete"
-      }
-    }
-  },
-  "terrain_modifier": 24.0
+  "height": 28
 }

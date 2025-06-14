@@ -2,8 +2,5 @@
   "biome": "minecraft:frozen_ocean",
   "color": "#4e7ecc",
   "height": -20,
-  "layers": {
-    "surface": "minecraft:sand"
-  },
   "pixel_weight": 3.0
 }

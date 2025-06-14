@@ -2,9 +2,5 @@
   "biome": "minecraft:river",
   "color": "#0162ff",
   "height": -15,
-  "layers": {
-    "dirt": "minecraft:sand",
-    "surface": "minecraft:sand"
-  },
   "pixel_weight": 2.0
 }

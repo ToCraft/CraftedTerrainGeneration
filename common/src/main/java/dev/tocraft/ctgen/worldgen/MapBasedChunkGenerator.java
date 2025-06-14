@@ -1,7 +1,6 @@
 package dev.tocraft.ctgen.worldgen;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
@@ -43,7 +42,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
             MapSettings.CODEC.fieldOf("settings").forGetter(MapBasedChunkGenerator::getSettings)
     ).apply(instance, instance.stable(MapBasedChunkGenerator::of)));
 
-    private final NoiseBasedChunkGenerator delegate;;
+    private final NoiseBasedChunkGenerator delegate;
 
     protected final MapBasedBiomeSource biomeSource;
     private SimplexNoise noise = null;
@@ -52,7 +51,6 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         super(biomeSource);
         this.biomeSource = biomeSource;
         this.delegate = new NoiseBasedChunkGenerator(biomeSource, getSettings().noiseGenSettings);
-        LogUtils.getLogger().warn("LOL: " + getSettings().surfaceLevel);
     }
 
     public static @NotNull MapBasedChunkGenerator of(MapSettings settings) {
@@ -67,11 +65,13 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public void applyCarvers(WorldGenRegion chunkRegion, long seed, RandomState noiseConfig, BiomeManager biomeAccess, StructureManager structureAccessor, ChunkAccess chunk2) {
+        setNoise(noiseConfig);
         delegate.applyCarvers(chunkRegion, seed, noiseConfig, biomeAccess, structureAccessor, chunk2);
     }
 
     @Override
     public void buildSurface(WorldGenRegion region, StructureManager structures, RandomState noiseConfig, ChunkAccess chunk) {
+        setNoise(noiseConfig);
         if (SharedConstants.debugVoidTerrain(chunk.getPos())) {
             return;
         }
@@ -79,8 +79,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         this.buildSurface(chunk, heightContext, noiseConfig, structures, region.getBiomeManager(), region.registryAccess().lookupOrThrow(Registries.BIOME), Blender.of(region));
     }
 
-    @VisibleForTesting
-    public void buildSurface(ChunkAccess chunk, WorldGenerationContext heightContext, RandomState noiseConfig, StructureManager structureAccessor, BiomeManager biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
+    private void buildSurface(ChunkAccess chunk, WorldGenerationContext heightContext, RandomState noiseConfig, StructureManager structureAccessor, BiomeManager biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
         NoiseGeneratorSettings chunkGeneratorSettings = this.getNoiseGenSettings();
         NoiseChunk chunkNoiseSampler = chunk.getOrCreateNoiseChunk(chunk3 -> this.createChunkNoiseSampler(chunkGeneratorSettings, chunk3, structureAccessor, blender, noiseConfig));
         ((SurfaceBuilderAccess) noiseConfig.surfaceSystem()).ctgen$buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.useLegacyRandomSource(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule(), this::getSettings);
@@ -95,7 +94,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
         int i = settings.seaLevel();
         return (x, y, z) -> {
             if (y < Math.min(-54, i)) {
-                //return fluidLevel; // TODO: uncomment for lava
+                return fluidLevel;
             }
             return new Aquifer.FluidStatus(settings.seaLevel(), settings.defaultFluid());
         };
@@ -103,6 +102,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public @NotNull CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig, StructureManager structureAccessor, @NotNull ChunkAccess chunk) {
+        setNoise(noiseConfig);
+
         NoiseSettings generationShapeConfig = getNoiseGenSettings().noiseSettings().clampToHeightAccessor(chunk.getHeightAccessorForGeneration());
         int k = Mth.floorDiv(generationShapeConfig.height(), generationShapeConfig.noiseSizeVertical());
         if (k <= 0) {
@@ -228,7 +229,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getGenDepth() {
-        return getSettings().genHeight;
+        return getNoiseGenSettings().noiseSettings().height();
     }
 
     @Override
@@ -238,31 +239,32 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getMinY() {
-        return getSettings().minY;
+        return getNoiseGenSettings().noiseSettings().minY();
     }
 
     @Override
     public int getBaseHeight(int pX, int pZ, @NotNull Heightmap.Types pType, @NotNull LevelHeightAccessor pLevel, @NotNull RandomState pRandom) {
         setNoise(pRandom);
-        return Math.max(getSettings().getElevation(pX, pZ), getSeaLevel());
+        return getSettings().getElevation(pX, pZ) + 1;
     }
 
     @Override
     public @NotNull NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world, RandomState noiseConfig) {
+        setNoise(noiseConfig);
         int elevation = this.getSettings().getElevation(x, z);
         int seaLevel = this.getSeaLevel();
         if (elevation < this.getMinY())
             return new NoiseColumn(world.getMinY(), new BlockState[]{Blocks.AIR.defaultBlockState()});
         if (elevation < seaLevel) {
             return new NoiseColumn(
-                    this.getSettings().minY,
+                    this.getMinY(),
                     Stream.concat(
                             Stream.generate(() -> this.getNoiseGenSettings().defaultBlock()).limit(elevation - this.getMinY()),
                             Stream.generate(() -> this.getNoiseGenSettings().defaultFluid()).limit(seaLevel - elevation - this.getMinY())
                     ).toArray(BlockState[]::new));
         }
         return new NoiseColumn(
-                this.getSettings().minY,
+                this.getMinY(),
                 Stream.generate(() -> this.getNoiseGenSettings().defaultBlock()).limit(elevation - this.getMinY() + 1).toArray(BlockState[]::new)
 
         );
@@ -270,6 +272,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
     @Override
     public void addDebugScreenInfo(@NotNull List<String> pInfo, @NotNull RandomState pRandom, @NotNull BlockPos pPos) {
+        setNoise(pRandom);
         pInfo.add("Pixel Pos: X: " + getSettings().xOffset(pPos.getX() >> 2) + " Y: " + getSettings().yOffset(pPos.getZ() >> 2));
     }
 
