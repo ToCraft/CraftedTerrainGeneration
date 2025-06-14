@@ -110,6 +110,10 @@ public final class MapSettings {
         return genHeight + addHeight;
     }
 
+    public int getElevation(int bX, int bY) {
+        return surfaceLevel + getZone(bX >> 2, bY >> 2).value().height();
+    }
+
     public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;

@@ -4,10 +4,12 @@
   "package": "dev.tocraft.ctgen.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ChunkMapMixin",
     "RegistryDataLoaderMixin",
     "SurfaceRulesContextMixin",
     "SurfaceSystemMixin",
     "VanillaRegistriesMixin",
+    "WorldCarverMixin",
     "impl.SendMapToPlayerMixin"
   ],
   "client": [

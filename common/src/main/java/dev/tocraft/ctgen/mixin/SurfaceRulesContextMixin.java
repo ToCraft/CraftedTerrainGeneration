@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 @Mixin(SurfaceRules.Context.class)
 public class SurfaceRulesContextMixin implements MapInfoAccessor {
     @Unique
-    private Supplier<MapSettings> ctgen$settings;
+    private Supplier<MapSettings> ctgen$settings = () -> null;
 
 
     @Override

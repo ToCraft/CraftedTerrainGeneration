@@ -9,3 +9,7 @@ accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context
 accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockX I
 accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockY I
 accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockZ I
+# Noise Chunk
+accessible method net/minecraft/world/level/levelgen/NoiseChunk cellWidth ()I
+accessible method net/minecraft/world/level/levelgen/NoiseChunk cellHeight ()I
+accessible method net/minecraft/world/level/levelgen/NoiseChunk getInterpolatedState ()Lnet/minecraft/world/level/block/state/BlockState;

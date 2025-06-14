@@ -31,7 +31,7 @@ public record CTGAboveSurfaceCondition(int depth) implements SurfaceRules.Condit
             protected boolean compute() {
                 MapSettings settings = ((MapInfoAccessor)(Object) context).ctgen$getSettings();
                 if (settings != null) {
-                    int elevation = settings.surfaceLevel + settings.getZone(this.context.blockX >> 2, this.context.blockZ >> 2).value().height();
+                    int elevation = settings.getElevation(this.context.blockX >> 2, this.context.blockZ);
                     return this.context.blockY > elevation - CTGAboveSurfaceCondition.this.depth;
                 }
                 return true;
