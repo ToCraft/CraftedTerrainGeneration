@@ -5,6 +5,7 @@ import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.ctgen.worldgen.noise.CTGAboveSurfaceCondition;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import dev.tocraft.ctgen.xtend.height.TerrainHeight;
 import dev.tocraft.ctgen.xtend.layer.BlockLayer;
@@ -67,6 +68,9 @@ public final class CTGNeoForgeEventListener {
         event.register(CTRegistries.BLOCK_PLACER_KEY, helper -> BlockPlacer.register(helper::register));
         event.register(CTRegistries.BLOCK_LAYER_KEY, helper -> BlockLayer.register(helper::register));
         event.register(CTRegistries.TERRAIN_KEY, helper -> TerrainHeight.register(helper::register));
+
+        // surface rules
+        event.register(Registries.MATERIAL_CONDITION, helper -> CTGAboveSurfaceCondition.register(helper::register));
     }
 
     private static void registerPayload(@NotNull RegisterPayloadHandlersEvent event) {
