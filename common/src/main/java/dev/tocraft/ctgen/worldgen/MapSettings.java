@@ -22,11 +22,11 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettings(null, new ArrayList<>(), null, 66, 8, Optional.empty(), Optional.empty(), Holder.direct(null));
+    static final MapSettings DEFAULT = new MapSettingsBuilder().setMapId(null).setZones(new ArrayList<>()).setDefaultBiome(null).setSurfaceLevel(66).setTransition(8).setSpawnX(Optional.empty()).setSpawnY(Optional.empty()).setNoiseGenSettings(Holder.direct(null)).createMapSettings();
 
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
-            Codec.list(Zone.CODEC).optionalFieldOf("zones", DEFAULT.zones).forGetter(o -> o.zones),
+            Codec.list(Zone.CODEC).fieldOf("zones").forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
             Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
             Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
@@ -39,7 +39,7 @@ public final class MapSettings {
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
     public final int surfaceLevel;
-    private final int transition;
+    final int transition;
     private final Supplier<BufferedImage> mapImage;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;

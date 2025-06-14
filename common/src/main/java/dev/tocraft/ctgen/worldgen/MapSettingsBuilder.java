@@ -3,21 +3,25 @@ package dev.tocraft.ctgen.worldgen;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unused"})
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class MapSettingsBuilder {
-    private ResourceLocation biomeMapId;
-    private List<Holder<Zone>> zones = MapSettings.DEFAULT.zones;
+    private ResourceLocation mapId;
+    private List<Holder<Zone>> zones;
     private Holder<Zone> defaultBiome;
-    private int surfaceLevel = MapSettings.DEFAULT.surfaceLevel;
-    private Optional<Integer> spawnX = MapSettings.DEFAULT.spawnX;
-    private Optional<Integer> spawnY = MapSettings.DEFAULT.spawnY;
+    private int surfaceLevel;
+    private int transition = MapSettings.DEFAULT.transition;
+    private @NotNull Optional<Integer> spawnX = Optional.empty();
+    private @NotNull Optional<Integer> spawnY = Optional.empty();
+    private Holder<NoiseGeneratorSettings> noiseGenSettings;
 
-    public MapSettingsBuilder setBiomeMapId(ResourceLocation biomeMapId) {
-        this.biomeMapId = biomeMapId;
+    public MapSettingsBuilder setMapId(ResourceLocation mapId) {
+        this.mapId = mapId;
         return this;
     }
 
@@ -36,6 +40,11 @@ public class MapSettingsBuilder {
         return this;
     }
 
+    public MapSettingsBuilder setTransition(int transition) {
+        this.transition = transition;
+        return this;
+    }
+
     public MapSettingsBuilder setSpawnX(int spawnX) {
         this.spawnX = Optional.of(spawnX);
         return this;
@@ -46,7 +55,22 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettings build() {
-        return new MapSettings(biomeMapId, zones, defaultBiome, surfaceLevel, spawnX, spawnY, MapSettings.DEFAULT.noiseGenSettings);
+    public MapSettingsBuilder setSpawnX(@NotNull Optional<Integer> spawnX) {
+        this.spawnX = spawnX;
+        return this;
+    }
+
+    public MapSettingsBuilder setSpawnY(@NotNull Optional<Integer> spawnY) {
+        this.spawnY = spawnY;
+        return this;
+    }
+
+    public MapSettingsBuilder setNoiseGenSettings(Holder<NoiseGeneratorSettings> noiseGenSettings) {
+        this.noiseGenSettings = noiseGenSettings;
+        return this;
+    }
+
+    public MapSettings createMapSettings() {
+        return new MapSettings(mapId, zones, defaultBiome, surfaceLevel, transition, spawnX, spawnY, noiseGenSettings);
     }
 }
