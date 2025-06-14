@@ -77,7 +77,7 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     private void buildSurface(ChunkAccess chunk, WorldGenerationContext heightContext, RandomState noiseConfig, StructureManager structureAccessor, BiomeManager biomeAccess, Registry<Biome> biomeRegistry, Blender blender) {
         NoiseGeneratorSettings chunkGeneratorSettings = this.getNoiseGenSettings();
         NoiseChunk chunkNoiseSampler = chunk.getOrCreateNoiseChunk(chunk3 -> this.createChunkNoiseSampler(chunkGeneratorSettings, chunk3, structureAccessor, blender, noiseConfig));
-        ((SurfaceBuilderAccess) noiseConfig.surfaceSystem()).ctgen$buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.useLegacyRandomSource(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule(), this::getSettings);
+        ((SurfaceBuilderAccess) noiseConfig.surfaceSystem()).ctgen$buildSurface(noiseConfig, biomeAccess, biomeRegistry, chunkGeneratorSettings.useLegacyRandomSource(), heightContext, chunk, chunkNoiseSampler, chunkGeneratorSettings.surfaceRule(), this::getSettings, () -> this.noise);
     }
 
     private NoiseChunk createChunkNoiseSampler(NoiseGeneratorSettings settings, ChunkAccess chunk, StructureManager world, Blender blender, RandomState noiseConfig) {
@@ -108,8 +108,10 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     }
 
     private @NotNull ChunkAccess fill(@NotNull ChunkAccess chunk) {
-        ChunkPos chunkPos = chunk.getPos();
         BlockState defaultBlock = biomeSource.settings.noiseGenSettings.value().defaultBlock();
+        BlockState defaultFluid = biomeSource.settings.noiseGenSettings.value().defaultFluid();
+
+        ChunkPos chunkPos = chunk.getPos();
         int minY = getNoiseGenSettings().noiseSettings().minY();
 
         for (int x = 0; x < 16; x++) {
@@ -117,11 +119,16 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
                 int xOff = chunk.getPos().getBlockX(x);
                 int zOff = chunk.getPos().getBlockZ(z);
 
-                double surfaceHeight = getSettings().getHeight(noise, xOff, zOff) + getSettings().surfaceLevel;
+                double surfaceHeight = getSettings().getHeight(noise, xOff, zOff);
 
-                for (int y = minY; y < surfaceHeight || y <= getSeaLevel(); y++) {
+                for (int y = minY; y < surfaceHeight; y++) {
                     BlockPos pos = chunkPos.getBlockAt(x, y, z);
                     chunk.setBlockState(pos,defaultBlock , false);
+                }
+
+                for (int y = (int) surfaceHeight; y < getSeaLevel(); y++) {
+                    BlockPos pos = chunkPos.getBlockAt(x, y, z);
+                    chunk.setBlockState(pos,defaultFluid , false);
                 }
             }
         }
@@ -156,13 +163,13 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     @Override
     public int getBaseHeight(int pX, int pZ, @NotNull Heightmap.Types pType, @NotNull LevelHeightAccessor pLevel, @NotNull RandomState pRandom) {
         setNoise(pRandom);
-        return Math.max((int) (1 + getSettings().surfaceLevel + getSettings().getHeight(noise, pX, pZ)), getSeaLevel());
+        return Math.max((int) (1 + getSettings().getHeight(noise, pX, pZ)), getSeaLevel());
     }
 
     @Override
     public @NotNull NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor world, RandomState noiseConfig) {
         setNoise(noiseConfig);
-        int elevation = Math.max((int) (1 + getSettings().surfaceLevel + getSettings().getHeight(noise, x, z)), getSeaLevel());
+        int elevation = Math.max((int) (1 + getSettings().getHeight(noise, x, z)), getSeaLevel());
         int seaLevel = this.getSeaLevel();
         if (elevation < this.getMinY())
             return new NoiseColumn(world.getMinY(), new BlockState[]{Blocks.AIR.defaultBlockState()});
@@ -185,6 +192,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     public void addDebugScreenInfo(@NotNull List<String> pInfo, @NotNull RandomState pRandom, @NotNull BlockPos pPos) {
         setNoise(pRandom);
         pInfo.add("Pixel Pos: X: " + getSettings().xOffset(pPos.getX() >> 2) + " Y: " + getSettings().yOffset(pPos.getZ() >> 2));
+        pInfo.add("Zone: " + getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).getRegisteredName());
+        pInfo.add("Pixel Height: " + getSettings().getRedHeight(pPos.getX() >> 2, pPos.getZ() >> 2));
     }
 
     @Override

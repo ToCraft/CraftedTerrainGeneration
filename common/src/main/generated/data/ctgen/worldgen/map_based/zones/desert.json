@@ -1,6 +1,4 @@
 {
   "biome": "minecraft:desert",
-  "color": "#a5ab36",
-  "height": 5,
-  "terrain_modifier": 4.0
+  "color": "#a5ab36"
 }

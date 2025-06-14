@@ -1,8 +1,6 @@
 package dev.tocraft.ctgen.data;
 
 import com.mojang.logging.LogUtils;
-import dev.tocraft.ctgen.util.MapUtils;
-import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -19,11 +17,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
-public class MapImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
+public class HeightImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
     private static final Map<ResourceLocation, BufferedImage> MAPS = new ConcurrentHashMap<>();
-    private static final String DIRECTORY = "worldgen/map_based/maps";
+    private static final String DIRECTORY = "worldgen/map_based/heightmaps";
 
     @Override
     protected @NotNull Map<ResourceLocation, BufferedImage> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
@@ -35,7 +32,7 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
             try (InputStream is = entry.getValue().open()) {
                 BufferedImage image = ImageIO.read(is);
                 preparedMaps.put(id, image);
-                LogUtils.getLogger().info("Registered map image: {}", id);
+                LogUtils.getLogger().info("Registered heightmap image: {}", id);
             } catch (IOException e) {
                 LogUtils.getLogger().error("Caught an error while reading map image {}", id, e);
             }
@@ -50,7 +47,7 @@ public class MapImageRegistry extends SimplePreparableReloadListener<Map<Resourc
     }
 
     @Nullable
-    public static BufferedImage getByIdOrUpscale(ResourceLocation id, Supplier<Iterable<Zone>> zones) {
+    public static BufferedImage getById(ResourceLocation id) {
         return MAPS.get(id);
     }
 }

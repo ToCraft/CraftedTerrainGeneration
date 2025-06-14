@@ -9,13 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"unused", "OptionalUsedAsFieldOrParameterType"})
 public class MapSettingsBuilder {
     private ResourceLocation mapId;
     private List<Holder<Zone>> zones;
     private Holder<Zone> defaultBiome;
-    private int surfaceLevel;
-    private int transition = MapSettings.DEFAULT.transition;
+    private int transition;
     private @NotNull Optional<Integer> spawnX = Optional.empty();
     private @NotNull Optional<Integer> spawnY = Optional.empty();
     private Holder<NoiseGeneratorSettings> noiseGenSettings;
@@ -32,11 +31,6 @@ public class MapSettingsBuilder {
 
     public MapSettingsBuilder setDefaultBiome(Holder<Zone> defaultBiome) {
         this.defaultBiome = defaultBiome;
-        return this;
-    }
-
-    public MapSettingsBuilder setSurfaceLevel(int surfaceLevel) {
-        this.surfaceLevel = surfaceLevel;
         return this;
     }
 
@@ -70,7 +64,7 @@ public class MapSettingsBuilder {
         return this;
     }
 
-    public MapSettings createMapSettings() {
-        return new MapSettings(mapId, zones, defaultBiome, surfaceLevel, transition, spawnX, spawnY, noiseGenSettings);
+    public MapSettings build() {
+        return new MapSettings(mapId, zones, defaultBiome, transition, spawnX, spawnY, noiseGenSettings);
     }
 }

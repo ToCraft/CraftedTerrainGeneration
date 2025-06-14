@@ -2,7 +2,8 @@ package dev.tocraft.ctgen.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.tocraft.ctgen.data.MapImageRegistry;
+import dev.tocraft.ctgen.data.BiomeImageRegistry;
+import dev.tocraft.ctgen.data.HeightImageRegistry;
 import dev.tocraft.ctgen.util.Noise;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
@@ -14,22 +15,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class MapSettings {
-    static final MapSettings DEFAULT = new MapSettingsBuilder().setMapId(null).setZones(new ArrayList<>()).setDefaultBiome(null).setSurfaceLevel(66).setTransition(8).setSpawnX(Optional.empty()).setSpawnY(Optional.empty()).setNoiseGenSettings(Holder.direct(null)).createMapSettings();
-
     public static final Codec<MapSettings> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-            ResourceLocation.CODEC.fieldOf("biome_map").forGetter(o -> o.mapId),
+            ResourceLocation.CODEC.fieldOf("map_id").forGetter(o -> o.mapId),
             Codec.list(Zone.CODEC).fieldOf("zones").forGetter(o -> o.zones),
             Zone.CODEC.fieldOf("default_map_biome").forGetter(o -> o.defaultBiome),
-            Codec.INT.optionalFieldOf("surface_level", DEFAULT.surfaceLevel).forGetter(o -> o.surfaceLevel),
-            Codec.INT.optionalFieldOf("transition", DEFAULT.transition).forGetter(o -> o.transition),
+            Codec.INT.optionalFieldOf("transition", 16).forGetter(o -> o.transition),
             Codec.INT.optionalFieldOf("spawn_pixel_x").forGetter(o -> o.spawnX),
             Codec.INT.optionalFieldOf("spawn_pixel_y").forGetter(o -> o.spawnY),
             NoiseGeneratorSettings.CODEC.fieldOf("noise_gen_settings").forGetter(o -> o.noiseGenSettings)
@@ -38,22 +34,22 @@ public final class MapSettings {
     private final ResourceLocation mapId;
     final List<Holder<Zone>> zones;
     private final Holder<Zone> defaultBiome;
-    public final int surfaceLevel;
     final int transition;
     private final Supplier<BufferedImage> mapImage;
+    private final Supplier<BufferedImage> heightmap;
     final Optional<Integer> spawnX;
     final Optional<Integer> spawnY;
     public final Holder<NoiseGeneratorSettings> noiseGenSettings;
 
 
     @ApiStatus.Internal
-    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int surfaceLevel, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
+    public MapSettings(ResourceLocation mapId, List<Holder<Zone>> zones, Holder<Zone> defaultBiome, int transition, @NotNull Optional<Integer> spawnX, @NotNull Optional<Integer> spawnY, Holder<NoiseGeneratorSettings> noiseGenSettings) {
         this.mapId = mapId;
         this.zones = zones;
         this.defaultBiome = defaultBiome;
-        this.surfaceLevel = surfaceLevel;
         this.transition = transition;
-        this.mapImage = () -> MapImageRegistry.getByIdOrUpscale(mapId, () -> zones.stream().map(Holder::value).toList());
+        this.mapImage = () -> BiomeImageRegistry.getById(mapId);
+        this.heightmap = () -> HeightImageRegistry.getById(mapId);
         this.spawnX = spawnX;
         this.spawnY = spawnY;
         this.noiseGenSettings = noiseGenSettings;
@@ -88,12 +84,12 @@ public final class MapSettings {
      * @return the relative height
      */
     public double getHeight(SimplexNoise noise, int pX, int pY) {
-        double addHeight = Noise.DEFAULT.getPerlin(noise, pX, pY) * getValueWithTransition(pX, pY, Zone::terrainModifier);
-        double genHeight = getValueWithTransition(pX, pY, zone -> (double) zone.height());
+        double genHeight = getTransitionedHeight(pX, pY);
+        double addHeight = Noise.DEFAULT.getPerlin(noise, pX, pY) * getTransitionedModifier(pX, pY);
         return genHeight + addHeight;
     }
 
-    public double getValueWithTransition(int x, int y, Function<Zone, Double> function) {
+    public double getTransitionedModifier(int x, int y) {
         // Determine the base coordinates for the current grid
         int baseX = (x / transition) * transition;
         int baseY = (y / transition) * transition;
@@ -102,23 +98,39 @@ public final class MapSettings {
         if (x < 0) baseX -= transition;
         if (y < 0) baseY -= transition;
 
-        Zone biome00 = getZone(baseX >> 2, baseY >> 2).value(); // Top-left
-        Zone biome10 = getZone((baseX + transition) >> 2, baseY >> 2).value(); // Top-right
-        Zone biome01 = getZone(baseX >> 2, (baseY + transition) >> 2).value(); // Bottom-left
-        Zone biome11 = getZone((baseX + transition) >> 2, (baseY + transition) >> 2).value(); // Bottom-right
-
-        double h00 = function.apply(biome00);
-        double h10 = function.apply(biome10);
-        double h01 = function.apply(biome01);
-        double h11 = function.apply(biome11);
+        double th00 = getZone(baseX >> 2, baseY >> 2).value().terrainModifier(); // Top-left
+        double th10 = getZone((baseX + transition) >> 2, baseY >> 2).value().terrainModifier(); // Top-right
+        double th01 = getZone(baseX >> 2, (baseY + transition) >> 2).value().terrainModifier(); // Bottom-left
+        double th11 = getZone((baseX + transition) >> 2, (baseY + transition) >> 2).value().terrainModifier(); // Bottom-right
 
         // Calculate the fractional positions within the grid, relative to base coordinates
-        double xPercent = (double) (x - baseX) / transition;
-        double yPercent = (double) (y - baseY) / transition;
+        double xPercent = Math.abs((double) (x - baseX) / transition);
+        double yPercent = Math.abs((double) (y - baseY) / transition);
 
-        // Ensure fractional values are within [0, 1] (handling negative values)
-        xPercent = Math.abs(xPercent);
-        yPercent = Math.abs(yPercent);
+        // Calculate bi-linear interpolation
+        return (th00 * (1 - xPercent) * (1 - yPercent)) +
+                (th10 * xPercent * (1 - yPercent)) +
+                (th01 * (1 - xPercent) * yPercent) +
+                (th11 * xPercent * yPercent);
+    }
+
+    public double getTransitionedHeight(int x, int y) {
+        // Determine the base coordinates for the current grid
+        int baseX = (x / transition) * transition;
+        int baseY = (y / transition) * transition;
+
+        // Adjust base coordinates for negative values
+        if (x < 0) baseX -= transition;
+        if (y < 0) baseY -= transition;
+
+        int h00 = getRedHeight(baseX >> 2, baseY >> 2); // Top-left
+        int h10 = getRedHeight(baseX + transition >> 2, baseY >> 2); // Top-right
+        int h01 = getRedHeight(baseX >> 2, baseY + transition >> 2); // Bottom-left
+        int h11 = getRedHeight(baseX + transition >> 2, baseY + transition >> 2); // Bottom-right
+
+        // Calculate the fractional positions within the grid, relative to base coordinates
+        double xPercent = Math.abs((double) (x - baseX) / transition);
+        double yPercent = Math.abs((double) (y - baseY) / transition);
 
         // Introduce cubic-like transitions based on weight differences
         xPercent = smoothStep(xPercent);
@@ -131,8 +143,23 @@ public final class MapSettings {
                 (h11 * xPercent * yPercent);
     }
 
+    public int getRedHeight(int pX, int pY) {
+        int x = xOffset(pX);
+        int y = yOffset(pY);
+
+        if (isPixelInHeightmap(x, y)) {
+            return heightmap.get().getRGB(x, y) >> 16 & 0xFF; // heightmap is grey - r g b should be the same
+        }
+        return heightmap.get().getRGB(0, 0) >> 16 & 0xFF; // the top-left pixel is most likely ocean -> use it's high
+    }
+
+
     private double smoothStep(double t) {
         return t * t * (3 - 2 * t);
+    }
+
+    private boolean isPixelInHeightmap(int x, int y) {
+        return x >= 0 && y >= 0 && x < heightmap.get().getWidth() && y < heightmap.get().getHeight();
     }
 
     private boolean isPixelInBiomeMap(int x, int y) {

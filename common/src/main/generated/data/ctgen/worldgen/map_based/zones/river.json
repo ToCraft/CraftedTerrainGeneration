@@ -1,6 +1,6 @@
 {
   "biome": "minecraft:river",
   "color": "#0162ff",
-  "height": -15,
-  "pixel_weight": 2.0
+  "pixel_weight": 2.0,
+  "terrain_modifier": 0.5
 }

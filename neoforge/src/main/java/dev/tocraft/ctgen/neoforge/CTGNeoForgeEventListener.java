@@ -1,6 +1,7 @@
 package dev.tocraft.ctgen.neoforge;
 
-import dev.tocraft.ctgen.data.MapImageRegistry;
+import dev.tocraft.ctgen.data.BiomeImageRegistry;
+import dev.tocraft.ctgen.data.HeightImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
@@ -33,7 +34,8 @@ public final class CTGNeoForgeEventListener {
 
     private static final List<PreparableReloadListener> RELOAD_LISTENERS = new CopyOnWriteArrayList<>() {
         {
-            add(new MapImageRegistry());
+            add(new BiomeImageRegistry());
+            add(new HeightImageRegistry());
         }
     };
 

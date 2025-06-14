@@ -1,7 +1,8 @@
 package dev.tocraft.ctgen.fabric;
 
 import dev.tocraft.ctgen.CTerrainGeneration;
-import dev.tocraft.ctgen.data.MapImageRegistry;
+import dev.tocraft.ctgen.data.BiomeImageRegistry;
+import dev.tocraft.ctgen.data.HeightImageRegistry;
 import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
@@ -33,21 +34,38 @@ public final class CTGFabric implements ModInitializer {
         Registry.register(BuiltInRegistries.CHUNK_GENERATOR, MapBasedChunkGenerator.ID, MapBasedChunkGenerator.CODEC);
 
         // register reload listener
-        MapImageRegistry reloadListener = new MapImageRegistry();
+        BiomeImageRegistry biomeImageRegistry = new BiomeImageRegistry();
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return CTerrainGeneration.id("map_image_listener");
+                return CTerrainGeneration.id("biome_map_image_listener");
             }
 
             @Override
             public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
-                return reloadListener.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
+                return biomeImageRegistry.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
             }
 
             @Override
             public @NotNull String getName() {
-                return reloadListener.getName();
+                return biomeImageRegistry.getName();
+            }
+        });
+        HeightImageRegistry heightImageRegistry = new HeightImageRegistry();
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
+            @Override
+            public ResourceLocation getFabricId() {
+                return CTerrainGeneration.id("heightmap_image_listener");
+            }
+
+            @Override
+            public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
+                return heightImageRegistry.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
+            }
+
+            @Override
+            public @NotNull String getName() {
+                return heightImageRegistry.getName();
             }
         });
 

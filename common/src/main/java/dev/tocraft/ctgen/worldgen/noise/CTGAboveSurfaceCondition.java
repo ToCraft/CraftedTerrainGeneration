@@ -9,6 +9,7 @@ import dev.tocraft.ctgen.worldgen.MapSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
@@ -26,15 +27,18 @@ public record CTGAboveSurfaceCondition(int depth) implements SurfaceRules.Condit
 
     @Override
     public SurfaceRules.Condition apply(final SurfaceRules.Context surfaceRuleContext) {
+        MapSettings settings = ((MapInfoAccessor) (Object) surfaceRuleContext).ctgen$getSettings();
+        SimplexNoise noise = ((MapInfoAccessor) (Object) surfaceRuleContext).ctgen$getNoise();
+        double elevation;
+        if (settings != null && noise != null) {
+            elevation = settings.getHeight(noise, surfaceRuleContext.blockX >> 2, surfaceRuleContext.blockZ);
+        } else {
+            elevation = -1;
+        }
         return new SurfaceRules.LazyYCondition(surfaceRuleContext) {
             @Override
             protected boolean compute() {
-                MapSettings settings = ((MapInfoAccessor)(Object) context).ctgen$getSettings();
-                if (settings != null) {
-                    int elevation = settings.getElevation(this.context.blockX >> 2, this.context.blockZ);
-                    return this.context.blockY > elevation - CTGAboveSurfaceCondition.this.depth;
-                }
-                return true;
+                return elevation == -1 || this.context.blockY > elevation - CTGAboveSurfaceCondition.this.depth;
             }
         };
     }

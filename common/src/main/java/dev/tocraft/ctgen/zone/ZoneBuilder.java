@@ -10,7 +10,6 @@ import java.awt.*;
 public class ZoneBuilder {
     private Holder<Biome> biome;
     private int color;
-    private int height = Zone.DEFAULT_HEIGHT;
     private double terrainModifier = Zone.DEFAULT_TERRAIN_MODIFIER;
     private double pixelWeight = Zone.DEFAULT_PIXEL_WEIGHT;
 
@@ -29,11 +28,6 @@ public class ZoneBuilder {
         return this;
     }
 
-    public ZoneBuilder setHeight(int height) {
-        this.height = height;
-        return this;
-    }
-
     public ZoneBuilder setTerrainModifier(double terrainModifier) {
         this.terrainModifier = terrainModifier;
         return this;
@@ -45,6 +39,6 @@ public class ZoneBuilder {
     }
 
     public Zone build() {
-        return new Zone(biome, color, height, terrainModifier, pixelWeight);
+        return new Zone(biome, color, terrainModifier, pixelWeight);
     }
 }

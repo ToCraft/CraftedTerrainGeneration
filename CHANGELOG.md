@@ -6,6 +6,8 @@ CTGen 1.1
 - add map texts
 - remove "pixelsAreChunks" map setting
 - add Zone builder methods for easily coping prebuild zones
+- add heightmap
+- **replace xtend features with Mojang's surface rules and carvers**
 
 Crafted Terrain Generation
 ================
