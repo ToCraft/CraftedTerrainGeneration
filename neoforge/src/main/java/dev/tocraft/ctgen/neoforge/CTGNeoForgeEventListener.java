@@ -5,6 +5,7 @@ import dev.tocraft.ctgen.impl.CTGCommand;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
 import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
+import dev.tocraft.ctgen.worldgen.noise.CTGAboveSurfaceCondition;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.bus.api.IEventBus;
@@ -50,6 +51,9 @@ public final class CTGNeoForgeEventListener {
         // generic stuff
         event.register(Registries.BIOME_SOURCE, helper -> helper.register(MapBasedBiomeSource.ID, MapBasedBiomeSource.CODEC));
         event.register(Registries.CHUNK_GENERATOR, helper -> helper.register(MapBasedChunkGenerator.ID, MapBasedChunkGenerator.CODEC));
+
+        // surface rules
+        event.register(Registries.MATERIAL_CONDITION, helper -> CTGAboveSurfaceCondition.register(helper::register));
     }
 
     private static void registerPayload(@NotNull RegisterPayloadHandlersEvent event) {
