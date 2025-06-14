@@ -1,4 +1,4 @@
-CTGen 1.1
+CTGen 2.0
 ================
 
 - port to 1.21.4
@@ -8,6 +8,7 @@ CTGen 1.1
 - add Zone builder methods for easily coping prebuild zones
 - add heightmap
 - **replace xtend features with Mojang's surface rules and carvers**
+- port to 1.21.5
 
 Crafted Terrain Generation
 ================

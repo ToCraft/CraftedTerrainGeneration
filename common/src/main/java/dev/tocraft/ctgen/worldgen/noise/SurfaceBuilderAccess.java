@@ -1,4 +1,4 @@
-package dev.tocraft.ctgen.data;
+package dev.tocraft.ctgen.worldgen.noise;
 
 import dev.tocraft.ctgen.worldgen.MapSettings;
 import net.minecraft.core.Registry;

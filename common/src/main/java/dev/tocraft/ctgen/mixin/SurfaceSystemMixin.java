@@ -2,7 +2,7 @@ package dev.tocraft.ctgen.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.tocraft.ctgen.data.MapInfoAccessor;
-import dev.tocraft.ctgen.data.SurfaceBuilderAccess;
+import dev.tocraft.ctgen.worldgen.noise.SurfaceBuilderAccess;
 import dev.tocraft.ctgen.worldgen.MapSettings;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;

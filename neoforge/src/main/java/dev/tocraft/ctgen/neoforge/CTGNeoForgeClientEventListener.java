@@ -6,10 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ public final class CTGNeoForgeClientEventListener {
         CTGClient.tick(Minecraft.getInstance());
     }
 
-    private static void registerReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new MapOverlayTextLoader());
+    private static void registerReloadListeners(AddClientReloadListenersEvent event) {
+        event.addListener(MapOverlayTextLoader.ID, new MapOverlayTextLoader());
     }
 }

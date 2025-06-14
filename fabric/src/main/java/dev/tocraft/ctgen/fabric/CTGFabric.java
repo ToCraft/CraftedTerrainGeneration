@@ -38,7 +38,7 @@ public final class CTGFabric implements ModInitializer {
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return CTerrainGeneration.id("biome_map_image_listener");
+                return BiomeImageRegistry.ID;
             }
 
             @Override
@@ -55,7 +55,7 @@ public final class CTGFabric implements ModInitializer {
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return CTerrainGeneration.id("heightmap_image_listener");
+                return HeightImageRegistry.ID;
             }
 
             @Override
