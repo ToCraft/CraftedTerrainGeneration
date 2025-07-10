@@ -1,5 +1,5 @@
 plugins {
-    id("dev.tocraft.modmaster.version")
+    id("dev.tocraft.modmaster.root") version("single-1.7")
 }
 
 allprojects {
@@ -17,7 +17,7 @@ allprojects {
 
 ext {
     val modMeta = mutableMapOf<String, Any>()
-    modMeta["minecraft"] = project.name
+    modMeta["minecraft"] = project.properties["minecraft"] as String
     modMeta["version"] = version
     set("mod_meta", modMeta)
 }

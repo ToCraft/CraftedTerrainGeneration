@@ -11,7 +11,7 @@ plugins {
 }
 
 loom {
-    accessWidenerPath = file("../../../common/src/main/resources/ctgen.accessWidener")
+    accessWidenerPath = file("src/main/resources/ctgen.accessWidener")
 }
 
 dependencies {
