@@ -3,6 +3,7 @@
   "ctgen.screen.no_texture": "No texture for map image %s was found!",
   "ctgen.screen.wrong_generation": "CTGen isn't used for Chunk Generation in your current level!",
   "ctgen.screen.mouse_pos": "Pixel: %s",
+  "ctgen.screen.zoom": "Zoom: %s",
   "ctgen.commands.invalidChunkGenerator": "The current level doesn't use CTGen for chunk generation!",
   "ctgen.commands.locate.success": "Located %s at pixel pos %s.",
   "ctgen.commands.locate.failure": "Couldn't locate %s in the current world!",

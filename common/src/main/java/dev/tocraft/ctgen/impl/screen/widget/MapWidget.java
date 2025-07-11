@@ -255,8 +255,18 @@ public class MapWidget extends AbstractWidget {
         this.zoom = Math.max(minZoom, zoom);
     }
 
+    /**
+     * @return backend zoom formated for processing only
+     */
     public double getZoom() {
         return zoom;
+    }
+
+    /**
+     * @return the zoom in a readable decimal format
+     */
+    public double getReadableZoom() {
+        return zoom * mapWidth / width;
     }
 
     private void updateZoomedWidth() {
@@ -324,22 +334,28 @@ public class MapWidget extends AbstractWidget {
         if (isHovered && showCursorPos) {
             int mousePixelX = mousePixelX(mouseX);
             int mousePixelY = mousePixelY(mouseY);
-            Component text = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
+            Component textPos = Component.translatable("ctgen.screen.mouse_pos", Component.translatable("ctgen.coordinates", mousePixelX, mousePixelY));
 
             // resize text
-            int textWidth = minecraft.font.width(text);
+            int posWidth = minecraft.font.width(textPos);
             PoseStack pose = context.pose();
             pose.pushPose();
             pose.scale(0.75f, 0.75f, 1);
             // render text centered
-            context.drawString(minecraft.font, text, (int) (getX() / 0.75f + width / 1.5f - (float) textWidth / 2), (int) ((getY() + (height - (float) height / 8)) / 0.75f), 0xffffff);
+            context.drawString(minecraft.font, textPos, (int) (getX() / 0.75f + width / 1.5f - (float) posWidth / 2), (int) ((getY() + (height - (float) height / 8)) / 0.75f), 0xffffff);
+
+            Component textZoom = Component.translatable("ctgen.screen.zoom", String.format("%.2f", getReadableZoom()));
+            int zoomWidth = minecraft.font.width(textZoom);
+            context.drawString(minecraft.font, textZoom, (int) (getX() / 0.75f + width / 1.5f - (float) zoomWidth / 2), (int) ((getY() + (height - (float) height / 8)) / 0.75f) + minecraft.font.lineHeight, 0xffffff);
+
             pose.popPose();
         }
 
         // render text overlays
         if (showTexts) {
+            double readableZoom = this.getReadableZoom();
             for (MapText entry : this.textOverlays) {
-                if (this.getZoom() > entry.minZoom() && (this.getZoom() < entry.maxZoom() || entry.maxZoom() == -1)) {
+                if (readableZoom > entry.minZoom() && (readableZoom < entry.maxZoom() || entry.maxZoom() == -1)) {
                     int px = getTextureX() + (int) (entry.x() * zoom);
                     int py = getTextureY() + (int) (entry.y() * zoom);
 
