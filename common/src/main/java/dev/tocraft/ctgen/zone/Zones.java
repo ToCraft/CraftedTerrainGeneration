@@ -3,6 +3,7 @@ package dev.tocraft.ctgen.zone;
 import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.xtend.CTRegistries;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -38,98 +39,98 @@ public final class Zones {
 
     public static void bootstrap(@NotNull BootstrapContext<Zone> context) {
         // Northern Continent
-        context.register(STONY_FLATS, stonyFlats(context).build());
-        context.register(SNOWY_FLATS, snowyFlats(context).build());
-        context.register(SNOWY_SLOPES, snowySlopes(context).build());
-        context.register(SNOWY_MOUNTAINS, snowyMountains(context).build());
-        context.register(FROZEN_RIVER, frozenRiver(context).build());
-        context.register(FROZEN_LAKE, frozenLake(context).build());
+        context.register(STONY_FLATS, stonyFlats(context.lookup(Registries.BIOME)).build());
+        context.register(SNOWY_FLATS, snowyFlats(context.lookup(Registries.BIOME)).build());
+        context.register(SNOWY_SLOPES, snowySlopes(context.lookup(Registries.BIOME)).build());
+        context.register(SNOWY_MOUNTAINS, snowyMountains(context.lookup(Registries.BIOME)).build());
+        context.register(FROZEN_RIVER, frozenRiver(context.lookup(Registries.BIOME)).build());
+        context.register(FROZEN_LAKE, frozenLake(context.lookup(Registries.BIOME)).build());
         // Eastern Continent
-        context.register(PLAINS, plains(context).build());
-        context.register(FOREST, forest(context).build());
-        context.register(HILLS, hills(context).build());
-        context.register(MOUNTAINS, mountains(context).build());
-        context.register(LAKE, lake(context).build());
+        context.register(PLAINS, plains(context.lookup(Registries.BIOME)).build());
+        context.register(FOREST, forest(context.lookup(Registries.BIOME)).build());
+        context.register(HILLS, hills(context.lookup(Registries.BIOME)).build());
+        context.register(MOUNTAINS, mountains(context.lookup(Registries.BIOME)).build());
+        context.register(LAKE, lake(context.lookup(Registries.BIOME)).build());
         // Western Continent
-        context.register(DESERT, desert(context).build());
-        context.register(BADLANDS, badlands(context).build());
-        context.register(BADLANDS_MOUNTAINS, badlandMountains(context).build());
+        context.register(DESERT, desert(context.lookup(Registries.BIOME)).build());
+        context.register(BADLANDS, badlands(context.lookup(Registries.BIOME)).build());
+        context.register(BADLANDS_MOUNTAINS, badlandMountains(context.lookup(Registries.BIOME)).build());
         // General Water Biomes
-        context.register(RIVER, river(context).build());
-        context.register(OCEAN, ocean(context).build());
-        context.register(DEEP_OCEAN, deepOcean(context).build());
+        context.register(RIVER, river(context.lookup(Registries.BIOME)).build());
+        context.register(OCEAN, ocean(context.lookup(Registries.BIOME)).build());
+        context.register(DEEP_OCEAN, deepOcean(context.lookup(Registries.BIOME)).build());
     }
 
-    private static ZoneBuilder deepOcean(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setTerrainModifier(33);
+    public static ZoneBuilder deepOcean(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.DEEP_OCEAN)).setColor(new Color(0, 35, 85)).setTerrainModifier(33);
     }
 
-    private static ZoneBuilder ocean(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setTerrainModifier(16);
+    public static ZoneBuilder ocean(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.OCEAN)).setColor(new Color(0, 42, 103)).setTerrainModifier(16);
     }
 
-    private static ZoneBuilder river(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setPixelWeight(2).setTerrainModifier(0.5);
+    public static ZoneBuilder river(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.RIVER)).setColor(new Color(1, 98, 255)).setPixelWeight(2).setTerrainModifier(0.5);
     }
 
-    public static ZoneBuilder badlandMountains(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setTerrainModifier(24);
+    public static ZoneBuilder badlandMountains(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.BADLANDS)).setColor(new Color(70, 71, 53)).setTerrainModifier(24);
     }
 
-    public static ZoneBuilder badlands(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setTerrainModifier(12);
+    public static ZoneBuilder badlands(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.BADLANDS)).setColor(new Color(84, 84, 56)).setTerrainModifier(12);
     }
 
-    public static ZoneBuilder desert(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setTerrainModifier(4);
+    public static ZoneBuilder desert(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.DESERT)).setColor(new Color(165, 171, 54)).setTerrainModifier(4);
     }
 
-    public static ZoneBuilder lake(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.LUKEWARM_OCEAN)).setColor(new Color(0, 83, 217)).setPixelWeight(3);
+    public static ZoneBuilder lake(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.LUKEWARM_OCEAN)).setColor(new Color(0, 83, 217)).setPixelWeight(3);
     }
 
-    public static ZoneBuilder mountains(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setTerrainModifier(50);
+    public static ZoneBuilder mountains(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.STONY_PEAKS)).setColor(new Color(130, 130, 130)).setTerrainModifier(50);
     }
 
-    public static ZoneBuilder hills(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setTerrainModifier(18);
+    public static ZoneBuilder hills(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.WINDSWEPT_GRAVELLY_HILLS)).setColor(new Color(151, 151, 151)).setTerrainModifier(18);
     }
 
-    public static ZoneBuilder forest(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setTerrainModifier(10);
+    public static ZoneBuilder forest(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.FOREST)).setColor(new Color(43, 70, 43)).setTerrainModifier(10);
     }
 
-    public static ZoneBuilder plains(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.PLAINS)).setColor(new Color(57, 95, 57));
+    public static ZoneBuilder plains(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.PLAINS)).setColor(new Color(57, 95, 57));
     }
 
-    public static ZoneBuilder frozenLake(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setPixelWeight(3);
+    public static ZoneBuilder frozenLake(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.FROZEN_OCEAN)).setColor(new Color(78, 126, 204)).setPixelWeight(3);
     }
 
-    public static ZoneBuilder frozenRiver(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setPixelWeight(2);
+    public static ZoneBuilder frozenRiver(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.FROZEN_RIVER)).setColor(new Color(87, 145, 240)).setPixelWeight(2);
     }
 
-    public static ZoneBuilder snowyMountains(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setTerrainModifier(50);
+    public static ZoneBuilder snowyMountains(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.JAGGED_PEAKS)).setColor(new Color(168, 168, 168)).setTerrainModifier(50);
     }
 
-    public static ZoneBuilder snowySlopes(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setTerrainModifier(20).setPixelWeight(1.5);
+    public static ZoneBuilder snowySlopes(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.SNOWY_SLOPES)).setColor(new Color(192, 192, 192)).setTerrainModifier(20).setPixelWeight(1.5);
     }
 
-    public static ZoneBuilder snowyFlats(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217));
+    public static ZoneBuilder snowyFlats(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.SNOWY_SLOPES)).setColor(new Color(217, 217, 217));
     }
 
-    public static ZoneBuilder stonyFlats(@NotNull BootstrapContext<Zone> context) {
-        return new ZoneBuilder().setBiome(getBiome(context, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130));
+    public static ZoneBuilder stonyFlats(@NotNull HolderGetter<Biome> lookup) {
+        return new ZoneBuilder().setBiome(getBiome(lookup, Biomes.STONY_SHORE)).setColor(new Color(130, 140, 130));
     }
 
-    public static @NotNull Holder<Biome> getBiome(@NotNull BootstrapContext<?> context, ResourceKey<Biome> biome) {
-        return context.lookup(Registries.BIOME).getOrThrow(biome);
+    public static @NotNull Holder<Biome> getBiome(@NotNull HolderGetter<Biome> lookup, ResourceKey<Biome> biome) {
+        return lookup.getOrThrow(biome);
     }
 
     private static @NotNull ResourceKey<Zone> getKey(String name) {

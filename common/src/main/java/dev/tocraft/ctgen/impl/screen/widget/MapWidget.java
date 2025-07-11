@@ -397,9 +397,9 @@ public class MapWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         //#if MC>=1214
         if (active && visible && button == 1 && minecraft != null && minecraft.player != null && isMouseOver(mouseX, mouseY)) {
-        //#else
-        //$$ if (active && visible && button == 1 && minecraft != null && minecraft.player != null && clicked(mouseX, mouseY)) {
-        //#endif
+            //#else
+            //$$ if (active && visible && button == 1 && minecraft != null && minecraft.player != null && clicked(mouseX, mouseY)) {
+            //#endif
             if (isHovered) {
                 // clicked on map
                 int mousePixelX = mousePixelX(mouseX);

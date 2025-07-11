@@ -30,7 +30,8 @@ public class WorldCarverMixin<C extends CarverConfiguration> {
                     target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;",
                     ordinal = 0,
                     shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true
-    ) private void atlas_stopWaterCarving(CarvingContext context, C config, ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeGetter, CarvingMask carvingMask, BlockPos.MutableBlockPos pos, BlockPos.MutableBlockPos checkPos, Aquifer aquifer, MutableBoolean reachedSurface, CallbackInfoReturnable<Boolean> cir, @NotNull BlockState blockState) {
+    )
+    private void atlas_stopWaterCarving(CarvingContext context, C config, ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeGetter, CarvingMask carvingMask, BlockPos.MutableBlockPos pos, BlockPos.MutableBlockPos checkPos, Aquifer aquifer, MutableBoolean reachedSurface, CallbackInfoReturnable<Boolean> cir, @NotNull BlockState blockState) {
         if (blockState.getFluidState().isSource()) {
             cir.setReturnValue(false);
         }

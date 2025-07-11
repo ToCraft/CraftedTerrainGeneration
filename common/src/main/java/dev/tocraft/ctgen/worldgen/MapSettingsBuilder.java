@@ -14,7 +14,7 @@ public class MapSettingsBuilder {
     private ResourceLocation mapId;
     private List<Holder<Zone>> zones;
     private Holder<Zone> defaultBiome;
-    private int transition;
+    private int transition = 16;
     private @NotNull Optional<Integer> spawnX = Optional.empty();
     private @NotNull Optional<Integer> spawnY = Optional.empty();
     private Holder<NoiseGeneratorSettings> noiseGenSettings;

@@ -8,7 +8,7 @@ import dev.tocraft.ctgen.util.Noise;
 import dev.tocraft.ctgen.zone.Zone;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

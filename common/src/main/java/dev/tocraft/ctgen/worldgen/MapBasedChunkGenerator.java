@@ -123,12 +123,12 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
                 for (int y = minY; y < surfaceHeight; y++) {
                     BlockPos pos = chunkPos.getBlockAt(x, y, z);
-                    chunk.setBlockState(pos,defaultBlock);
+                    chunk.setBlockState(pos, defaultBlock);
                 }
 
                 for (int y = (int) surfaceHeight; y < getSeaLevel(); y++) {
                     BlockPos pos = chunkPos.getBlockAt(x, y, z);
-                    chunk.setBlockState(pos,defaultFluid);
+                    chunk.setBlockState(pos, defaultFluid);
                 }
             }
         }
@@ -192,7 +192,8 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
     public void addDebugScreenInfo(@NotNull List<String> pInfo, @NotNull RandomState pRandom, @NotNull BlockPos pPos) {
         setNoise(pRandom);
         pInfo.add("Pixel Pos: X: " + getSettings().xOffset(pPos.getX() >> 2) + " Y: " + getSettings().yOffset(pPos.getZ() >> 2));
-        pInfo.add("Zone: " + getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).getRegisteredName());
+        // only show 'Zone' when it is actually registered
+        getSettings().getZone(pPos.getX() >> 2, pPos.getZ() >> 2).unwrapKey().ifPresent(zoneResourceKey -> pInfo.add("Zone: " + zoneResourceKey.location()));
         pInfo.add("Pixel Height: " + getSettings().getRedHeight(pPos.getX() >> 2, pPos.getZ() >> 2));
     }
 
