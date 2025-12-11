@@ -44,7 +44,7 @@ public class MapProvider implements DataProvider {
                 BufferedImage detailedMap = MapUtils.generateDetailedMap(validOriginal, biomesList);
                 LogUtils.getLogger().info("Generated Map Image with estimated {}MB.", detailedMap.getWidth() * detailedMap.getHeight() * 3 / 1048576);
                 {
-                    Path output = packOutput.getOutputFolder().resolve("data/" + id.getNamespace() + "/worldgen/map_based/maps/" + id.getPath() + ".png");
+                    Path output = packOutput.getOutputFolder().resolve("data/" + id.getNamespace() + "/worldgen/map_based/biomes/" + id.getPath() + ".png");
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     HashingOutputStream hashStream = new HashingOutputStream(Hashing.sha1(), baos);
                     ImageIO.write(detailedMap, "PNG", hashStream);
