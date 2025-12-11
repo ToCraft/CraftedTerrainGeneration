@@ -1,6 +1,7 @@
 CTGen 2.1
 ================
 - backport to 1.21.3
+- fix neoforge reload listener
 
 CTGen 2.0
 ================

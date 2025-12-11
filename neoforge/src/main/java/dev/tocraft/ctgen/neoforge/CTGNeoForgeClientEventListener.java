@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public final class CTGNeoForgeClientEventListener {
     public static void initialize(IEventBus modEventBus) {
         modEventBus.addListener(CTGNeoForgeClientEventListener::registerKeys);
-        modEventBus.addListener(CTGNeoForgeClientEventListener::registerReloadListeners);
+        NeoForge.EVENT_BUS.addListener(CTGNeoForgeClientEventListener::registerReloadListeners);
         NeoForge.EVENT_BUS.addListener(CTGNeoForgeClientEventListener::tick);
     }
 
