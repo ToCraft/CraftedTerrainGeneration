@@ -139,8 +139,8 @@ public class CTGLocateCommand {
         Component component = ComponentUtils.wrapInSquareBrackets(Component.translatable("ctgen.coordinates", pixelPos.x, pixelPos.y))
                 .withStyle(
                         style -> style.withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent.SuggestCommand("/ctgen teleport @s " + pixelPos.x + " " + pixelPos.y))
-                                .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ctgen teleport @s " + pixelPos.x + " " + pixelPos.y))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")))
                 );
         source.sendSuccess(() -> Component.translatable("ctgen.commands.locate.success", elementName, component), false);
         LogUtils.getLogger().info("Locating element {} took {} ms", elementName, duration.toMillis());

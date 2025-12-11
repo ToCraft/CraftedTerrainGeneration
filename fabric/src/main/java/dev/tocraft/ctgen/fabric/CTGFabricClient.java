@@ -1,5 +1,6 @@
 package dev.tocraft.ctgen.fabric;
 
+import dev.tocraft.ctgen.CTerrainGeneration;
 import dev.tocraft.ctgen.data.MapOverlayTextLoader;
 import dev.tocraft.ctgen.impl.CTGClient;
 import dev.tocraft.ctgen.impl.network.SyncMapPacket;
@@ -37,7 +38,7 @@ public final class CTGFabricClient {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return MapOverlayTextLoader.ID;
+                return CTerrainGeneration.id("text_overlay_loader");
             }
 
             @Override

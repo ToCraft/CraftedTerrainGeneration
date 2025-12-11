@@ -8,14 +8,18 @@ import dev.tocraft.ctgen.worldgen.MapBasedBiomeSource;
 import dev.tocraft.ctgen.worldgen.MapBasedChunkGenerator;
 import dev.tocraft.ctgen.worldgen.noise.CTGAboveSurfaceCondition;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @ApiStatus.Internal
 public final class CTGNeoForgeEventListener {
@@ -28,9 +32,17 @@ public final class CTGNeoForgeEventListener {
         modEventBus.addListener(CTGNeoForgeEventListener::registerPayload);
     }
 
-    private static void addReloadListenerEvent(@NotNull AddServerReloadListenersEvent event) {
-        event.addListener(BiomeImageRegistry.ID, new BiomeImageRegistry());
-        event.addListener(HeightImageRegistry.ID, new HeightImageRegistry());
+    private static final List<PreparableReloadListener> RELOAD_LISTENERS = new CopyOnWriteArrayList<>() {
+        {
+            add(new BiomeImageRegistry());
+            add(new HeightImageRegistry());
+        }
+    };
+
+    private static void addReloadListenerEvent(AddReloadListenerEvent event) {
+        for (PreparableReloadListener reloadListener : RELOAD_LISTENERS) {
+            event.addListener(reloadListener);
+        }
     }
 
     private static void registerCommands(@NotNull RegisterCommandsEvent event) {

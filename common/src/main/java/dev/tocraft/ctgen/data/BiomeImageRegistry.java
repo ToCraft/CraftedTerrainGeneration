@@ -1,7 +1,6 @@
 package dev.tocraft.ctgen.data;
 
 import com.mojang.logging.LogUtils;
-import dev.tocraft.ctgen.CTerrainGeneration;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BiomeImageRegistry extends SimplePreparableReloadListener<Map<ResourceLocation, BufferedImage>> {
-    public static final ResourceLocation ID = CTerrainGeneration.id("biome_map_image_listener");
     private static final Map<ResourceLocation, BufferedImage> MAPS = new ConcurrentHashMap<>();
     private static final String DIRECTORY = "worldgen/map_based/biomes";
 

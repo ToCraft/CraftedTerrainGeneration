@@ -3,7 +3,7 @@ package dev.tocraft.ctgen.worldgen;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.tocraft.ctgen.CTerrainGeneration;
-import dev.tocraft.ctgen.worldgen.noise.SurfaceBuilderAccess;
+import dev.tocraft.ctgen.data.SurfaceBuilderAccess;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -123,12 +123,12 @@ public class MapBasedChunkGenerator extends ChunkGenerator {
 
                 for (int y = minY; y < surfaceHeight; y++) {
                     BlockPos pos = chunkPos.getBlockAt(x, y, z);
-                    chunk.setBlockState(pos, defaultBlock);
+                    chunk.setBlockState(pos, defaultBlock , false);
                 }
 
                 for (int y = (int) surfaceHeight; y < getSeaLevel(); y++) {
                     BlockPos pos = chunkPos.getBlockAt(x, y, z);
-                    chunk.setBlockState(pos, defaultFluid);
+                    chunk.setBlockState(pos, defaultFluid , false);
                 }
             }
         }

@@ -7,7 +7,6 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.thread.BlockableEventLoop;
-import net.minecraft.world.level.TicketStorage;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.entity.ChunkStatusUpdateListener;
@@ -41,13 +40,26 @@ public class ChunkMapMixin {
                     shift = At.Shift.BEFORE)
     )
     private void populateNoise(
-            ServerLevel level, LevelStorageSource.LevelStorageAccess levelStorageAccess, DataFixer fixerUpper, StructureTemplateManager structureManager, Executor dispatcher, BlockableEventLoop<Runnable> mainThreadExecutor, LightChunkGetter lightChunk, ChunkGenerator generator, ChunkProgressListener progressListener, ChunkStatusUpdateListener chunkStatusListener, Supplier<DimensionDataStorage> overworldDataStorage, TicketStorage ticketStorage, int serverViewDistance, boolean sync, CallbackInfo ci
+            ServerLevel world,
+            LevelStorageSource.LevelStorageAccess session,
+            DataFixer dataFixer,
+            StructureTemplateManager structureTemplateManager,
+            Executor executor,
+            BlockableEventLoop<Runnable> mainThreadExecutor,
+            LightChunkGetter chunkProvider,
+            ChunkGenerator chunkGenerator,
+            ChunkProgressListener worldGenerationProgressListener,
+            ChunkStatusUpdateListener chunkStatusChangeListener,
+            Supplier<DimensionDataStorage> persistentStateManagerFactory,
+            int viewDistance,
+            boolean dsync,
+            CallbackInfo ci
     ) {
-        if (generator instanceof MapBasedChunkGenerator gen) {
+        if (chunkGenerator instanceof MapBasedChunkGenerator generator) {
             this.randomState = RandomState.create(
-                    gen.getNoiseGenSettings(),
-                    level.registryAccess().lookupOrThrow(Registries.NOISE),
-                    level.getSeed()
+                    generator.getNoiseGenSettings(),
+                    world.registryAccess().lookupOrThrow(Registries.NOISE),
+                    world.getSeed()
             );
         }
     }
